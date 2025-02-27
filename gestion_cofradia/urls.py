@@ -6,7 +6,8 @@ from . import views
 from .views import informes, descargar_hermanos_pdf, descargar_hermanos_mayores_pdf
 
 urlpatterns = [
-    path('', lambda request: redirect('/inicio/')),  # Redirige "/" a "/inicio/"
+    path('', lambda request: __import__('django.shortcuts').shortcuts.redirect('/inicio/')),
+
     path('login/', auth_views.LoginView.as_view(template_name='gestion_cofradia/login.html'), name='login'),
     path('logout/', views.logout_view, name='logout'),  # Ruta para cerrar sesión
 
