@@ -1,0 +1,17 @@
+{% extends "gestion_cofradia/base.html" %}
+{% load static %}
+
+{% block title %}Editar Hermano{% endblock %}
+
+{% block content %}
+    <h1>Editar Hermano</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar Cambios</button>
+        <a href="{% url 'listar_hermanos' %}" class="btn colorCofradia textoMulticolor">
+            Volver a lista
+        </a>
+    </form>
+    
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "gestion_cofradia/base.html" %}
+
+{% block title %}Generar Informes{% endblock %}
+
+{% block content %}
+    <div class="contenedor">
+        <h2>Generar Informes</h2>
+
+        <!-- Botón para descargar el PDF -->
+        <a href="{% url 'descargar_hermanos_pdf' %}" class="btn btnInforme colorCofradia textoMulticolor">Descargar Lista de Hermanos</a>
+        <a href="{% url 'descargar_hermanos_mayores_pdf' %}" class="btn colorCofradia textoMulticolor">Descargar Lista de Hermanos Mayores de Edad</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "gestion_cofradia/base.html" %}
+{% load static %}
+
+{% block title %}Inicio Sesión{% endblock %}
+
+{% block content %}
+    <div class="contenedor">
+        <h1>Inicio Sesión</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Entrar</button>
+        </form>
+    </div>   
+{% endblock %}

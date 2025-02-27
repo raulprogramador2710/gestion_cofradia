@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Eliminar Hermano</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <h1>¿Estás seguro de que quieres eliminar a {{ hermano.nombre }} {{ hermano.apellido }}?</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" style="color: red;">Eliminar</button>
+    </form>
+    <a href="{% url 'listar_hermanos' %}">⬅️ Cancelar</a>
+</body>
+</html>

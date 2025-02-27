@@ -1,0 +1,26 @@
+{% extends "gestion_cofradia/base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center">
+        <h1 class="display-4">Bienvenido al Gestor de Cofradía</h1>
+        <p class="lead">Gestiona los hermanos, descarga informes y controla la gestión económica.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-md-4 text-center mb-4">
+        <a class="btn colorCofradia textoMulticolor" href="{% url 'listar_hermanos' %}">Lista de Hermanos</a>
+    </div>
+    {% if perms.gestion_cofradia.puede_ver_cuentas %}
+    <div class="col-12 col-md-4 text-center mb-4">
+        <a class="btn colorCofradia textoMulticolor" href="{% url 'informes' %}">Descargar Informes</a>
+    </div>
+    <div class="col-12 col-md-4 text-center mb-4">
+        <a class="btn colorCofradia textoMulticolor" href="#">Gestión Económica (Futuro)</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

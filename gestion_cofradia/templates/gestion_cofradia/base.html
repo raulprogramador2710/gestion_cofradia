@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cofradía{% endblock %}</title>
+
+    <style>
+        :root {
+            --color-principal:  {% if request.user.is_authenticated and not request.user.is_superuser %}  
+                                    {{ request.user.perfilusuario.cofradia.color }} 
+                                {% else %} 
+                                    #000000 
+                                {% endif %};
+        }
+
+    </style>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="cofradia-{{ request.user.perfil.cofradia.color }} body-base">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg shadow colorCofradia">
+        <div class="container-fluid colorCofradia">
+            <a class="navbar-brand fw-bold textoMulticolor" href="{% url 'listar_hermanos' %}">Gestor de Cofradía</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse textoMulticolor" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item colorCofradia">
+                            <span class="nav-link textoMulticolor">👤 {{ user.username }}</span>
+                        </li>
+                        <li class="nav-item colorCofradia">
+                            <a class="nav-link btn px-3 textoMulticolor" href="{% url 'logout' %}">Cerrar Sesión</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido -->
+    <div class="container-fluid mt-4" style="flex: 1;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 mt-4 colorCofradia">
+        <p class="mb-0 textoMulticolor">&copy; 2024 Gestor de Cofradía. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Seleccionar el elemento que contiene el texto
+            const texto = document.querySelector(".textoMulticolor");
+            
+            // Seleccionar el color del fondo (en este caso, el color del body)
+            const fondo = window.getComputedStyle(document.body).backgroundColor;
+
+            // Verificar si el fondo es negro (rgb(0, 0, 0) es el color negro en RGB)
+            if (fondo === 'rgb(0, 0, 0)') {
+                texto.classList.add("black-background");  // Cambiar el color del texto a negro
+            } else {
+                texto.classList.remove("black-background");  // Mantener el color blanco
+            }
+        });
+    </script>
+</body>
+</html>
