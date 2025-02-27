@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-14js(vbf33@p&@-k@zv%tneryc)qw%+9lq(e9j3a3oj(ulx==t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gestion-cofradia.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
