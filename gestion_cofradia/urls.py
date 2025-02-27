@@ -1,6 +1,7 @@
 # gestion_cofradia/urls.py
-from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.shortcuts import redirect
+from django.urls import path
 from . import views
 from .views import informes, descargar_hermanos_pdf, descargar_hermanos_mayores_pdf
 
