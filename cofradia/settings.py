@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.gestion_cofradia.middleware.CurrentUserMiddleware',
+    'apps.gestion_cofrade.middleware.CurrentUserMiddleware',
 ]
 
 # Esto es para manejar archivos estáticos en producción
