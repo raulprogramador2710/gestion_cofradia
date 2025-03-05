@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: gestion-cofradia-app
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn cofradia.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: "cofradia.settings"
