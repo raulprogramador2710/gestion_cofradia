@@ -1,0 +1,276 @@
+/* ========= GENERAL ========= */
+body {
+    padding-top: 56px; /* Ajuste para la barra superior */
+    font-family: Arial, sans-serif;
+}
+
+/* ========= NAVBAR SUPERIOR ========= */
+.navbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+}
+
+#divMenu{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribuye los elementos */
+    height: 100%; /* Para que el div tenga un tamaño flexible */
+    padding: 10px;
+}
+
+#menu{
+    flex-grow: 1; /* Permite que la lista crezca y ocupe el espacio disponible */
+}
+
+
+
+/* ========= SIDEBAR (MENÚ LATERAL) ========= */
+
+/* Estilos del menú */
+.sidebar ul {
+    padding-left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.sidebar .nav-link {
+    padding: 10px;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+}
+
+.iconoMenu{
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+}
+
+/* ========= AJUSTE PARA ESCRITURA EN MAYÚSCULAS ========= */
+.mayusculas {
+    text-transform: uppercase;
+}
+
+/* ========= AJUSTE PARA ÍCONOS Y ELEMENTOS VISUALES ========= */
+.fs-4 {
+    font-size: 1.25rem;
+}
+
+.profile-image {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+/* ========= VERSIÓN ESCRITORIO (LATERAL) ========= */
+@media (min-width: 769px) {
+    .sidebar {
+        width: 200px;
+        height: 100vh;
+        max-height: 100vh;
+        position: fixed;
+        overflow: visible;
+        background-color: rgba(33, 37, 41, 1);
+        color: white;
+        left: 0;
+        top: 56px; /* Justo debajo de la barra de navegación */
+        box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-toggle{
+        display: none;
+    }
+    
+    .perfilGrande{
+        display: inline;
+    }
+    
+    .perfilPequeño{
+        display: none;
+    }
+
+    .content {
+        transition: margin-left 0.5s ease-in-out;
+        padding: 20px;
+        margin-left: 200px;
+    }
+
+    .contentBase{
+        margin-left: 200px; padding: 20px;
+    }
+}
+
+/* ========= VERSIÓN movil (LATERAL) ========= */
+@media (max-width: 768px) {
+    .navbar span.fs-5 {
+        max-width: 100%; /* Limita el ancho */
+        overflow: hidden; /* Oculta el desbordamiento */
+        white-space: nowrap; /* Evita que se divida en varias líneas */
+    }
+
+    .sidebar {
+        width: 100%;
+        top: 56px;
+        left: 0;
+        background-color: rgba(33, 37, 41, 1);
+        color: white;
+        overflow: hidden;
+        transition: height 0.3s ease-in-out; /* Transición suave */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebarinvisible{
+        height: 0; /* Se oculta detrás de la barra superior */
+    }
+
+    .menu-toggle{
+        background-color: rgba(33, 37, 41, 1);
+        border: none; /* Elimina el borde */
+        color: white; 
+        display: inline;
+        font-size: 28px; /* Ajusta el tamaño del icono */
+        width: 40px; /* Ajusta el tamaño según necesites */
+        height: 40px;
+        cursor: pointer;
+    }
+
+    .menu-toggle:hover {
+        opacity: 0.7; /* Efecto al pasar el mouse */
+    }
+
+    .perfilGrande{
+        display: none;
+    }
+
+    .perfilPequeño{
+        display: inline;
+    }
+
+    .content {
+        transition: margin-left 0.5s ease-in-out;
+        padding: 20px;
+        margin-left: 0; /* El contenido se ajusta */
+    }
+
+    
+    canvas {
+        height: 200px !important; /* Reducimos el tamaño de los gráficos en pantallas pequeñas */
+    }
+
+
+    .card {
+        padding: 15px;
+    }
+    .btn {
+        width: 100%;
+    }
+}
+
+
+
+
+
+/*stilos ventanas hermanos*/
+
+/* Personalización para las tablas */
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Estilo para el título principal de la página */
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+
+
+/* Estilo para los gráficos */
+canvas {
+    width: 100% !important;
+    max-height: 400px;
+}
+
+/* ========= Gráficos en línea ========= */
+.row {
+    display: flex;
+    flex-wrap: wrap; /* Asegura que los elementos se acomoden en pantallas pequeñas */
+    justify-content: space-between;
+}
+
+
+/* Estilos Generales de la Página */
+.contenedor {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Detalle del Hermano */
+.contenedor p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.contenedor p strong {
+    font-weight: bold;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Botones de la vista de detalle */
+.btn.colorCofradia {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn.colorCofradia:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+.textoMulticolor {
+    color: #ff5722;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card .form-label {
+    font-weight: bold;
+}
+
+.card .form-control {
+    border-radius: 5px;
+}
+
+.card .btn {
+    margin-top: 10px;
+}

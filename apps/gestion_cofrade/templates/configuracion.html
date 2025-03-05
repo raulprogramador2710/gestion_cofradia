@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Configuración{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1>Configuración</h1>
+        <p>Desde aquí puedes gestionar los aspectos generales de la Cofradía.</p>
+
+        <!-- Opción para cargar los hermanos masivamente -->
+        <h2>Carga Masiva de Hermanos</h2>
+        <p>Aquí puedes cargar un archivo Excel con la información de los hermanos.</p>
+        <a href="{% url 'cargar_hermanos' %}" class="btn btn-primary">Cargar Excel de Hermanos</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestión Cofradía{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    {% load static %}  <!-- Cargar la librería static -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    
+    <!-- Barra superior fija con botón de menú -->
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <button class="menu-toggle" aria-label="Abrir menú de navegación">☰</button>
+        <span class="d-flex align-items-center mb-md-0 me-md-auto text-white text-decoration-none">
+            <span class="fs-5 mayusculas w-100">
+                {% if user.is_staff %}
+                    ADMIN
+                {% else %}
+                    {% if user.perfilusuario %}
+                        {{ user.perfilusuario.cofradia.nombre }}
+                    {% else %}
+                        No asignada
+                    {% endif %}
+                {% endif %}
+            </span>
+        </span>
+
+        <div class="dropdown perfilGrande">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'img/logo_admin.avif' %}{% endif %}" alt="Foto de perfil" width="30" height="30"  class="profile-image rounded-circle">
+                <span class="d-none d-sm-inline mx-1">{{ user.username }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a href="{% url 'logout' %}" class="dropdown-item" href="#">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    {% block menu %}
+    <div id="sidebar"  class="sidebar sidebarinvisible">
+        <div id="divMenu" class="d-flex flex-column align-items-start px-3 py-2 text-white">
+            <ul class="nav nav-pills flex-column  mb-0 align-items-center align-items-sm-start" id="menu">                
+                <li class="nav-item">
+                    <a href="{% url 'inicio' %}" class="nav-link align-middle px-0 dropdown-item">
+                        <i class="iconoMenu bi-house"></i> 
+                        <span class="textoMenu ms-1">Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'lista_hermanos' %}" class="nav-link align-middle px-0 dropdown-item">
+                        <i class="iconoMenu bi-person-fill"></i> 
+                        <span class="textoMenu ">Hermanos</span>
+                    </a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'lista_eventos' %}" class="nav-link align-middle px-0 dropdown-item">
+                        <i class="iconoMenu bi-calendar"></i> 
+                        <span class="textoMenu ">Eventos</span>
+                    </a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'lista_tareas' %}" class="nav-link align-middle px-0 dropdown-item">
+                        <i class="iconoMenu bi-check2-all"></i> 
+                        <span class="textoMenu ">Tareas</span>
+                    </a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'configuracion' %}" class="nav-link align-middle px-0 dropdown-item">
+                        <i class="iconoMenu bi-gear"></i> <span class="textoMenu ms-1">Configuración</span></a>
+                </li>
+                <li class="nav-item perfilPequeño">
+                    <a href="#submenu2" data-bs-toggle="collapse" class="nav-link align-middle px-0 dropdown-item">
+                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'img/logo_admin.avif' %}{% endif %}" alt="Foto de perfil" width="30" height="30"  class="profile-image rounded-circle">
+                        <span class="d-none d-sm-inline mx-1">{{ user.username }}</span>
+                    </a>
+                    <ul class="collapse nav flex-column ms-1" id="submenu2" data-bs-parent="#menu">
+                        <li><a class="dropdown-item" href="#">Perfil</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a href="{% url 'logout' %}" class="dropdown-item" href="#">Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        
+    </div>
+
+    
+    {% endblock %}
+
+    <!-- Contenido -->
+    <div class="content contentBase" style="">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var menuToggle = document.querySelector(".menu-toggle"); // Botón del menú
+            var sidebar = document.getElementById("sidebar"); // Sidebar
+
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener("click", function () {
+                    sidebar.classList.toggle("sidebarinvisible"); // Añade o elimina la clase
+                });
+            }
+        });
+
+
+    </script>
+
+</body>
+</html>

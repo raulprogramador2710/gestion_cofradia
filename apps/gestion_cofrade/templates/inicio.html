@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Control - Cofradía{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+
+    <!-- Bienvenida -->
+    <div class="row mt-4">
+        <h1>Bienvenido, {{ perfil.cargo.cargo }}</h1>
+        <p>Aquí puedes gestionar la cofradía y ver información clave.</p>
+    </div>
+
+    <!-- 🔹 Resumen Rápido -->
+    <div class="row mt-4">
+        <!-- Columna de Tarjetas -->
+        <div class="col-md-4 col-12">
+            <div class="card border-dark bg-light p-3 mb-3 border-5">
+                <h5>Hay un total de {{ hermanos_total|default:"0" }} hermanos</h5>
+            </div>
+            <div class="card border-dark bg-light p-3 mb-3 border-5">
+                <h5>Hay un total de {{ hermanos_no_pagados|default:"0" }} cuotas pendientes</h5>
+            </div>
+            <div class="card border-dark bg-light p-3 mb-3 border-5">
+                <h5>Próximo Evento</h5>
+                <p>{{ eventos_proximos.0.nombre|default:"Sin eventos" }}</p>
+            </div>
+        </div>
+    
+        <!-- Columna de Tabla con Scroll -->
+        <div class="col-md-7 col-12">
+            <div style="max-height: 300px; overflow-y: auto; width: 100%;">
+                <table class="table table-bordered mt-3">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Título</th>
+                            <th>Estado</th>
+                            <th>Fecha Límite</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tarea in tareas_proximas %}
+                        <tr {% if tarea.fecha_limite <= hoy_mas_5 %} class="table-danger" {% endif %}>
+                                <td>{{ tarea.titulo }}</td>
+                                <td>{{ tarea.estado }}</td>
+                                <td>{{ tarea.fecha_limite|date:"d/m/Y" }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalDetalle{{ tarea.id }}">
+                                        Ver Detalles
+                                    </button>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">✅ No hay tareas pendientes en los próximos 30 días.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="text-center mb-4">
+        <h3>Graficos hermanos</h3>
+    </div>
+    <br>
+
+    <!-- 🔹 Gráficos -->
+    <div class="row mt-4 container ">
+        <div class="col-md-4 col-12">
+            <canvas id="graficoEstados"></canvas>
+            <p class="text-center">Hermanos por Estado</p>
+        </div>
+        <div class="col-md-4 col-12">
+            <canvas id="graficoFormaPago"></canvas>
+            <p class="text-center">Forma de Pago</p>
+        </div>
+        <div class="col-md-4 col-12">
+            <canvas id="graficoFormaComunicacion"></canvas>
+            <p class="text-center">Forma de Comunicación</p>
+        </div>
+    </div>
+    <br>
+
+    <div class="text-center mb-4">
+        <h3>Resumen finanzas</h3>
+    </div>
+    <br>
+
+    <!-- 🔹 Finanza -->
+    <div class="row mt-4">
+        <div class="col-md-4 col-12">
+            <div class="card bg-success text-white p-3">
+                <h5>Ingresos Totales</h5>
+                <p>{{ total_ingresos|default:"0" }} €</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-12">
+            <div class="card bg-danger text-white p-3">
+                <h5>Gastos Totales</h5>
+                <p>{{ total_gastos|default:"0" }} €</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-12">
+            <div class="card bg-dark text-white p-3">
+                <h5>Saldo en Caja</h5>
+                <p>{{ saldo_total|default:"0" }} €</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- 🔹 Modal de Detalles de la Tarea -->
+    {% for tarea in tareas_proximas %}
+        <div class="modal fade" id="modalDetalle{{ tarea.id }}" tabindex="-1" aria-labelledby="modalDetalleLabel{{ tarea.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalDetalleLabel{{ tarea.id }}">Detalles de la Tarea: {{ tarea.titulo }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Asignado a:</strong> {{ tarea.asignado_a.username|default:"Sin asignar" }}</p>
+                        <p><strong>Fecha Límite:</strong> {{ tarea.fecha_limite }}</p>
+                        <p><strong>Prioridad:</strong> {{ tarea.prioridad }}</p>
+                        <p><strong>Estado:</strong> {{ tarea.estado }}</p>
+                        <p><strong>Descripción:</strong> {{ tarea.descripcion|default:"No disponible" }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+<script>
+    function crearGrafico(idCanvas, etiquetas, datos, colores, etiqueta) {
+        if (document.getElementById(idCanvas)) {
+            var ctx = document.getElementById(idCanvas).getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: etiquetas,
+                    datasets: [{
+                        label: etiqueta,
+                        data: datos,
+                        backgroundColor: colores,
+                        borderColor: ['#ffffff'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        datalabels: {
+                            color: '#fff',
+                            formatter: function(value) {
+                                return value;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Inicializar los gráficos con los datos de Django
+    crearGrafico(
+        'graficoEstados',
+        ['Activo', 'No Pagado', 'Baja', 'Fallecido'],
+        [{{ hermanos_activos|default:0 }}, {{ hermanos_no_pagados|default:0 }}, {{ hermanos_baja|default:0 }}, {{ hermanos_fallecidos|default:0 }}],
+        ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+        'Estado'
+    );
+
+    crearGrafico(
+        'graficoFormaPago',
+        ['Efectivo', 'Transferencia', 'Domiciliación'],
+        [{{ pago_efectivo|default:0 }}, {{ pago_transferencia|default:0 }}, {{ pago_domiciliacion|default:0 }}],
+        ['#007bff', '#28a745', '#ffc107'],
+        'Forma de Pago'
+    );
+
+    crearGrafico(
+        'graficoFormaComunicacion',
+        ['Teléfono', 'Carta', 'Email'],
+        [{{ comunicacion_telefono|default:0 }}, {{ comunicacion_carta|default:0 }}, {{ comunicacion_email|default:0 }}],
+        ['#28a745', '#ffc107', '#007bff'],
+        'Forma de Comunicación'
+    );
+
+</script>
+
+{% endblock %}

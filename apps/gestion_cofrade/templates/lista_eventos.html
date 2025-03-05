@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Eventos{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Eventos</h1>
+
+        <!-- Botón para crear un nuevo evento -->
+        <div class="mb-3">
+            <a href="{% url 'crear_evento' %}" class="btn btn-success">➕ Crear Evento</a>
+        </div>
+
+        <!-- Filtros -->
+        <form method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre" value="{{ nombre_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        {% if eventos %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            <a href="?order_by=id" class="{% if order_by == 'id' %}text-primary{% endif %}">ID</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=nombre" class="{% if order_by == 'nombre' %}text-primary{% endif %}">Nombre</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=fecha" class="{% if order_by == 'fecha' %}text-primary{% endif %}">Fecha</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=tipo" class="{% if order_by == 'tipo' %}text-primary{% endif %}">Tipo</a>
+                        </th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evento in eventos %}
+                        <tr>
+                            <td>{{ evento.id }}</td>
+                            <td>{{ evento.nombre }}</td>
+                            <td>{{ evento.fecha|date:"d/m/Y" }}</td>
+                            <td>{{ evento.tipo }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'detalle_evento' evento.id %}" class="btn btn-info btn-sm">👁️</a>
+                                    <a href="{% url 'editar_evento' evento.id %}" class="btn btn-warning btn-sm">✏️</a>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ evento.id }}">
+                                        🗑
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Modal de Confirmación de eliminación -->
+                        <div class="modal fade" id="confirmarEliminar{{ evento.id }}" tabindex="-1" aria-labelledby="modalLabel{{ evento.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel{{ evento.id }}">Confirmar Eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Estás seguro de que deseas eliminar el evento <strong>{{ evento.nombre }}</strong>? Esta acción no se puede deshacer.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        
+                                        <!-- Formulario para eliminar -->
+                                        <form method="POST" action="{% url 'eliminar_evento' evento.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay eventos registrados.</p>
+        {% endif %}
+    </div>
+{% endblock %}

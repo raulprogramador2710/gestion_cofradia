@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Hermano{% endblock %}
+
+{% block content %}
+{% load widget_tweaks %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Crear Hermano</h1>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Campo DNI -->
+            <div class="mb-3">
+                <label for="{{ form.dni.id_for_label }}" class="form-label">DNI</label>
+                {{ form.dni|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Nombre -->
+            <div class="mb-3">
+                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre</label>
+                {{ form.nombre|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Apellidos -->
+            <div class="mb-3">
+                <label for="{{ form.apellidos.id_for_label }}" class="form-label">Apellidos</label>
+                {{ form.apellidos|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Teléfono -->
+            <div class="mb-3">
+                <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                {{ form.telefono|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Dirección -->
+            <div class="mb-3">
+                <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección</label>
+                {{ form.direccion|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Localidad -->
+            <div class="mb-3">
+                <label for="{{ form.localidad.id_for_label }}" class="form-label">Localidad</label>
+                {{ form.localidad|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Fecha de Nacimiento -->
+            <div class="mb-3">
+                <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de Nacimiento</label>
+                {{ form.fecha_nacimiento|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Fecha de Inicio -->
+            <div class="mb-3">
+                <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">Fecha de Inicio</label>
+                {{ form.fecha_inicio|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Fecha Último Pago -->
+            <div class="mb-3">
+                <label for="{{ form.fecha_ultimo_pago.id_for_label }}" class="form-label">Fecha Último Pago</label>
+                {{ form.fecha_ultimo_pago|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Email -->
+            <div class="mb-3">
+                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                {{ form.email|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo IBAN -->
+            <div class="mb-3">
+                <label for="{{ form.iban.id_for_label }}" class="form-label">IBAN</label>
+                {{ form.iban|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Estado -->
+            <div class="mb-3">
+                <label for="{{ form.estado.id_for_label }}" class="form-label">Estado</label>
+                {{ form.estado|add_class:"form-select" }}
+            </div>
+
+            <!-- Campo Forma de Pago -->
+            <div class="mb-3">
+                <label for="{{ form.forma_pago.id_for_label }}" class="form-label">Forma de Pago</label>
+                {{ form.forma_pago|add_class:"form-select" }}
+            </div>
+
+            <!-- Campo Forma de Comunicación -->
+            <div class="mb-3">
+                <label for="{{ form.forma_comunicacion.id_for_label }}" class="form-label">Forma de Comunicación</label>
+                {{ form.forma_comunicacion|add_class:"form-select" }}
+            </div>
+
+            <!-- Campo Cofradía -->
+            <div class="mb-3">
+                <label for="{{ form.cofradia.id_for_label }}" class="form-label">Cofradía</label>
+                {{ form.cofradia|add_class:"form-select" }}
+            </div>
+
+            <!-- Botón de Enviar -->
+            <button type="submit" class="btn btn-primary">Crear Hermano</button>
+        </form>
+    </div>
+{% endblock %}

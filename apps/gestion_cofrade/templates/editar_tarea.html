@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+    {% load static %}
+    
+    {% block title %}Editar Tarea{% endblock %}
+    
+    {% block content %}
+    <div class="container mt-4">
+        <div class="card shadow-lg p-4">
+            <h2 class="text-center">Editar Tarea</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    {% for field in form %}
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+    
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary px-4">💾 Guardar Cambios</button>
+                    <a href="{% url 'lista_tareas' %}" class="btn btn-secondary px-4">⬅️ Volver</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endblock %}

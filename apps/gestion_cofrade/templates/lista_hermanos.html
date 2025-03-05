@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Hermanos{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Hermanos</h1>
+
+        <!-- Botón para crear un nuevo hermano -->
+        <div class="mb-3">
+            <a href="{% url 'crear_hermano' %}" class="btn btn-success">➕ Crear Hermano</a>
+        </div>
+
+        <!-- Filtros -->
+        <form method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" name="apellidos" class="form-control" placeholder="Buscar por apellido" value="{{ apellidos_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="estado" class="form-control">
+                        <option value="">Filtrar por estado</option>
+                        <option value="Activo" {% if estado_filter == 'Activo' %}selected{% endif %}>Activo</option>
+                        <option value="No_pagado" {% if estado_filter == 'No_pagado' %}selected{% endif %}>No Pagado</option>
+                        <option value="Baja" {% if estado_filter == 'Baja' %}selected{% endif %}>Baja</option>
+                        <option value="Fallecido" {% if estado_filter == 'Fallecido' %}selected{% endif %}>Fallecido</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        {% if hermanos %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            <a href="?order_by=id" class="{% if order_by == 'id' %}text-primary{% endif %}">ID</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=dni" class="{% if order_by == 'dni' %}text-primary{% endif %}">DNI</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=nombre" class="{% if order_by == 'nombre' %}text-primary{% endif %}">Nombre</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=apellidos" class="{% if order_by == 'apellidos' %}text-primary{% endif %}">Apellidos</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=telefono" class="{% if order_by == 'telefono' %}text-primary{% endif %}">Teléfono</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=direccion" class="{% if order_by == 'direccion' %}text-primary{% endif %}">Dirección</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=localidad" class="{% if order_by == 'localidad' %}text-primary{% endif %}">Localidad</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=fecha_nacimiento" class="{% if order_by == 'fecha_nacimiento' %}text-primary{% endif %}">Fecha Nacimiento</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=estado" class="{% if order_by == 'estado' %}text-primary{% endif %}">Estado</a>
+                        </th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hermano in hermanos %}
+                        <tr>
+                            <td>{{ hermano.id }}</td>
+                            <td>{{ hermano.dni }}</td>
+                            <td>{{ hermano.nombre }}</td>
+                            <td>{{ hermano.apellidos }}</td>
+                            <td>{{ hermano.telefono }}</td>
+                            <td>{{ hermano.direccion }}</td>
+                            <td>{{ hermano.localidad }}</td>
+                            <td>{{ hermano.fecha_nacimiento|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if hermano.estado.nombre == "Activo" %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% elif hermano.estado.nombre == "No Pagado" %}
+                                    <span class="badge bg-warning text-dark">No Pagado</span>
+                                {% elif hermano.estado.nombre == "Baja" %}
+                                    <span class="badge bg-danger">Baja</span>
+                                {% elif hermano.estado.nombre == "Fallecido" %}
+                                    <span class="badge bg-dark">Fallecido</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'detalle_hermano' hermano.id %}" class="btn btn-info btn-sm">👁️</a>
+                                    <a href="{% url 'editar_hermano' hermano.id %}" class="btn btn-warning btn-sm">✏️</a>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ hermano.id }}">
+                                        🗑
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Modal de Confirmación de eliminación -->
+                        <div class="modal fade" id="confirmarEliminar{{ hermano.id }}" tabindex="-1" aria-labelledby="modalLabel{{ hermano.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel{{ hermano.id }}">Confirmar Eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Estás seguro de que deseas eliminar el hermano <strong>{{ hermano.nombre }} {{ hermano.apellidos }}</strong>? Esta acción no se puede deshacer.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        
+                                        <!-- Formulario para eliminar -->
+                                        <form method="POST" action="{% url 'eliminar_hermano' hermano.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay hermanos registrados.</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalles del Hermano{% endblock %}
+
+{% block content %}
+    <div class="contenedor">
+        <h2>Detalles del Hermano</h2>
+        <p><strong>DNI:</strong> {{ hermano.dni }}</p>
+        <p><strong>Nombre:</strong> {{ hermano.nombre }}</p>
+        <p><strong>Apellido:</strong> {{ hermano.apellido }}</p>
+        <p><strong>Teléfono:</strong> {{ hermano.telefono }}</p>
+        <p><strong>Dirección:</strong> {{ hermano.direccion }}</p>
+        <p><strong>Localidad:</strong> {{ hermano.localidad }}</p>
+        <p><strong>Fecha de Nacimiento:</strong> {{ hermano.fecha_nacimiento|date:"d/m/Y" }}</p>
+        <p><strong>Fecha de Inicio:</strong> {{ hermano.fecha_inicio|date:"d/m/Y" }}</p>
+        <p><strong>Fecha de Último Pago:</strong> {{ hermano.fecha_ultimo_pago|date:"d/m/Y" }}</p>
+        <p><strong>Email:</strong> {{ hermano.email }}</p>
+        <p><strong>IBAN:</strong> {{ hermano.iban }}</p>
+        <p><strong>Estado:</strong> {{ hermano.estado }}</p>
+        <p><strong>Forma de Pago:</strong> {{ hermano.forma_pago }}</p>
+        <p><strong>Forma de Comunicación:</strong> {{ hermano.forma_comunicacion }}</p>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'lista_hermanos' %}" class="btn colorCofradia textoMulticolor">
+                ⬅️ Volver
+            </a>
+        </div>
+    </div>
+{% endblock %}

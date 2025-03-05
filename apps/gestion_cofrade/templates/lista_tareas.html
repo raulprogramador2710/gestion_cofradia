@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Tareas{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Tareas</h1>
+
+        <!-- Botón para crear una nueva tarea -->
+        <div class="mb-3">
+            <a href="{% url 'crear_tarea' %}" class="btn btn-success">➕ Crear Tarea</a>
+        </div>
+
+        <!-- Filtros -->
+        <form method="GET" class="mb-4">
+            <div class="row d-flex align-items-end"> <!-- Alinea todo en la parte inferior -->
+                <div class="col-md-3">
+                    <input type="text" name="titulo" class="form-control" placeholder="Buscar por título" value="{{ titulo_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="estado" class="form-control">
+                        <option value="">Filtrar por estado</option>
+                        <option value="Pendiente" {% if estado_filter == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                        <option value="En_Proceso" {% if estado_filter == 'En_Proceso' %}selected{% endif %}>En Proceso</option>
+                        <option value="Completada" {% if estado_filter == 'Completada' %}selected{% endif %}>Completada</option>
+                        <option value="Atrasada" {% if estado_filter == 'Atrasada' %}selected{% endif %}>Atrasada</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="prioridad" class="form-control">
+                        <option value="">Filtrar por prioridad</option>
+                        <option value="Baja" {% if prioridad_filter == 'Baja' %}selected{% endif %}>Baja</option>
+                        <option value="Media" {% if prioridad_filter == 'Media' %}selected{% endif %}>Media</option>
+                        <option value="Alta" {% if prioridad_filter == 'Alta' %}selected{% endif %}>Alta</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+        
+
+        {% if tareas %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            <a href="?order_by=id" class="{% if order_by == 'id' %}text-primary{% endif %}">ID</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=titulo" class="{% if order_by == 'titulo' %}text-primary{% endif %}">Titulo</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=descripcion" class="{% if order_by == 'descripcion' %}text-primary{% endif %}">Descripcion</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=asignado_a" class="{% if order_by == 'asignado_a' %}text-primary{% endif %}">Asignado a</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=fecha_limite" class="{% if order_by == 'fecha_limite' %}text-primary{% endif %}">Fecha limite</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=estado" class="{% if order_by == 'estado' %}text-primary{% endif %}">Estado</a>
+                        </th>
+                        <th scope="col">
+                            <a href="?order_by=prioridad" class="{% if order_by == 'prioridad' %}text-primary{% endif %}">Prioridad</a>
+                        </th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarea in tareas %}
+                        <tr>
+                            <td>{{ tarea.id }}</td>
+                            <td>{{ tarea.titulo }}</td>
+                            <td>{{ tarea.descripcion }}</td>
+                            <td>{{ tarea.asignado_a }}</td>
+                            <td>{{ tarea.fecha_limite|date:"d/m/Y" }}</td>
+                            <td>{{ tarea.estado }}</td>
+                            <td>{{ tarea.prioridad }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'detalle_tarea' tarea.id %}" class="btn btn-info btn-sm">👁️</a>
+                                    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-warning btn-sm">✏️</a>
+                                    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger btn-sm">🗑</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay tareas registrados.</p>
+        {% endif %}
+    </div>
+{% endblock %}

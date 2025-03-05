@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+    {% block title %}Detalles del Evento{% endblock %}
+    {% block content %}
+    <div class="container mt-4">
+        <h2>Detalles del Evento</h2>
+        <p><strong>Nombre:</strong> {{ evento.nombre }}</p>
+        <p><strong>Fecha:</strong> {{ evento.fecha|date:"d/m/Y" }}</p>
+        <p><strong>Tipo:</strong> {{ evento.tipo }}</p>
+        <p><strong>Cofradía:</strong> {{ evento.cofradia }}</p>
+        <div class="text-center mt-4">
+            <a href="{% url 'lista_eventos' %}" class="btn btn-secondary">⬅️ Volver</a>
+        </div>
+    </div>
+    {% endblock %}
