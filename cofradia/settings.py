@@ -32,7 +32,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-=sk&)16pec-9$wak-+qy78z&otc&tf@mm(^its7-tqbf(@*+8n'
 
-ALLOWED_HOSTS = ['https://gestion-cofradia-6byp.onrender.com']
+ALLOWED_HOSTS = ['gestion-cofradia-6byp.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['https://gestion-cofradia-6byp.onrender.com']
 
 # Application definition
 
