@@ -27,4 +27,8 @@ urlpatterns = [
 
     path('configuracion/', views.configuracion, name='configuracion'),  # Vista de configuración
     path('configuracion/cargar-hermanos/', views.cargar_hermanos, name='cargar_hermanos'),  # Vista de carga masiva
+
+
+
+    path('eliminar_usuario/', views.eliminar_usuario, name='eliminar_usuario'),
 ]
