@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'cofradia.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gestion_cofradia',  # Cambia esto por el nombre de tu base de datos en PostgreSQL
+        'NAME': 'gestion_cofradia_wql4',  # Cambia esto por el nombre de tu base de datos en PostgreSQL
         #'USER': 'postgres',  # Cambia esto por el nombre de tu usuario de PostgreSQL
         #'PASSWORD': 'Frakyx_es10',  # Cambia esto por la contraseña de tu usuario de PostgreSQL
         #'HOST': 'localhost',  # Deja esto como 'localhost' si PostgreSQL está en tu máquina local
