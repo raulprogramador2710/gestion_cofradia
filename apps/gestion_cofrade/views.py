@@ -468,27 +468,3 @@ def convertir_año(valor):
         return int(valor) if pd.notna(valor) else None
     except ValueError:
         return None
-
-
-
-
-
-def eliminar_usuario(request):
-    user_ids = [2, 3, 4]  # Lista de IDs de los usuarios que quieres eliminar
-
-    try:
-        with transaction.atomic():  # Esto asegura que todo el proceso de eliminación sea atómico
-            # Usamos filter() para obtener todos los usuarios con esos IDs
-            users = User.objects.filter(id__in=user_ids)
-
-            # Comprobamos si encontramos usuarios
-            if not users.exists():
-                return HttpResponse(f"No se encontraron usuarios con los IDs {user_ids}.")
-
-            # Eliminamos los usuarios
-            users.delete()
-
-            return HttpResponse(f"Usuarios con IDs {user_ids} eliminados correctamente.")
-
-    except Exception as e:
-        return HttpResponse(f"Ocurrió un error: {e}")

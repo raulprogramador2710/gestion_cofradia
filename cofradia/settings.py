@@ -104,8 +104,8 @@ DATABASES = {
         #'HOST': 'localhost',  # Deja esto como 'localhost' si PostgreSQL está en tu máquina local
         #'PORT': '5432',  # El puerto por defecto de PostgreSQL
         'USER': 'gestion_cofradia_user',  # Usuario de la base de datos
-        'PASSWORD': 'YSWCqpzusJ4Vq0Ak9hquEtLvYKA3Uhjx',  # Contraseña de la base de datos
-        'HOST': 'dpg-cv1gh3tds78s73drmp40-a.frankfurt-postgres.render.com',  # Hostname del servidor
+        'PASSWORD': 'dADd7dp5cVPtDX763EB1mAuU4hfacBu1',  # Contraseña de la base de datos
+        'HOST': 'dpg-cv4eat2n91rc73e00g80-a.frankfurt-postgres.render.com',  # Hostname del servidor
         'PORT': '5432',  # Puerto para PostgreSQL (usualmente 5432)
     }
 }
