@@ -103,10 +103,10 @@ DATABASES = {
         #'PASSWORD': 'Frakyx_es10',  
         #'HOST': 'localhost',  
         #'PORT': '5432', 
-        'NAME': 'gestion_cofradia_wql4',  
+        'NAME': 'gestion_cofradia_n9jd',  
         'USER': 'gestion_cofradia_user',  # Usuario de la base de datos
-        'PASSWORD': 'dADd7dp5cVPtDX763EB1mAuU4hfacBu1',  # Contraseña de la base de datos
-        'HOST': 'dpg-cv4eat2n91rc73e00g80-a.frankfurt-postgres.render.com',  # Hostname del servidor
+        'PASSWORD': 'tpm3vfM59lhWEyxflFZUARhk60wNyM2z',  # Contraseña de la base de datos
+        'HOST': 'dpg-cv4lh0lds78s73e0am40-a.frankfurt-postgres.render.com',  # Hostname del servidor
         'PORT': '5432',  # Puerto para PostgreSQL (usualmente 5432)
     }
 }
