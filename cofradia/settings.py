@@ -18,7 +18,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
@@ -32,7 +32,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-=sk&)16pec-9$wak-+qy78z&otc&tf@mm(^its7-tqbf(@*+8n'
 
-ALLOWED_HOSTS = ['gestion-cofradia-6byp.onrender.com']
+ALLOWED_HOSTS = ['gestion-cofradia-6byp.onrender.com', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://gestion-cofradia-6byp.onrender.com']
 
 # Application definition
@@ -98,11 +98,12 @@ WSGI_APPLICATION = 'cofradia.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gestion_cofradia_wql4',  # Cambia esto por el nombre de tu base de datos en PostgreSQL
-        #'USER': 'postgres',  # Cambia esto por el nombre de tu usuario de PostgreSQL
-        #'PASSWORD': 'Frakyx_es10',  # Cambia esto por la contraseña de tu usuario de PostgreSQL
-        #'HOST': 'localhost',  # Deja esto como 'localhost' si PostgreSQL está en tu máquina local
-        #'PORT': '5432',  # El puerto por defecto de PostgreSQL
+        #'NAME': 'gestion_cofradia',  
+        #'USER': 'postgres', 
+        #'PASSWORD': 'Frakyx_es10',  
+        #'HOST': 'localhost',  
+        #'PORT': '5432', 
+        'NAME': 'gestion_cofradia_wql4',  
         'USER': 'gestion_cofradia_user',  # Usuario de la base de datos
         'PASSWORD': 'dADd7dp5cVPtDX763EB1mAuU4hfacBu1',  # Contraseña de la base de datos
         'HOST': 'dpg-cv4eat2n91rc73e00g80-a.frankfurt-postgres.render.com',  # Hostname del servidor
