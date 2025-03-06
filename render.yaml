@@ -5,5 +5,9 @@ services:
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn cofradia.wsgi:application"
     envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: "cofradia.settings"
+      - key: DJANGO_PRODUCTION
+        value: "true"
+      - key: DATABASE_URL
+        value: "postgresql://gestion_cofradia_user:tpm3vfM59lhWEyxflFZUARhk60wNyM2z@dpg-cv4lh0lds78s73e0am40-a.frankfurt-postgres.render.com/gestion_cofradia_n9jd"
+      - key: DJANGO_SECRET_KEY
+        value: "django-insecure-=sk&)16pec-9$wak-+qy78z&otc&tf@mm(^its7-tqbf(@*+8n"
