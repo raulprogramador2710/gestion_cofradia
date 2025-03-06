@@ -2,6 +2,8 @@ from .base import *
 import dj_database_url
 import logging
 
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 DEBUG = False
 
 ALLOWED_HOSTS = ["gestion-cofradia-6byp.onrender.com"]
