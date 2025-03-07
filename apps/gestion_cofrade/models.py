@@ -43,6 +43,7 @@ class FormaComunicacion(models.Model):
         return self.nombre
 
 class Hermano(models.Model):
+    numero_hermano = models.CharField(max_length=9, null=True)
     dni = models.CharField(max_length=9, null=True)
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)

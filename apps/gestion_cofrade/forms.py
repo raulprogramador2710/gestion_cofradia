@@ -5,7 +5,7 @@ from .models import Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tar
 class HermanoForm(forms.ModelForm):
     class Meta:
         model = Hermano
-        fields = ['dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'fecha_inicio', 'fecha_ultimo_pago', 'email', 'iban', 'estado', 'forma_pago', 'forma_comunicacion', 'cofradia']
+        fields = ['numero_hermano', 'dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'fecha_inicio', 'fecha_ultimo_pago', 'email', 'iban', 'estado', 'forma_pago', 'forma_comunicacion', 'cofradia']
         widgets = {
             'fecha_nacimiento': forms.DateInput(format='%d/%m/%Y', attrs={'type': 'date'}),
         }

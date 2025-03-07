@@ -1,12 +1,14 @@
 from datetime import date, timedelta
 from django.db import transaction
 from django.db.models import Q, Sum
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
+from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -151,12 +153,12 @@ def crear_hermano(request):
 @login_required
 def lista_hermanos(request):
     # Obtener el parámetro de ordenación (por defecto será por 'id')
-    order_by = request.GET.get('order_by', 'id')  # Si no se especifica, se ordena por 'id'
-    valid_order_fields = ['id', 'dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'estado']
+    order_by = request.GET.get('order_by', 'numero_hermano')  # Si no se especifica, se ordena por 'id'
+    valid_order_fields = ['numero_hermano', 'dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'estado']
     
     # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
     if order_by not in valid_order_fields:
-        order_by = 'id'  # Orden por defecto en caso de un parámetro no válido
+        order_by = 'numero_hermano'  # Orden por defecto en caso de un parámetro no válido
     
     # Filtros
     estado_filter = request.GET.get('estado', '')
@@ -463,19 +465,10 @@ def lista_inventario(request):
         'nombre_filter': nombre_filter,
     })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+@login_required
+def detalle_inventario(request, pk):
+    inventario = get_object_or_404(Inventario, pk=pk)
+    return render(request, 'detalle/detalle_inventario.html', {'inventario': inventario})
 
 @login_required
 def editar_inventario(request, pk):
@@ -536,6 +529,11 @@ def lista_prestamos(request):
         prestamos = prestamos.filter(hermano__nombre__icontains=query)  # Filtra por nombre de usuario
 
     return render(request, 'lista/lista_prestamos.html', {'prestamos': prestamos, 'hermano_filter': query})
+
+@login_required
+def detalle_prestamo(request, pk):
+    prestamo = get_object_or_404(Prestamo, pk=pk)
+    return render(request, 'detalle/detalle_prestamo.html', {'prestamo': prestamo})
 
 @login_required
 def editar_prestamo(request, pk):
@@ -773,6 +771,46 @@ def informe_tareas_pendientes(request):
     tareas = Tarea.objects.filter(estado__in=['Pendiente', 'Atrasada'])
     datos = [(t.titulo, t.asignado_a, t.fecha_limite, t.estado, t.prioridad) for t in tareas]
     return generar_pdf('Tareas_Pendientes.pdf', ['Título', 'Asignado A', 'Fecha Límite', 'Estado', 'Prioridad'], datos)
+
+
+
+#Notificaciones
+def enviar_correo(request):
+    hermanos_con_email = Hermano.objects.filter(email__isnull=False).exclude(email="")  # Solo hermanos con email
+
+    if request.method == 'POST':
+        asunto = request.POST.get('asunto')
+        mensaje = request.POST.get('mensaje')
+        destinatario_id = request.POST.get('destinatario')  # Puede ser 'todos' o un ID
+
+        if asunto and mensaje:
+            if destinatario_id == "todos":
+                destinatarios = list(hermanos_con_email.values_list('email', flat=True))
+            else:
+                hermano = hermanos_con_email.filter(id=destinatario_id).first()
+                destinatarios = [hermano.email] if hermano else []
+
+            if destinatarios:
+                try:
+                    send_mail(
+                        asunto,
+                        mensaje,
+                        settings.EMAIL_HOST_USER,
+                        destinatarios,
+                        fail_silently=False,
+                    )
+                    messages.success(request, f"Correo enviado a {len(destinatarios)} destinatario(s).")
+                except Exception as e:
+                    messages.error(request, f"Error al enviar el correo: {e}")
+            else:
+                messages.warning(request, "No hay destinatarios válidos.")
+
+        else:
+            messages.warning(request, "Por favor, completa todos los campos.")
+
+        return redirect('enviar_correo')
+
+    return render(request, 'enviar_correo.html', {'hermanos': hermanos_con_email})
 
 
 

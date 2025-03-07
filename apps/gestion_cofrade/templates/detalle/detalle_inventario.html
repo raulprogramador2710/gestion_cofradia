@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalles del Inventario{% endblock %}
+
+{% block content %}
+    <div class="contenedor">
+        <h2>Detalles del Inventario</h2>
+        <p><strong>Nombre:</strong> {{ inventario.nombre }}</p>
+        <p><strong>descripcion:</strong> {{ inventario.descripcion }}</p>
+        <p><strong>Cantidad disponible:</strong> {{ inventario.cantidad_disponible }}</p>
+        <p><strong>Ubicacion:</strong> {{ inventario.ubicacion }}</p>
+        <div class="text-center mt-4">
+            <a href="{% url 'lista_inventario' %}" class="btn colorCofradia textoMulticolor">
+                ⬅️ Volver
+            </a>
+        </div>
+    </div>
+{% endblock %}

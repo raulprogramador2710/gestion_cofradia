@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import inicio, CustomLoginView
+from .views import inicio, CustomLoginView, enviar_correo
 from .views import (
     informes_view,
     informe_hermanos_alfabetico,
@@ -46,13 +46,17 @@ urlpatterns = [
 
     path('crear-inventario/', views.crear_inventario, name='crear_inventario'),
     path('lista-inventario/', views.lista_inventario, name='lista_inventario'),#primero vista despues menu
+    path('detalle-inventario/<int:pk>/', views.detalle_inventario, name='detalle_inventario'),
     path('editar-inventario/<int:pk>/', views.editar_inventario, name='editar_inventario'),
     path('eliminar-inventario/<int:pk>/', views.eliminar_inventario, name='eliminar_inventario'),
 
     path('crear-prestamo/', views.crear_prestamo, name='crear_prestamo'),
     path('lista-prestamos/', views.lista_prestamos, name='lista_prestamos'),
+    path('detalle-prestamo/<int:pk>/', views.detalle_prestamo, name='detalle_prestamo'),
     path('editar-prestamo/<int:pk>/', views.editar_prestamo, name='editar_prestamo'),
     path('eliminar-prestamo/<int:pk>/', views.eliminar_prestamo, name='eliminar_prestamo'),
+
+    path('enviar-correo/', enviar_correo, name='enviar_correo'),
 
     path('configuracion/', views.configuracion, name='configuracion'),  # Vista de configuración
     path('configuracion/cargar-hermanos/', views.cargar_hermanos, name='cargar_hermanos'),  # Vista de carga masiva

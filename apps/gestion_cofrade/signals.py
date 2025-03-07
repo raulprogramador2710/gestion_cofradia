@@ -19,14 +19,14 @@ def crear_datos_prueba(sender, **kwargs):
         PerfilUsuario.objects.filter(cofradia=cofradia_demo).delete()
         User.objects.filter(username='HM_Demo').delete()
         cofradia_demo.delete()
-
+"""
     # Crear una nueva Cofradía DEMO
     cofradia_demo = Cofradia.objects.create(
         nombre="Cofradía DEMO",
         descripcion="Esta es una Cofradía de ejemplo para pruebas.",
         color="#ff5733"  # Color HEX de ejemplo
     )
-    
+  
     user_demo = User.objects.create_user(username='HM_Demo', password='Demo1234')
     PerfilUsuario.objects.create(usuario=user_demo, cofradia=cofradia_demo, cargo=Cargo.objects.get(cargo='Hermano Mayor'))
 
@@ -229,3 +229,4 @@ def crear_datos_prueba(sender, **kwargs):
         comentario="Prestado para la procesión",
         fianza="40 EUR"
     )
+""" 

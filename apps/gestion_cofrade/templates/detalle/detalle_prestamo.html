@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalles del Prestamo{% endblock %}
+
+{% block content %}
+    <div class="contenedor">
+        <h2>Detalles del Prestamo</h2>
+        <p><strong>Hermano:</strong> {{ prestamo.hermano }}</p>
+        <p><strong>Inventario:</strong> {{ prestamo.inventario }}</p>
+        <p><strong>Fecha prestamo:</strong> {{ prestamo.fecha_prestamo }}</p>
+        <p><strong>Fecha devolucion:</strong> {{ prestamo.fecha_devolucion }}</p>
+        <p><strong>Estado material:</strong> {{ prestamo.estado_material }}</p>
+        <p><strong>Comentario:</strong> {{ prestamo.comentario }}</p>
+        <p><strong>Fianza:</strong> {{ prestamo.fianza }}</p>
+        <div class="text-center mt-4">
+            <a href="{% url 'lista_prestmos %}" class="btn colorCofradia textoMulticolor">
+                ⬅️ Volver
+            </a>
+        </div>
+    </div>
+{% endblock %}

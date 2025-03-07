@@ -43,7 +43,7 @@
                             <td>{{ item.ubicacion }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="#" class="btn btn-info btn-sm">👁️</a>
+                                    <a href="{% url 'detalle_inventario' item.id %}" class="btn btn-info btn-sm">👁️</a>
                                     <a href="{% url 'editar_inventario' item.id %}" class="btn btn-warning btn-sm">✏️</a>
                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ item.id }}">
                                         🗑
