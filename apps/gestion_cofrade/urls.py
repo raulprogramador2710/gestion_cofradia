@@ -1,6 +1,16 @@
 from django.urls import path
 from . import views
 from .views import inicio, CustomLoginView
+from .views import (
+    informes_view,
+    informe_hermanos_alfabetico,
+    informe_mayores_edad,
+    informe_cuotas_pendientes,
+    informe_antiguedad,
+    informe_eventos,
+    informe_finanzas,
+    informe_tareas_pendientes,
+)
 
 urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
@@ -24,6 +34,25 @@ urlpatterns = [
     path('detalle-evento/<int:pk>/', views.detalle_evento, name='detalle_evento'),
     path('editar-evento/<int:pk>/', views.editar_evento, name='editar_evento'),
     path('eliminar-evento/<int:pk>/', views.eliminar_evento, name='eliminar_evento'),
+
+    path('informes/', informes_view, name='informes'),
+    path('informes/hermanos-alfabetico/', informe_hermanos_alfabetico, name='informe_hermanos_alfabetico'),
+    path('informes/hermanos-mayores/', informe_mayores_edad, name='informe_mayores_edad'),
+    path('informes/cuotas-pendientes/', informe_cuotas_pendientes, name='informe_cuotas_pendientes'),
+    path('informes/hermanos-antiguedad/', informe_antiguedad, name='informe_antiguedad'),
+    path('informes/eventos-anuales/', informe_eventos, name='informe_eventos'),
+    path('informes/finanzas/', informe_finanzas, name='informe_finanzas'),
+    path('informes/tareas-pendientes/', informe_tareas_pendientes, name='informe_tareas_pendientes'),
+
+    path('crear-inventario/', views.crear_inventario, name='crear_inventario'),
+    path('lista-inventario/', views.lista_inventario, name='lista_inventario'),#primero vista despues menu
+    path('editar-inventario/<int:pk>/', views.editar_inventario, name='editar_inventario'),
+    path('eliminar-inventario/<int:pk>/', views.eliminar_inventario, name='eliminar_inventario'),
+
+    path('crear-prestamo/', views.crear_prestamo, name='crear_prestamo'),
+    path('lista-prestamos/', views.lista_prestamos, name='lista_prestamos'),
+    path('editar-prestamo/<int:pk>/', views.editar_prestamo, name='editar_prestamo'),
+    path('eliminar-prestamo/<int:pk>/', views.eliminar_prestamo, name='eliminar_prestamo'),
 
     path('configuracion/', views.configuracion, name='configuracion'),  # Vista de configuración
     path('configuracion/cargar-hermanos/', views.cargar_hermanos, name='cargar_hermanos'),  # Vista de carga masiva

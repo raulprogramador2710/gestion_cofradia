@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Inventario{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Inventario</h1>
+
+        <div class="mb-3">
+            <a href="{% url 'crear_inventario' %}" class="btn btn-success">➕ Agregar Item</a>
+        </div>
+
+        <form method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre" value="{{ nombre_filter }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        {% if inventario %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><a href="?order_by=id">ID</a></th>
+                        <th><a href="?order_by=nombre">Nombre</a></th>
+                        <th><a href="?order_by=categoria">Categoría</a></th>
+                        <th><a href="?order_by=cantidad">Cantidad</a></th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventario %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.nombre }}</td>
+                            <td>{{ item.categoria }}</td>
+                            <td>{{ item.cantidad }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'detalle_inventario' item.id %}" class="btn btn-info btn-sm">👁️</a>
+                                    <a href="{% url 'editar_inventario' item.id %}" class="btn btn-warning btn-sm">✏️</a>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ item.id }}">
+                                        🗑
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Modal de Confirmación de eliminación -->
+                        <div class="modal fade" id="confirmarEliminar{{ item.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmar Eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Eliminar <strong>{{ item.nombre }}</strong>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form method="POST" action="{% url 'eliminar_inventario' item.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay elementos en el inventario.</p>
+        {% endif %}
+    </div>
+{% endblock %}

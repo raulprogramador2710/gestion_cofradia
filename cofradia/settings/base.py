@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 
     # otras aplicaciones...
     'widget_tweaks',
+     'celery',
 ]
 
 MIDDLEWARE = [
@@ -93,3 +94,6 @@ LOGIN_REDIRECT_URL = 'inicio'
 LOGOUT_REDIRECT_URL = 'login'
 
 LOGIN_URL = 'login'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'

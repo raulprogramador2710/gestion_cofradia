@@ -11,9 +11,14 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now
-from .forms import HermanoForm, EventoForm, TareaForm, EstadoForm, FormaPagoForm, FormaComunicacionForm, CofradiaForm, CargarExcelForm
-from .models import PerfilUsuario, Cargo, Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Finanza
-import datetime
+from .forms import HermanoForm, EventoForm, TareaForm, EstadoForm, FormaPagoForm, FormaComunicacionForm, CofradiaForm, CargarExcelForm, InventarioForm, PrestamoForm
+from .models import PerfilUsuario, Cargo, Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Finanza, AuditoriaHermano, Inventario, Prestamo
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+import datetime, csv
 import pandas as pd
 
 
@@ -129,10 +134,17 @@ def crear_hermano(request):
                 user.set_password(hermano.dni)  # Guardar contraseña de forma segura
                 user.save()
 
+            AuditoriaHermano.objects.create(
+                hermano=hermano,
+                accion="CREAR",
+                usuario=request.user,
+                detalles=f"Nuevo hermano registrado: {hermano.nombre} {hermano.apellidos}"
+            )    
+
             return redirect('lista_hermanos')
     else:
         form = HermanoForm()
-    return render(request, 'crear_hermano.html', {'form': form})
+    return render(request, 'crear/crear_hermano.html', {'form': form})
 
 @login_required
 def lista_hermanos(request):
@@ -161,7 +173,7 @@ def lista_hermanos(request):
     # Ordenar según el 'order_by'
     hermanos = hermanos.order_by(order_by)
 
-    return render(request, 'lista_hermanos.html', {
+    return render(request, 'lista/lista_hermanos.html', {
         'hermanos': hermanos,
         'order_by': order_by,
         'estado_filter': estado_filter,
@@ -171,7 +183,7 @@ def lista_hermanos(request):
 login_required
 def detalle_hermano(request, pk):
     hermano = get_object_or_404(Hermano, pk=pk)
-    return render(request, 'detalle_hermano.html', {'hermano': hermano})
+    return render(request, 'detalle/detalle_hermano.html', {'hermano': hermano})
 
 @login_required
 def editar_hermano(request, pk):
@@ -188,20 +200,41 @@ def editar_hermano(request, pk):
             hermano.save()
             user.save()
 
+            AuditoriaHermano.objects.create(
+                hermano=hermano,
+                accion="MODIFICAR",
+                usuario=request.user,
+                detalles="Datos modificados"
+            )
+
             return redirect('listar_hermanos')
     else:
         form = HermanoForm(instance=hermano)
 
-    return render(request, 'editar_hermano.html', {'form': form})
+    return render(request, 'editar/editar_hermano.html', {'form': form})
 
 @login_required
 def eliminar_hermano(request, pk):
     hermano = get_object_or_404(Hermano, pk=pk)
     if request.method == "POST":
+
+        user = get_object_or_404(User, username=hermano.dni)
+        perfilUsuario = get_object_or_404(PerfilUsuario, usuario=user)
+
+        perfilUsuario.delete()
+        user.delete()
         hermano.delete()
+
+        AuditoriaHermano.objects.create(
+            hermano=hermano,
+            accion="ELIMINAR",
+            usuario=request.user,
+            detalles="Hermano eliminado del sistema"
+        )
+
         return redirect('listar_hermanos')
 
-    return render(request, 'eliminar_hermano.html', {'hermano': hermano})
+    return render(request, 'eliminar/eliminar_hermano.html', {'hermano': hermano})
 
 
 
@@ -219,7 +252,7 @@ def crear_tarea(request):
             return redirect('lista_tareas')
     else:
         form = TareaForm()
-    return render(request, 'crear_tarea.html', {'form': form})
+    return render(request, 'crear/crear_tarea.html', {'form': form})
 
 @login_required
 def lista_tareas(request):
@@ -250,7 +283,7 @@ def lista_tareas(request):
     # Ordenar según el 'order_by'
     tareas = tareas.order_by(order_by)
 
-    return render(request, 'lista_tareas.html', {
+    return render(request, 'lista/lista_tareas.html', {
         'tareas': tareas,
         'order_by': order_by,
         'titulo_filter': titulo_filter,
@@ -261,7 +294,7 @@ def lista_tareas(request):
 login_required
 def detalle_tarea(request, pk):
     tarea = get_object_or_404(Tarea, pk=pk)
-    return render(request, 'detalle_tarea.html', {'tarea': tarea})
+    return render(request, 'detalle/detalle_tarea.html', {'tarea': tarea})
 
 @login_required
 def editar_tarea(request, pk):
@@ -275,7 +308,7 @@ def editar_tarea(request, pk):
     else:
         form = TareaForm(instance=tarea)
 
-    return render(request, 'editar_tarea.html', {'form': form})
+    return render(request, 'editar/editar_tarea.html', {'form': form})
 
 @login_required
 def eliminar_tarea(request, pk):
@@ -302,7 +335,7 @@ def crear_evento(request):
             return redirect('lista_eventos')
     else:
         form = EventoForm()
-    return render(request, 'crear_evento.html', {'form': form})
+    return render(request, 'crear/crear_evento.html', {'form': form})
 
 @login_required
 def lista_eventos(request):
@@ -327,7 +360,7 @@ def lista_eventos(request):
     # Ordenar según el 'order_by'
     eventos = eventos.order_by(order_by)
 
-    return render(request, 'lista_eventos.html', {
+    return render(request, 'lista/lista_eventos.html', {
         'eventos': eventos,
         'order_by': order_by,
         'nombre_filter': nombre_filter,
@@ -336,7 +369,7 @@ def lista_eventos(request):
 login_required
 def detalle_evento(request, pk):
     evento = get_object_or_404(Evento, pk=pk)
-    return render(request, 'detalle_evento.html', {'evento': evento})
+    return render(request, 'detalle/detalle_evento.html', {'evento': evento})
 
 @login_required
 def editar_evento(request, pk):
@@ -350,7 +383,7 @@ def editar_evento(request, pk):
     else:
         form = EventoForm(instance=evento)
 
-    return render(request, 'editar_evento.html', {'form': form})
+    return render(request, 'editar/editar_evento.html', {'form': form})
 
 @login_required
 def eliminar_evento(request, pk):
@@ -360,6 +393,326 @@ def eliminar_evento(request, pk):
         return redirect('lista_eventos')
 
     return render(request, 'eliminar_evento.html', {'evento': evento})
+
+
+
+#Inventario
+@login_required
+def crear_inventario(request):
+    if request.method == 'POST':
+        form = InventarioForm(request.POST)
+        if form.is_valid():
+            inventario = form.save(commit=False)
+            inventario.cofradia = request.user.perfilusuario.cofradia
+            inventario.save()
+            return redirect('lista_inventario')
+    else:
+        form = InventarioForm()
+
+    return render(request, 'crear/crear_inventario.html', {'form': form})
+
+@login_required
+def lista_inventario(request):
+    query = request.GET.get('nombre', '')  # Obtiene el parámetro 'nombre' de la URL
+    inventarios = Inventario.objects.filter(cofradia=request.user.perfilusuario.cofradia)
+
+    if query:
+        inventarios = inventarios.filter(nombre__icontains=query)  # Filtra por nombre
+
+    return render(request, 'lista/lista_inventario.html', {'inventarios': inventarios, 'nombre_filter': query})
+
+@login_required
+def editar_inventario(request, pk):
+    inventario = get_object_or_404(Inventario, pk=pk)
+
+    if request.method == "POST":
+        form = InventarioForm(request.POST, instance=inventario)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_inventario')
+    else:
+        form = InventarioForm(instance=inventario)
+
+    return render(request, 'editar/editar_inventario.html', {'form': form})
+
+@login_required
+def eliminar_inventario(request, pk):
+    inventario = get_object_or_404(Inventario, pk=pk)
+    if request.method == "POST":
+        inventario.delete()
+        return redirect('lista_inventario')
+    
+    return render(request, 'eliminar_inventario.html', {'inventario': inventario})
+
+
+
+#Prestamos
+@login_required
+def crear_prestamo(request):
+    if request.method == 'POST':
+        form = PrestamoForm(request.POST)
+        if form.is_valid():
+            prestamo = form.save(commit=False)
+            # Definir la fecha de préstamo
+            prestamo.fecha_prestamo = request.POST.get('fecha_prestamo', None) or None
+            prestamo.save()
+            # Reducir la cantidad disponible del material prestado
+            inventario = prestamo.inventario
+            inventario.cantidad_disponible -= 1
+            inventario.save()
+            messages.success(request, 'Préstamo registrado correctamente.')
+            return redirect('lista_prestamos')
+    else:
+        form = PrestamoForm()
+
+    return render(request, 'crear/crear_prestamo.html', {'form': form})
+
+@login_required
+def lista_prestamos(request):
+    query = request.GET.get('hermano', '')  # Obtiene el parámetro 'usuario' de la URL
+    prestamos = Prestamo.objects.all()
+
+    if query:
+        prestamos = prestamos.filter(hermano__nombre__icontains=query)  # Filtra por nombre de usuario
+
+    return render(request, 'lista/lista_prestamos.html', {'prestamos': prestamos, 'hermano_filter': query})
+
+@login_required
+def editar_prestamo(request, pk):
+    prestamo = get_object_or_404(Prestamo, pk=pk)
+
+    if request.method == "POST":
+        form = PrestamoForm(request.POST, instance=prestamo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Préstamo actualizado correctamente.')
+            return redirect('lista_prestamos')
+    else:
+        form = PrestamoForm(instance=prestamo)
+
+    return render(request, 'editar/editar_prestamo.html', {'form': form})
+
+@login_required
+def eliminar_prestamo(request, pk):
+    prestamo = get_object_or_404(Prestamo, pk=pk)
+    if request.method == "POST":
+        inventario = prestamo.inventario
+        # Devolver el material (aumentar la cantidad disponible)
+        inventario.cantidad_disponible += 1
+        inventario.save()
+        prestamo.delete()
+        messages.success(request, 'Préstamo eliminado correctamente.')
+        return redirect('lista_prestamos')
+
+    return render(request, 'eliminar_prestamo.html', {'prestamo': prestamo})
+
+
+
+#Informes
+def generar_pdf(nombre_archivo, encabezados, datos):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.pdf'
+
+    # Configurar el PDF en apaisado
+    doc = SimpleDocTemplate(response, pagesize=landscape(letter))
+    elements = []
+
+    # Crear la tabla con encabezados + datos
+    tabla_datos = [encabezados] + datos
+
+    # Ajuste automático de columnas (misma anchura para todas)
+    num_columnas = len(encabezados)
+    column_widths = [landscape(letter)[0] / num_columnas] * num_columnas  
+
+    table = Table(tabla_datos, colWidths=column_widths)
+
+    # Aplicar estilos a la tabla
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Fondo gris en encabezados
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),  # Texto blanco en encabezados
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Centrar texto
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Negrita en encabezados
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),  # Espaciado en encabezados
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Bordes negros
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+
+    return response
+
+@login_required
+def informes_view(request):
+    informes = [
+        {"titulo": "Hermanos (Ordenado por Apellido)", "descripcion": "Descarga un listado ordenado alfabéticamente.", "url": "informe_hermanos_alfabetico"},
+        {"titulo": "Hermanos Mayores de Edad", "descripcion": "Consulta los miembros mayores de edad.", "url": "informe_mayores_edad"},
+        {"titulo": "Cuotas Pendientes", "descripcion": "Lista de hermanos con pagos pendientes.", "url": "informe_cuotas_pendientes"},
+        {"titulo": "Antigüedad de Hermanos", "descripcion": "Ordenado por años de pertenencia.", "url": "informe_antiguedad"},
+        {"titulo": "Eventos del Año", "descripcion": "Resumen de actividades y reuniones.", "url": "informe_eventos"},
+        {"titulo": "Resumen Financiero", "descripcion": "Informe de ingresos y gastos.", "url": "informe_finanzas"},
+        {"titulo": "Tareas Pendientes", "descripcion": "Listado de tareas aún sin completar.", "url": "informe_tareas_pendientes"},
+    ]
+    return render(request, 'informes.html', {"informes": informes})
+
+@login_required
+def informe_hermanos_alfabetico(request):
+    hermanos = Hermano.objects.all().order_by('apellidos')
+    datos = [(h.dni, h.nombre, h.apellidos, h.telefono, h.direccion, h.fecha_nacimiento, h.email, h.estado, h.forma_comunicacion, h.forma_pago) for h in hermanos]
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Hermanos.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=landscape(letter))
+    elements = []
+    styles = getSampleStyleSheet()
+
+    elements.append(Paragraph("Informe de Hermanos Ordenados por Apellido", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    col_widths = [50, 100, 120, 52, 140, 50, 100, 50, 50, 50]
+    encabezados = ["DNI", "Nombre", "Apellidos", "Teléfono", "Dirección", "Fecha nacimiento", "Email", "Estado", "Forma Comunicacion", "Forma Pago"]
+    
+    # Crear un Paragraph para cada celda del encabezado para permitir el salto de línea
+    encabezados_paragraph = [
+        Paragraph(f'<b>{header}</b>', 
+                  ParagraphStyle('HeaderStyle', fontSize=10, textColor=colors.white, alignment=1)) 
+        for header in encabezados
+    ]
+
+    tabla_datos = [encabezados_paragraph] + datos
+    table = Table(tabla_datos, colWidths=col_widths)
+
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.lightgrey]),
+        ('WORDWRAP', (0, 0), (-1, -1), True)  # Habilitar el salto de línea en las celdas
+    ]))
+
+    normal_style = ParagraphStyle('NormalStyle', parent=styles['Normal'], fontSize=8)
+
+    elements.append(table)
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"Generado el {date.today().strftime('%d/%m/%Y')}", normal_style))
+
+    doc.build(elements)
+    return response
+
+@login_required
+def informe_mayores_edad(request):
+    # Datos
+    hoy = date.today()
+    hermanos = Hermano.objects.filter(fecha_nacimiento__lte=hoy.replace(year=hoy.year - 18)).order_by('apellidos')
+    datos = [(h.dni, h.nombre, h.apellidos, h.telefono, h.fecha_nacimiento.strftime("%d-%m-%Y")) for h in hermanos]
+
+    # Respuesta HTTP para PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="hermanos_mayores.pdf"'
+
+    # Crear documento
+    doc = SimpleDocTemplate(response, pagesize=landscape(letter))
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # **Encabezado**
+    elements.append(Paragraph("Informe de Hermanos Mayores de Edad", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    # **Tabla de Datos**
+    encabezados = ["DNI", "Nombre", "Apellidos", "Telefono", "Fecha de Nacimiento"]
+    tabla_datos = [encabezados] + datos
+
+    # Ajuste automático de columnas
+    col_widths = [65, 150, 150, 65, 105]
+    
+    table = Table(tabla_datos, colWidths=col_widths)
+
+    # **Estilos de la tabla**
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.lightgrey])
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 12))
+
+    # **Pie de Página con Fecha**
+    elements.append(Paragraph(f"Generado el {hoy.strftime('%d/%m/%Y')}", styles['Normal']))
+
+    doc.build(elements)
+
+    return response
+
+@login_required
+def informe_cuotas_pendientes(request):
+    hermanos = Hermano.objects.filter(cuota_pendiente__gt=0).order_by('apellidos')
+    datos = [(h.dni, h.nombre, h.apellidos, f"{h.cuota_pendiente} €") for h in hermanos]
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Cuotas_Pendientes.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=landscape(letter))
+    elements = []
+    styles = getSampleStyleSheet()
+
+    elements.append(Paragraph("Informe de Cuotas Pendientes", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    col_widths = [80, 150, 150, 120]
+    encabezados = ["DNI", "Nombre", "Apellidos", "Cuota Pendiente"]
+    tabla_datos = [encabezados] + datos
+    table = Table(tabla_datos, colWidths=col_widths)
+
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.darkred),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.lightgrey])
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"Generado el {date.today().strftime('%d/%m/%Y')}", styles['Normal']))
+
+    doc.build(elements)
+    return response
+
+@login_required
+def informe_antiguedad(request):
+    hermanos = Hermano.objects.all().order_by('fecha_inicio')
+    datos = [(h.dni, h.nombre, h.apellidos, h.fecha_inicio) for h in hermanos]
+    return generar_pdf('Hermanos_por_Antiguedad.pdf', ['DNI', 'Nombre', 'Apellidos', 'Año de Inicio'], datos)
+
+@login_required
+def informe_eventos(request):
+    eventos = Evento.objects.filter(fecha__year=date.today().year).order_by('fecha')
+    datos = [(e.nombre, e.fecha, e.tipo) for e in eventos]
+    return generar_pdf('Eventos_Anuales.pdf', ['Nombre', 'Fecha', 'Tipo'], datos)
+
+@login_required
+def informe_finanzas(request):
+    finanzas = Finanza.objects.all().order_by('fecha')
+    datos = [(f.tipo, f.monto, f.fecha) for f in finanzas]
+    return generar_pdf('Resumen_Finanzas.pdf', ['Tipo', 'Monto', 'Fecha'], datos)
+
+@login_required
+def informe_tareas_pendientes(request):
+    tareas = Tarea.objects.filter(estado__in=['Pendiente', 'Atrasada'])
+    datos = [(t.titulo, t.asignado_a, t.fecha_limite, t.estado, t.prioridad) for t in tareas]
+    return generar_pdf('Tareas_Pendientes.pdf', ['Título', 'Asignado A', 'Fecha Límite', 'Estado', 'Prioridad'], datos)
 
 
 

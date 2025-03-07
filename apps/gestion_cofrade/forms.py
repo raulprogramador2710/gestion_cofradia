@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento
+from .models import Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Inventario, Prestamo
 
 class HermanoForm(forms.ModelForm):
     class Meta:
@@ -75,3 +75,16 @@ class CofradiaForm(forms.ModelForm):
 
 class CargarExcelForm(forms.Form):
     archivo_excel = forms.FileField(label="Seleccionar archivo Excel", widget=forms.ClearableFileInput(attrs={'accept': '.xlsx, .xls'}))
+
+class InventarioForm(forms.ModelForm):
+    class Meta:
+        model = Inventario
+        fields = ['nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
+
+class PrestamoForm(forms.ModelForm):
+    class Meta:
+        model = Prestamo
+        fields = ['hermano', 'inventario', 'fecha_devolucion', 'estado_material', 'comentario', 'fianza']
+        widgets = {
+            'fecha_prestamo': forms.HiddenInput(),
+        }

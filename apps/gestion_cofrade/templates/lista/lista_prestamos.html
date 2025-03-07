@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Préstamos{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Préstamos</h1>
+
+        <div class="mb-3">
+            <a href="{% url 'crear_prestamo' %}" class="btn btn-success">➕ Nuevo Préstamo</a>
+        </div>
+
+        <form method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" name="hermano" class="form-control" placeholder="Buscar por hermano" value="{{ hermano_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        {% if prestamos %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th><a href="?order_by=id">ID</a></th>
+                        <th><a href="?order_by=hermano">Hermano</a></th>
+                        <th><a href="?order_by=inventario">Ítem</a></th>
+                        <th><a href="?order_by=fecha_prestamo">Fecha Préstamo</a></th>
+                        <th><a href="?order_by=fecha_devolucion">Fecha Devolución</a></th>
+                        <th><a href="?order_by=estado_material">Estado</a></th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prestamo in prestamos %}
+                        <tr>
+                            <td>{{ prestamo.id }}</td>
+                            <td>{{ prestamo.hermano.nombre }} {{ prestamo.hermano.apellidos }}</td>
+                            <td>{{ prestamo.inventario.nombre }}</td>
+                            <td>{{ prestamo.fecha_prestamo|date:"d/m/Y" }}</td>
+                            <td>{{ prestamo.fecha_devolucion|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if prestamo.estado_material == "Pendiente" %}
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                {% elif prestamo.estado_material == "Devuelto" %}
+                                    <span class="badge bg-success">Devuelto</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'detalle_prestamo' prestamo.id %}" class="btn btn-info btn-sm">👁️</a>
+                                    <a href="{% url 'editar_prestamo' prestamo.id %}" class="btn btn-warning btn-sm">✏️</a>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ prestamo.id }}">
+                                        🗑
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Modal de Confirmación de eliminación -->
+                        <div class="modal fade" id="confirmarEliminar{{ prestamo.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmar Eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Eliminar el préstamo de <strong>{{ prestamo.inventario.nombre }}</strong> a <strong>{{ prestamo.hermano.nombre }} {{ prestamo.hermano.apellidos }}</strong>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form method="POST" action="{% url 'eliminar_prestamo' prestamo.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay préstamos registrados.</p>
+        {% endif %}
+    </div>
+{% endblock %}
