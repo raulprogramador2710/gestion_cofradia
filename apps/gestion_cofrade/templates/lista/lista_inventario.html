@@ -21,27 +21,29 @@
             </div>
         </form>
 
-        {% if inventario %}
+        {% if inventarios %}
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th><a href="?order_by=id">ID</a></th>
-                        <th><a href="?order_by=nombre">Nombre</a></th>
-                        <th><a href="?order_by=categoria">Categoría</a></th>
-                        <th><a href="?order_by=cantidad">Cantidad</a></th>
+                        <th><a href="?order_by=id{% if order_by != 'id' %}&order_by=id{% endif %}">ID</a></th>
+                        <th><a href="?order_by=nombre{% if order_by != 'nombre' %}&order_by=nombre{% endif %}">Nombre</a></th>
+                        <th><a href="?order_by=descripcion{% if order_by != 'descripcion' %}&order_by=descripcion{% endif %}">Descripción</a></th>
+                        <th><a href="?order_by=cantidad_disponible{% if order_by != 'cantidad_disponible' %}&order_by=cantidad_disponible{% endif %}">Cantidad</a></th>
+                        <th><a href="?order_by=ubicacion{% if order_by != 'ubicacion' %}&order_by=ubicacion{% endif %}">Ubicación</a></th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in inventario %}
+                    {% for item in inventarios %}
                         <tr>
                             <td>{{ item.id }}</td>
                             <td>{{ item.nombre }}</td>
-                            <td>{{ item.categoria }}</td>
-                            <td>{{ item.cantidad }}</td>
+                            <td>{{ item.descripcion }}</td>
+                            <td>{{ item.cantidad_disponible }}</td>
+                            <td>{{ item.ubicacion }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{% url 'detalle_inventario' item.id %}" class="btn btn-info btn-sm">👁️</a>
+                                    <a href="#" class="btn btn-info btn-sm">👁️</a>
                                     <a href="{% url 'editar_inventario' item.id %}" class="btn btn-warning btn-sm">✏️</a>
                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ item.id }}">
                                         🗑

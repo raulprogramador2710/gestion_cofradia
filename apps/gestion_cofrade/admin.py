@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cofradia, Cargo, PerfilUsuario, Estado, FormaPago, FormaComunicacion, Hermano, AuditoriaHermano, Tarea, Evento, Finanza
+from .models import Cofradia, Cargo, PerfilUsuario, Estado, FormaPago, FormaComunicacion, Hermano, AuditoriaHermano, Tarea, Evento, Finanza, Inventario, Prestamo
 
 class PerfilUsuarioAdmin(admin.ModelAdmin):
     list_display = ('usuario', 'cofradia', 'cargo')
@@ -16,4 +16,6 @@ admin.site.register(AuditoriaHermano)
 admin.site.register(Tarea)
 admin.site.register(Evento)
 admin.site.register(Finanza)
+admin.site.register(Inventario)
+admin.site.register(Prestamo)
 

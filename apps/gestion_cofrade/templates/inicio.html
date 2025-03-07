@@ -24,7 +24,10 @@
             <div class="card border-dark bg-light p-3 mb-3 border-5">
                 <h5>Próximo Evento</h5>
                 <p>{{ eventos_proximos.0.nombre|default:"Sin eventos" }}</p>
-            </div>
+                {% if eventos_proximos.0.fecha %}
+                    <p><strong>Fecha:</strong> {{ eventos_proximos.0.fecha|date:"d/m/Y" }}</p>
+                {% endif %}
+            </div>   
         </div>
     
         <!-- Columna de Tabla con Scroll -->

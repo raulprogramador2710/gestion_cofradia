@@ -54,19 +54,21 @@ def inicio(request):
     email_comunicacion = FormaComunicacion.objects.get(nombre='Email')
 
     # Datos para los gráficos
-    hermanos_total = Hermano.objects.count()
-    hermanos_activos = Hermano.objects.filter(estado=activo_estado).count()
-    hermanos_no_pagados = Hermano.objects.filter(estado=no_pagado_estado).count()
-    hermanos_baja = Hermano.objects.filter(estado=baja_estado).count()
-    hermanos_fallecidos = Hermano.objects.filter(estado=fallecido_estado).count()
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
 
-    pago_efectivo = Hermano.objects.filter(forma_pago=efectivo_pago).count()
-    pago_transferencia = Hermano.objects.filter(forma_pago=transferencia_pago).count()
-    pago_domiciliacion = Hermano.objects.filter(forma_pago=domiciliacion_pago).count()
+    hermanos_total = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia).count()
+    hermanos_activos = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, estado=activo_estado).count()
+    hermanos_no_pagados = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, estado=no_pagado_estado).count()
+    hermanos_baja = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, estado=baja_estado).count()
+    hermanos_fallecidos = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, estado=fallecido_estado).count()
 
-    comunicacion_telefono = Hermano.objects.filter(forma_comunicacion=telefono_comunicacion).count()
-    comunicacion_carta = Hermano.objects.filter(forma_comunicacion=carta_comunicacion).count()
-    comunicacion_email = Hermano.objects.filter(forma_comunicacion=email_comunicacion).count()
+    pago_efectivo = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, forma_pago=efectivo_pago).count()
+    pago_transferencia = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, forma_pago=transferencia_pago).count()
+    pago_domiciliacion = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, forma_pago=domiciliacion_pago).count()
+
+    comunicacion_telefono = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, forma_comunicacion=telefono_comunicacion).count()
+    comunicacion_carta = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, forma_comunicacion=carta_comunicacion).count()
+    comunicacion_email = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia, forma_comunicacion=email_comunicacion).count()
 
     # **Nuevos datos para el Dashboard**
     # Obtener la fecha actual
@@ -160,8 +162,9 @@ def lista_hermanos(request):
     estado_filter = request.GET.get('estado', '')
     apellidos_filter = request.GET.get('apellidos', '')
 
-    # Consultar todos los hermanos
-    hermanos = Hermano.objects.all()
+    # Consultar todos los hermanos de la cofradia del usuario logueado
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    hermanos = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
 
     # Aplicar filtros
     if estado_filter:
@@ -207,7 +210,7 @@ def editar_hermano(request, pk):
                 detalles="Datos modificados"
             )
 
-            return redirect('listar_hermanos')
+            return redirect('lista_hermanos')
     else:
         form = HermanoForm(instance=hermano)
 
@@ -306,7 +309,7 @@ def editar_tarea(request, pk):
         form = TareaForm(request.POST, instance=tarea)
         if form.is_valid():
             form.save()
-            return redirect('listar_tareas')
+            return redirect('lista_tareas')
     else:
         form = TareaForm(instance=tarea)
 
@@ -390,7 +393,7 @@ def editar_evento(request, pk):
         form = EventoForm(request.POST, instance=evento)
         if form.is_valid():
             form.save()
-            return redirect('listar_eventos')
+            return redirect('lista_eventos')
     else:
         form = EventoForm(instance=evento)
 
@@ -433,13 +436,46 @@ def crear_inventario(request):
 
 @login_required
 def lista_inventario(request):
-    query = request.GET.get('nombre', '')  # Obtiene el parámetro 'nombre' de la URL
-    inventarios = Inventario.objects.filter(cofradia=request.user.perfilusuario.cofradia)
+    # Obtener el parámetro de ordenación (por defecto será por 'id')
+    order_by = request.GET.get('order_by', 'id')  # Si no se especifica, se ordena por 'id'
+    valid_order_fields = ['id', 'nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
+    
+    # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
+    if order_by not in valid_order_fields:
+        order_by = 'id'  # Orden por defecto en caso de un parámetro no válido
+    
+    # Filtros
+    nombre_filter = request.GET.get('nombre', '')
 
-    if query:
-        inventarios = inventarios.filter(nombre__icontains=query)  # Filtra por nombre
+    # Consultar todos los hermanos
+    inventarios = Inventario.objects.all()
 
-    return render(request, 'lista/lista_inventario.html', {'inventarios': inventarios, 'nombre_filter': query})
+    # Aplicar filtros
+    if nombre_filter:
+        inventarios = inventarios.filter(Q(nombre__icontains=nombre_filter))
+
+    # Ordenar según el 'order_by'
+    inventarios = inventarios.order_by(order_by)
+
+    return render(request, 'lista/lista_inventario.html', {
+        'inventarios': inventarios,
+        'order_by': order_by,
+        'nombre_filter': nombre_filter,
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @login_required
 def editar_inventario(request, pk):
