@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Inventario, Prestamo
+from .models import Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Inventario, Prestamo, Donacion
 
 class HermanoForm(forms.ModelForm):
     class Meta:
@@ -87,4 +87,12 @@ class PrestamoForm(forms.ModelForm):
         fields = ['hermano', 'inventario', 'fecha_devolucion', 'estado_material', 'comentario', 'fianza']
         widgets = {
             'fecha_prestamo': forms.HiddenInput(),
+        }
+
+class DonacionForm(forms.ModelForm):
+    class Meta:
+        model = Donacion
+        fields = ['donante', 'cantidad', 'cofradia', 'evento']
+        widgets = {
+            'fecha': forms.DateInput(attrs={'type': 'date'}),
         }

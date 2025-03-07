@@ -125,6 +125,34 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% if hermanos.has_other_pages %}
+                <nav>
+                    <ul class="pagination">
+                        {% if hermanos.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1&order_by={{ order_by }}&estado={{ estado_filter }}&apellidos={{ nombre_filter }}">&laquo; Primero</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ hermanos.previous_page_number }}&order_by={{ order_by }}&estado={{ estado_filter }}&apellidos={{ nombre_filter }}">Anterior</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item disabled">
+                            <span class="page-link">Página {{ hermanos.number }} de {{ hermanos.paginator.num_pages }}</span>
+                        </li>
+
+                        {% if hermanos.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ hermanos.next_page_number }}&order_by={{ order_by }}&estado={{ estado_filter }}&apellidos={{ nombre_filter }}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ hermanos.paginator.num_pages }}&order_by={{ order_by }}&estado={{ estado_filter }}&apellidos={{ nombre_filter }}">Última &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
         {% else %}
             <p>No hay hermanos registrados.</p>
         {% endif %}

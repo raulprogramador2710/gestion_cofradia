@@ -56,6 +56,9 @@ urlpatterns = [
     path('editar-prestamo/<int:pk>/', views.editar_prestamo, name='editar_prestamo'),
     path('eliminar-prestamo/<int:pk>/', views.eliminar_prestamo, name='eliminar_prestamo'),
 
+    path('crear-donacion/', views.crear_donacion, name='crear_donacion'),
+    path('lista-donaciones/', views.lista_donaciones, name='lista_donaciones'),
+
     path('enviar-correo/', enviar_correo, name='enviar_correo'),
 
     path('configuracion/', views.configuracion, name='configuracion'),  # Vista de configuración

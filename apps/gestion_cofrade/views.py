@@ -9,12 +9,13 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import now
-from .forms import HermanoForm, EventoForm, TareaForm, EstadoForm, FormaPagoForm, FormaComunicacionForm, CofradiaForm, CargarExcelForm, InventarioForm, PrestamoForm
-from .models import PerfilUsuario, Cargo, Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Finanza, AuditoriaHermano, Inventario, Prestamo
+from .forms import HermanoForm, EventoForm, TareaForm, EstadoForm, FormaPagoForm, FormaComunicacionForm, CofradiaForm, CargarExcelForm, InventarioForm, PrestamoForm, DonacionForm
+from .models import PerfilUsuario, Cargo, Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Finanza, AuditoriaHermano, Inventario, Prestamo, Donacion
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -152,31 +153,35 @@ def crear_hermano(request):
 
 @login_required
 def lista_hermanos(request):
-    # Obtener el parámetro de ordenación (por defecto será por 'id')
-    order_by = request.GET.get('order_by', 'numero_hermano')  # Si no se especifica, se ordena por 'id'
+    order_by = request.GET.get('order_by', 'numero_hermano')
     valid_order_fields = ['numero_hermano', 'dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'estado']
     
-    # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
     if order_by not in valid_order_fields:
-        order_by = 'numero_hermano'  # Orden por defecto en caso de un parámetro no válido
-    
-    # Filtros
+        order_by = 'numero_hermano'
+
     estado_filter = request.GET.get('estado', '')
     apellidos_filter = request.GET.get('apellidos', '')
 
-    # Consultar todos los hermanos de la cofradia del usuario logueado
     perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
     hermanos = Hermano.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
 
-    # Aplicar filtros
     if estado_filter:
         hermanos = hermanos.filter(estado__nombre=estado_filter)
-
     if apellidos_filter:
         hermanos = hermanos.filter(Q(nombre__icontains=apellidos_filter) | Q(apellidos__icontains=apellidos_filter))
 
-    # Ordenar según el 'order_by'
     hermanos = hermanos.order_by(order_by)
+
+    # Paginación: 10 elementos por página
+    paginator = Paginator(hermanos, 10)  # Cambia el número según lo necesites
+    page = request.GET.get('page')
+
+    try:
+        hermanos = paginator.page(page)
+    except PageNotAnInteger:
+        hermanos = paginator.page(1)  # Si no es un número, mostrar la primera página
+    except EmptyPage:
+        hermanos = paginator.page(paginator.num_pages)  # Si está fuera de rango, mostrar la última
 
     return render(request, 'lista/lista_hermanos.html', {
         'hermanos': hermanos,
@@ -356,7 +361,8 @@ def crear_evento(request):
 @login_required
 def lista_eventos(request):
     # Obtener el parámetro de ordenación (por defecto será por 'id')
-    order_by = request.GET.get('order_by', 'id')  # Si no se especifica, se ordena por 'id'
+    order_by = request.GET.get('order_by', 'fecha')  # Si no se especifica, se ordena por 'id'
+    order_direction = request.GET.get('order_direction', 'desc')  # 'asc' o 'desc'
     valid_order_fields = ['id', 'nombre', 'fecha', 'tipo']
     
     # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
@@ -374,7 +380,10 @@ def lista_eventos(request):
         eventos = eventos.filter(Q(nombre__icontains=nombre_filter))
 
     # Ordenar según el 'order_by'
-    eventos = eventos.order_by(order_by)
+    if order_direction == 'desc':
+        eventos = eventos.order_by(f'-{order_by}')
+    else:
+        eventos = eventos.order_by(order_by)
 
     return render(request, 'lista/lista_eventos.html', {
         'eventos': eventos,
@@ -771,6 +780,28 @@ def informe_tareas_pendientes(request):
     tareas = Tarea.objects.filter(estado__in=['Pendiente', 'Atrasada'])
     datos = [(t.titulo, t.asignado_a, t.fecha_limite, t.estado, t.prioridad) for t in tareas]
     return generar_pdf('Tareas_Pendientes.pdf', ['Título', 'Asignado A', 'Fecha Límite', 'Estado', 'Prioridad'], datos)
+
+
+
+@login_required
+def crear_donacion(request):
+    if request.method == 'POST':
+        form = DonacionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Donación registrada correctamente.")
+            return redirect('lista_donaciones')  # Redirige a la lista de donaciones
+        else:
+            messages.error(request, "Error al registrar la donación. Por favor, revisa los campos.")
+    else:
+        form = DonacionForm()
+
+    return render(request, 'crear/crear_donacion.html', {'form': form})
+
+@login_required
+def lista_donaciones(request):
+    donaciones = Donacion.objects.all()
+    return render(request, 'lista/lista_donaciones.html', {'donaciones': donaciones})
 
 
 

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Donaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Lista de Donaciones</h2>
+
+    <!-- Botón para crear una nueva tarea -->
+    <div class="mb-3">
+        <a href="{% url 'crear_donacion' %}" class="btn btn-success">➕ Crear Donacion</a>
+    </div>
+
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Donante</th>
+                <th>Cantidad</th>
+                <th>Fecha</th>
+                <th>Cofradía</th>
+                <th>Evento</th>
+                <th>Gasto</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for donacion in donaciones %}
+            <tr>
+                <td>{{ donacion.donante }}</td>
+                <td>{{ donacion.cantidad }}€</td>
+                <td>{{ donacion.fecha }}</td>
+                <td>{{ donacion.cofradia }}</td>
+                <td>{{ donacion.evento }}</td>
+                <td>{{ donacion.gasto }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hay donaciones registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

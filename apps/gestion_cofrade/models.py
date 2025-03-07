@@ -17,6 +17,7 @@ class Cargo(models.Model):
         return self.cargo
 
 class PerfilUsuario(models.Model):
+    identificador = models.IntegerField(null=True, blank=True)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, null=True)
     cargo = models.ForeignKey(Cargo, on_delete=models.SET_NULL, null=True, default=None)
@@ -43,7 +44,7 @@ class FormaComunicacion(models.Model):
         return self.nombre
 
 class Hermano(models.Model):
-    numero_hermano = models.CharField(max_length=9, null=True)
+    numero_hermano = models.IntegerField(null=True, blank=True)
     dni = models.CharField(max_length=9, null=True)
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
@@ -72,11 +73,13 @@ class AuditoriaHermano(models.Model):
         ('PAGO', 'Registro de Pago'),
         ('CAMBIO_ESTADO', 'Cambio de Estado'),
     )
+    identificador = models.IntegerField(null=True, blank=True)
     hermano = models.ForeignKey('Hermano', on_delete=models.CASCADE)
     accion = models.CharField(max_length=20, choices=ACCIONES)
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     fecha = models.DateTimeField(auto_now_add=True)
     detalles = models.TextField(null=True, blank=True)  # Para registrar cambios específicos
+    cofradia = models.ForeignKey(Cofradia, on_delete=models.SET_NULL, null=True, default=None)
 
     def __str__(self):
         return f"{self.accion} - {self.hermano} - {self.fecha}"
@@ -95,6 +98,7 @@ class Tarea(models.Model):
         ('Atrasada', 'Atrasada'),
     ]
     
+    identificador = models.IntegerField(null=True, blank=True)
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True, null=True)
     asignado_a = models.CharField(max_length=200)
@@ -107,12 +111,14 @@ class Tarea(models.Model):
         return self.titulo
 
 class Evento(models.Model):
+    identificador = models.IntegerField(null=True, blank=True)
     nombre = models.CharField(max_length=100)
     fecha = models.DateField()
     tipo = models.CharField(max_length=50, choices=[('Ensayo', 'Ensayo'), ('Procesión', 'Procesión'), ('Reunión', 'Reunión')])
     cofradia = models.ForeignKey(Cofradia, on_delete=models.SET_NULL, null=True, default=None)
 
 class Finanza(models.Model):
+    identificador = models.IntegerField(null=True, blank=True)
     TIPOS = [('Ingreso', 'Ingreso'), ('Gasto', 'Gasto')]
     tipo = models.CharField(max_length=10, choices=TIPOS)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
@@ -120,6 +126,7 @@ class Finanza(models.Model):
     cofradia = models.ForeignKey(Cofradia, on_delete=models.SET_NULL, null=True, default=None)
 
 class Inventario(models.Model):
+    identificador = models.IntegerField(null=True, blank=True)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     cantidad_disponible = models.PositiveIntegerField()
@@ -130,6 +137,7 @@ class Inventario(models.Model):
         return self.nombre
 
 class Prestamo(models.Model):
+    identificador = models.IntegerField(null=True, blank=True)
     hermano = models.ForeignKey(Hermano, on_delete=models.CASCADE)
     inventario = models.ForeignKey(Inventario, on_delete=models.CASCADE)
     fecha_prestamo = models.DateField(auto_now_add=True)
@@ -137,7 +145,20 @@ class Prestamo(models.Model):
     estado_material = models.CharField(max_length=100)  # Ejemplo: 'En buen estado', 'Dañado', etc.
     comentario = models.TextField()
     fianza = models.CharField(max_length=100)
+    cofradia = models.ForeignKey(Cofradia, on_delete=models.SET_NULL, null=True, default=None)
     
     def __str__(self):
         return f"Préstamo de {self.inventario.nombre} a {self.hermano.nombre}"
     
+class Donacion(models.Model):
+    identificador = models.IntegerField(null=True, blank=True)
+    donante = models.CharField(max_length=100)  # Nombre del donante (particular o empresa)
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)  # Monto de la donación
+    fecha = models.DateField(auto_now_add=True)  # Fecha de la donación
+    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE)  # Cofradía a la que pertenece la donación
+    evento = models.ForeignKey('Evento', null=True, blank=True, on_delete=models.CASCADE)  # (Opcional) Evento asociado
+    #gasto = models.ForeignKey('Gasto', null=True, blank=True, on_delete=models.CASCADE)  # (Opcional) Gasto asociado
+
+    def __str__(self):
+        return f"Donación de {self.donante} - {self.cantidad}€"
+
