@@ -232,9 +232,11 @@ def eliminar_hermano(request, pk):
             detalles="Hermano eliminado del sistema"
         )
 
+        messages.success(request, f'El hermano "{hermano.nombre}"  "{hermano.apellidos}" ha sido eliminado con éxito.')
+
         return redirect('listar_hermanos')
 
-    return render(request, 'eliminar/eliminar_hermano.html', {'hermano': hermano})
+    return redirect('listar_hermanos')
 
 
 
@@ -312,12 +314,21 @@ def editar_tarea(request, pk):
 
 @login_required
 def eliminar_tarea(request, pk):
-    tarea = get_object_or_404(Tarea, pk=pk)
-    if request.method == "POST":
-        tarea.delete()
-        return redirect('lista_tareas')
+    # Obtener la tarea a eliminar
+    tarea = get_object_or_404(Tarea, id=pk)
+    
+    # Verificar que la solicitud sea un POST (para evitar eliminar accidentalmente con GET)
+    if request.method == 'POST':
+        tarea.delete()  # Eliminar la tarea
 
-    return render(request, 'eliminar_tarea.html', {'tarea': tarea})
+        # Mostrar un mensaje de éxito
+        messages.success(request, f'La tarea "{tarea.titulo}" ha sido eliminada con éxito.')
+
+        # Redirigir al usuario de vuelta a la lista de tareas
+        return redirect('lista_tareas')  # Asegúrate de que 'lista_tareas' es el nombre correcto de la vista
+
+    # Si la solicitud no es un POST, redirigir al usuario de vuelta (aunque no debería llegar aquí por el tipo de formulario)
+    return redirect('lista_tareas')
 
 
 
@@ -387,12 +398,21 @@ def editar_evento(request, pk):
 
 @login_required
 def eliminar_evento(request, pk):
-    evento = get_object_or_404(Evento, pk=pk)
-    if request.method == "POST":
-        evento.delete()
-        return redirect('lista_eventos')
+    # Obtener el evento a eliminar
+    evento = get_object_or_404(Evento, id=pk)
+    
+    # Verificar que la solicitud sea un POST (para evitar eliminar accidentalmente con GET)
+    if request.method == 'POST':
+        evento.delete()  # Eliminar el evento
 
-    return render(request, 'eliminar_evento.html', {'evento': evento})
+        # Mostrar un mensaje de éxito
+        messages.success(request, f'El evento "{evento.nombre}" ha sido eliminado con éxito.')
+
+        # Redirigir al usuario de vuelta a la lista de eventos
+        return redirect('lista_eventos')  # Asegúrate de que 'lista_eventos' es el nombre correcto de la vista
+
+    # Si la solicitud no es un POST, redirigir al usuario de vuelta (aunque no debería llegar aquí por el tipo de formulario)
+    return redirect('lista_eventos')
 
 
 
@@ -440,9 +460,13 @@ def eliminar_inventario(request, pk):
     inventario = get_object_or_404(Inventario, pk=pk)
     if request.method == "POST":
         inventario.delete()
+
+        # Mostrar un mensaje de éxito
+        messages.success(request, f'El inventario "{inventario.nombre}" ha sido eliminado con éxito.')
+
         return redirect('lista_inventario')
     
-    return render(request, 'eliminar_inventario.html', {'inventario': inventario})
+    return redirect('lista_inventario')
 
 
 
@@ -501,10 +525,10 @@ def eliminar_prestamo(request, pk):
         inventario.cantidad_disponible += 1
         inventario.save()
         prestamo.delete()
-        messages.success(request, 'Préstamo eliminado correctamente.')
+        messages.success(request, f'El prestamo de "{prestamo.inventario.nombre}" al hermano "{prestamo.hermano.nombre}" "{prestamo.hermano.apellidos}" ha sido eliminado con éxito.')
         return redirect('lista_prestamos')
 
-    return render(request, 'eliminar_prestamo.html', {'prestamo': prestamo})
+    return redirect('lista_prestamos')
 
 
 
