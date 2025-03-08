@@ -37,7 +37,7 @@
                 <tbody>
                     {% for prestamo in prestamos %}
                         <tr>
-                            <td>{{ prestamo.id }}</td>
+                            <td>{{ prestamo.identificador }}</td>
                             <td>{{ prestamo.hermano.nombre }} {{ prestamo.hermano.apellidos }}</td>
                             <td>{{ prestamo.inventario.nombre }}</td>
                             <td>{{ prestamo.fecha_prestamo|date:"d/m/Y" }}</td>

@@ -22,7 +22,7 @@ class HermanoForm(forms.ModelForm):
 class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
-        fields = ['nombre', 'fecha', 'tipo']
+        fields = ['identificador', 'nombre', 'fecha', 'tipo']
         widgets = {
             'fecha': forms.DateInput(format='%d/%m/%Y', attrs={'type': 'date'}),
         }
@@ -39,7 +39,7 @@ class EventoForm(forms.ModelForm):
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea
-        fields = ['titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
+        fields = ['identificador', 'titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
         widgets = {
             'fecha_limite': forms.DateInput(format='%d/%m/%Y', attrs={'type': 'date'}),
         }
@@ -79,12 +79,12 @@ class CargarExcelForm(forms.Form):
 class InventarioForm(forms.ModelForm):
     class Meta:
         model = Inventario
-        fields = ['nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
+        fields = ['identificador', 'nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
 
 class PrestamoForm(forms.ModelForm):
     class Meta:
         model = Prestamo
-        fields = ['hermano', 'inventario', 'fecha_devolucion', 'estado_material', 'comentario', 'fianza']
+        fields = ['identificador', 'hermano', 'inventario', 'fecha_devolucion', 'estado_material', 'comentario', 'fianza']
         widgets = {
             'fecha_prestamo': forms.HiddenInput(),
         }
@@ -92,7 +92,7 @@ class PrestamoForm(forms.ModelForm):
 class DonacionForm(forms.ModelForm):
     class Meta:
         model = Donacion
-        fields = ['donante', 'cantidad', 'cofradia', 'evento']
+        fields = ['identificador', 'donante', 'cantidad', 'cofradia', 'evento']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date'}),
         }

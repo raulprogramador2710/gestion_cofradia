@@ -21,7 +21,6 @@ urlpatterns = [
     path('lista-hermanos/', views.lista_hermanos, name='lista_hermanos'),
     path('detalle-hermanos/<int:pk>/', views.detalle_hermano, name='detalle_hermano'),
     path('editar-hermano/<int:pk>/', views.editar_hermano, name='editar_hermano'),
-    path('eliminar-hermano/<int:pk>/', views.eliminar_hermano, name='eliminar_hermano'),
 
     path('crear-tarea/', views.crear_tarea, name='crear_tarea'),
     path('lista-tareas/', views.lista_tareas, name='lista_tareas'),

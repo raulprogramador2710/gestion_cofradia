@@ -45,7 +45,7 @@
                 <tbody>
                     {% for evento in eventos %}
                         <tr>
-                            <td>{{ evento.id }}</td>
+                            <td>{{ evento.identificador }}</td>
                             <td>{{ evento.nombre }}</td>
                             <td>{{ evento.fecha|date:"d/m/Y" }}</td>
                             <td>{{ evento.tipo }}</td>

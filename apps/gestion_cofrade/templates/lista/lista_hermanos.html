@@ -92,36 +92,9 @@
                                 <div class="d-flex gap-2">
                                     <a href="{% url 'detalle_hermano' hermano.id %}" class="btn btn-info btn-sm">👁️</a>
                                     <a href="{% url 'editar_hermano' hermano.id %}" class="btn btn-warning btn-sm">✏️</a>
-                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar{{ hermano.id }}">
-                                        🗑
-                                    </button>
                                 </div>
                             </td>
                         </tr>
-
-                        <!-- Modal de Confirmación de eliminación -->
-                        <div class="modal fade" id="confirmarEliminar{{ hermano.id }}" tabindex="-1" aria-labelledby="modalLabel{{ hermano.id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalLabel{{ hermano.id }}">Confirmar Eliminación</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        ¿Estás seguro de que deseas eliminar el hermano <strong>{{ hermano.nombre }} {{ hermano.apellidos }}</strong>? Esta acción no se puede deshacer.
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        
-                                        <!-- Formulario para eliminar -->
-                                        <form method="POST" action="{% url 'eliminar_hermano' hermano.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     {% endfor %}
                 </tbody>
             </table>

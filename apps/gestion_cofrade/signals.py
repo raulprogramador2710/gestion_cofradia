@@ -172,6 +172,7 @@ def crear_datos_prueba(sender, **kwargs):
 
     # Crear Eventos de ejemplo
     evento1 = Evento.objects.create(
+        identificador='1',
         nombre="Procesión Semana Santa",
         fecha="2025-04-13",
         tipo="Procesión",
@@ -179,6 +180,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     evento2 = Evento.objects.create(
+        identificador='2',
         nombre="Muda",
         fecha="2025-04-06",
         tipo="Ensayo",
@@ -186,6 +188,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     evento3 = Evento.objects.create(
+        identificador='3',
         nombre="Reunión General",
         fecha="2025-03-30",
         tipo="Reunión",
@@ -194,6 +197,7 @@ def crear_datos_prueba(sender, **kwargs):
 
     # Crear Tareas de ejemplo
     tarea1 = Tarea.objects.create(
+        identificador='1',
         titulo="Revisión de Inventario",
         descripcion="Revisar el estado de los materiales de la Cofradía.",
         asignado_a="Juan Pérez",
@@ -204,6 +208,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     tarea2 = Tarea.objects.create(
+        identificador='2',
         titulo="Recaudación de Fondos",
         descripcion="Realizar una colecta para el mantenimiento de la Cofradía.",
         asignado_a="Ana López",
@@ -214,6 +219,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     tarea3 = Tarea.objects.create(
+        identificador='3',
         titulo="Limpieza de la Iglesia",
         descripcion="Realizar una limpieza profunda en la iglesia de la Cofradía.",
         asignado_a="Carlos Martínez",
@@ -224,6 +230,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     tarea4 = Tarea.objects.create(
+        identificador='4',
         titulo="Organización de la Procesión",
         descripcion="Coordinar los detalles logísticos para la procesión de Semana Santa.",
         asignado_a="Lucía Fernández",
@@ -235,6 +242,7 @@ def crear_datos_prueba(sender, **kwargs):
 
     # Crear Inventario de ejemplo
     inventario1 = Inventario.objects.create(
+        identificador='1',
         nombre="Cruz de Procesión",
         descripcion="Cruz que se lleva durante la procesión.",
         cantidad_disponible=5,
@@ -243,6 +251,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     inventario2 = Inventario.objects.create(
+        identificador='2',
         nombre="Velas",
         descripcion="Velas para las celebraciones.",
         cantidad_disponible=50,
@@ -251,6 +260,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     inventario3 = Inventario.objects.create(
+        identificador='3',
         nombre="Banderines",
         descripcion="Banderines para la procesión.",
         cantidad_disponible=10,
@@ -260,6 +270,7 @@ def crear_datos_prueba(sender, **kwargs):
 
     # Crear Préstamos de ejemplo
     prestamo1 = Prestamo.objects.create(
+        identificador='1',
         hermano=hermano1,
         inventario=inventario1,
         estado_material="En buen estado",
@@ -268,6 +279,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     prestamo2 = Prestamo.objects.create(
+        identificador='2',
         hermano=hermano2,
         inventario=inventario2,
         estado_material="En buen estado",
@@ -276,6 +288,7 @@ def crear_datos_prueba(sender, **kwargs):
     )
 
     prestamo3 = Prestamo.objects.create(
+        identificador='3',
         hermano=hermano1,
         inventario=inventario3,
         estado_material="En buen estado",

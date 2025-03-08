@@ -223,31 +223,6 @@ def editar_hermano(request, pk):
 
     return render(request, 'editar/editar_hermano.html', {'form': form})
 
-@login_required
-def eliminar_hermano(request, pk): 
-    hermano = get_object_or_404(Hermano, pk=pk)
-    if request.method == "POST":
-
-        user = get_object_or_404(User, username=hermano.dni)
-        perfilUsuario = get_object_or_404(PerfilUsuario, usuario=user)
-
-        perfilUsuario.delete()
-        user.delete()
-        hermano.delete()
-
-        AuditoriaHermano.objects.create(
-            hermano=hermano,
-            accion="ELIMINAR",
-            usuario=request.user,
-            detalles="Hermano eliminado del sistema"
-        )
-
-        messages.success(request, f'El hermano "{hermano.nombre}"  "{hermano.apellidos}" ha sido eliminado con éxito.')
-
-        return redirect('lista/listar_hermanos')
-
-    return redirect('lista/listar_hermanos')
-
 
 
 #Tareas
@@ -269,12 +244,12 @@ def crear_tarea(request):
 @login_required
 def lista_tareas(request):
     # Obtener el parámetro de ordenación (por defecto será por 'id')
-    order_by = request.GET.get('order_by', 'id')  # Si no se especifica, se ordena por 'id'
-    valid_order_fields = ['id', 'titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
+    order_by = request.GET.get('order_by', 'identificador')  # Si no se especifica, se ordena por 'id'
+    valid_order_fields = ['id', 'identificador', 'titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
     
     # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
     if order_by not in valid_order_fields:
-        order_by = 'id'  # Orden por defecto en caso de un parámetro no válido
+        order_by = 'identificador'  # Orden por defecto en caso de un parámetro no válido
     
     # Filtros
     titulo_filter = request.GET.get('titulo', '')
@@ -364,7 +339,7 @@ def lista_eventos(request):
     # Obtener el parámetro de ordenación (por defecto será por 'id')
     order_by = request.GET.get('order_by', 'fecha')  # Si no se especifica, se ordena por 'id'
     order_direction = request.GET.get('order_direction', 'desc')  # 'asc' o 'desc'
-    valid_order_fields = ['id', 'nombre', 'fecha', 'tipo']
+    valid_order_fields = ['id', 'identificador', 'nombre', 'fecha', 'tipo']
     
     # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
     if order_by not in valid_order_fields:
@@ -450,12 +425,12 @@ def crear_inventario(request):
 @login_required
 def lista_inventario(request):
     # Obtener el parámetro de ordenación (por defecto será por 'id')
-    order_by = request.GET.get('order_by', 'id')  # Si no se especifica, se ordena por 'id'
-    valid_order_fields = ['id', 'nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
+    order_by = request.GET.get('order_by', 'identificador')  # Si no se especifica, se ordena por 'id'
+    valid_order_fields = ['id', 'identificador', 'nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
     
     # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
     if order_by not in valid_order_fields:
-        order_by = 'id'  # Orden por defecto en caso de un parámetro no válido
+        order_by = 'identificador'  # Orden por defecto en caso de un parámetro no válido
     
     # Filtros
     nombre_filter = request.GET.get('nombre', '')
@@ -945,6 +920,8 @@ def cargar_hermanos(request):
         form = CargarExcelForm()
 
     return render(request, 'cargar_hermanos.html', {'form': form})
+
+
 
 
 def convertir_fecha(valor):
