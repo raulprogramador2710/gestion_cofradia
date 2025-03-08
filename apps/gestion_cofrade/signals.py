@@ -42,9 +42,18 @@ def crear_datos_prueba(sender, **kwargs):
         Inventario.objects.filter(cofradia=cofradia_demo).delete()
         Tarea.objects.filter(cofradia=cofradia_demo).delete()
         Evento.objects.filter(cofradia=cofradia_demo).delete()
+
+        PerfilUsuario.objects.filter(cofradia=cofradia_demo).delete()
+
+        dnis_a_eliminar = Hermano.objects.filter(cofradia__nombre="Cofradía DEMO").values_list('dni', flat=True)
+        # Eliminar los usuarios cuyo username coincida con esos DNIs
+        User.objects.filter(username__in=dnis_a_eliminar).delete()
+
         Hermano.objects.filter(cofradia=cofradia_demo).delete()
+
         PerfilUsuario.objects.filter(cofradia=cofradia_demo).delete()
         User.objects.filter(username='HM_Demo').delete()
+
         cofradia_demo.delete()
 
     # Crear una nueva Cofradía DEMO
@@ -147,6 +156,19 @@ def crear_datos_prueba(sender, **kwargs):
         forma_comunicacion=forma_comunicacion_whatsapp,
         cofradia=cofradia_demo
     )
+
+    #Crear user y perfil usuario
+    user_1= User.objects.create_user(username=hermano1.dni, password=hermano1.dni)
+    PerfilUsuario.objects.create(usuario=user_1, cofradia=cofradia_demo, cargo=Cargo.objects.get(cargo='Hermano'))
+
+    user_2 = User.objects.create_user(username=hermano2.dni, password=hermano2.dni)
+    PerfilUsuario.objects.create(usuario=user_2, cofradia=cofradia_demo, cargo=Cargo.objects.get(cargo='Hermano'))
+
+    user_3 = User.objects.create_user(username=hermano3.dni, password=hermano3.dni)
+    PerfilUsuario.objects.create(usuario=user_3, cofradia=cofradia_demo, cargo=Cargo.objects.get(cargo='Hermano'))
+
+    user_4 = User.objects.create_user(username=hermano4.dni, password=hermano4.dni)
+    PerfilUsuario.objects.create(usuario=user_4, cofradia=cofradia_demo, cargo=Cargo.objects.get(cargo='Hermano'))
 
     # Crear Eventos de ejemplo
     evento1 = Evento.objects.create(

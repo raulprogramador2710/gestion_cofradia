@@ -224,7 +224,7 @@ def editar_hermano(request, pk):
     return render(request, 'editar/editar_hermano.html', {'form': form})
 
 @login_required
-def eliminar_hermano(request, pk):
+def eliminar_hermano(request, pk): 
     hermano = get_object_or_404(Hermano, pk=pk)
     if request.method == "POST":
 
@@ -244,9 +244,9 @@ def eliminar_hermano(request, pk):
 
         messages.success(request, f'El hermano "{hermano.nombre}"  "{hermano.apellidos}" ha sido eliminado con éxito.')
 
-        return redirect('listar_hermanos')
+        return redirect('lista/listar_hermanos')
 
-    return redirect('listar_hermanos')
+    return redirect('lista/listar_hermanos')
 
 
 
@@ -335,10 +335,10 @@ def eliminar_tarea(request, pk):
         messages.success(request, f'La tarea "{tarea.titulo}" ha sido eliminada con éxito.')
 
         # Redirigir al usuario de vuelta a la lista de tareas
-        return redirect('lista_tareas')  # Asegúrate de que 'lista_tareas' es el nombre correcto de la vista
+        return redirect('lista/lista_tareas')  # Asegúrate de que 'lista_tareas' es el nombre correcto de la vista
 
     # Si la solicitud no es un POST, redirigir al usuario de vuelta (aunque no debería llegar aquí por el tipo de formulario)
-    return redirect('lista_tareas')
+    return redirect('lista/lista_tareas')
 
 
 
@@ -423,10 +423,10 @@ def eliminar_evento(request, pk):
         messages.success(request, f'El evento "{evento.nombre}" ha sido eliminado con éxito.')
 
         # Redirigir al usuario de vuelta a la lista de eventos
-        return redirect('lista_eventos')  # Asegúrate de que 'lista_eventos' es el nombre correcto de la vista
+        return redirect('lista/lista_eventos')  # Asegúrate de que 'lista_eventos' es el nombre correcto de la vista
 
     # Si la solicitud no es un POST, redirigir al usuario de vuelta (aunque no debería llegar aquí por el tipo de formulario)
-    return redirect('lista_eventos')
+    return redirect('lista/lista_eventos')
 
 
 
@@ -502,9 +502,9 @@ def eliminar_inventario(request, pk):
         # Mostrar un mensaje de éxito
         messages.success(request, f'El inventario "{inventario.nombre}" ha sido eliminado con éxito.')
 
-        return redirect('lista_inventario')
+        return redirect('lista/lista_inventario')
     
-    return redirect('lista_inventario')
+    return redirect('lista/lista_inventario')
 
 
 
@@ -569,9 +569,9 @@ def eliminar_prestamo(request, pk):
         inventario.save()
         prestamo.delete()
         messages.success(request, f'El prestamo de "{prestamo.inventario.nombre}" al hermano "{prestamo.hermano.nombre}" "{prestamo.hermano.apellidos}" ha sido eliminado con éxito.')
-        return redirect('lista_prestamos')
+        return redirect('lista/lista_prestamos')
 
-    return redirect('lista_prestamos')
+    return redirect('lista/lista_prestamos')
 
 
 
