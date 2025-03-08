@@ -282,7 +282,8 @@ def lista_tareas(request):
     prioridad_filter = request.GET.get('estado', '')
 
     # Consultar todos los hermanos
-    tareas = Tarea.objects.all()
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    tareas = Tarea.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
 
     # Aplicar filtros
     if titulo_filter:
@@ -373,7 +374,8 @@ def lista_eventos(request):
     nombre_filter = request.GET.get('nombre', '')
 
     # Consultar todos los hermanos
-    eventos = Evento.objects.all()
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    eventos = Evento.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
 
     # Aplicar filtros
     if nombre_filter:
@@ -459,7 +461,8 @@ def lista_inventario(request):
     nombre_filter = request.GET.get('nombre', '')
 
     # Consultar todos los hermanos
-    inventarios = Inventario.objects.all()
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    inventarios = Inventario.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
 
     # Aplicar filtros
     if nombre_filter:
@@ -532,7 +535,9 @@ def crear_prestamo(request):
 @login_required
 def lista_prestamos(request):
     query = request.GET.get('hermano', '')  # Obtiene el parámetro 'usuario' de la URL
-    prestamos = Prestamo.objects.all()
+    
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    prestamos = Prestamo.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
 
     if query:
         prestamos = prestamos.filter(hermano__nombre__icontains=query)  # Filtra por nombre de usuario
@@ -800,14 +805,17 @@ def crear_donacion(request):
 
 @login_required
 def lista_donaciones(request):
-    donaciones = Donacion.objects.all()
+    
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    donaciones = Donacion.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
     return render(request, 'lista/lista_donaciones.html', {'donaciones': donaciones})
 
 
 
 #Notificaciones
 def enviar_correo(request):
-    hermanos_con_email = Hermano.objects.filter(email__isnull=False).exclude(email="")  # Solo hermanos con email
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    hermanos_con_email = Hermano.objects.filter(email__isnull=False, cofradia__nombre=perfil_usuario.cofradia).exclude(email="")  # Solo hermanos con email
 
     if request.method == 'POST':
         asunto = request.POST.get('asunto')
