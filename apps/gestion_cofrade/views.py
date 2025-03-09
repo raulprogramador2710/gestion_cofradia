@@ -84,9 +84,9 @@ def inicio(request):
         fecha_limite__range=[hoy, limite_30_dias]
     ).order_by('fecha_limite')
     # Tareas urgentes (menos de 5 días para vencimiento)
-    tareas_urgentes = tareas_proximas.filter(fecha_limite__lte=hoy + timedelta(days=5))
+    tareas_urgentes = tareas_proximas.filter(fecha_limite__lte=hoy + timedelta(days=5), cofradia = perfil.cofradia)
 
-    eventos_proximos = Evento.objects.filter(fecha__gte=now().date()).order_by('fecha')[:3]
+    eventos_proximos = Evento.objects.filter(fecha__gte=now().date(), cofradia = perfil.cofradia).order_by('fecha')[:3]
 
     total_ingresos = Finanza.objects.filter(tipo='Ingreso').aggregate(Sum('monto'))['monto__sum'] or 0
     total_gastos = Finanza.objects.filter(tipo='Gasto').aggregate(Sum('monto'))['monto__sum'] or 0
