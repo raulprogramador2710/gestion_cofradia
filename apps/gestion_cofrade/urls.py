@@ -44,7 +44,7 @@ urlpatterns = [
     path('informes/tareas-pendientes/', informe_tareas_pendientes, name='informe_tareas_pendientes'),
 
     path('crear-inventario/', views.crear_inventario, name='crear_inventario'),
-    path('lista-inventario/', views.lista_inventario, name='lista_inventario'),#primero vista despues menu
+    path('lista-inventarios/', views.lista_inventarios, name='lista_inventarios'),#primero vista despues menu
     path('detalle-inventario/<int:pk>/', views.detalle_inventario, name='detalle_inventario'),
     path('editar-inventario/<int:pk>/', views.editar_inventario, name='editar_inventario'),
     path('eliminar-inventario/<int:pk>/', views.eliminar_inventario, name='eliminar_inventario'),

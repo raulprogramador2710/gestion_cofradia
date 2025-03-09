@@ -5,7 +5,7 @@ from django.db.models import Max
 from django.db.models.signals import pre_save
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from .models import Cofradia, Cargo, PerfilUsuario, Estado, FormaPago, FormaComunicacion, Hermano, Evento, Tarea, Inventario, Prestamo, Donacion
+from .models import Cofradia, Cargo, PerfilUsuario, Estado, FormaPago, FormaComunicacion, Hermano, AuditoriaHermano, Evento, Tarea, Finanza, Inventario, Prestamo, Donacion
 
 # Signal para asignar el número de hermano autoincremental dentro de cada cofradía
 @receiver(pre_save, sender=Hermano)
@@ -19,8 +19,13 @@ def set_numero_hermano(sender, instance, **kwargs):
             instance.numero_hermano = max_numero + 1  # Incrementa el número más alto para esta cofradía
 
 # Signal para asignar el identificador autoincremental dentro de cada cofradía
-@receiver(pre_save, sender=Donacion)
+@receiver(pre_save, sender=AuditoriaHermano)
+@receiver(pre_save, sender=Evento)
+@receiver(pre_save, sender=Tarea)
+@receiver(pre_save, sender=Finanza)
+@receiver(pre_save, sender=Inventario)
 @receiver(pre_save, sender=Prestamo)
+@receiver(pre_save, sender=Donacion)
 def set_identificador(sender, instance, **kwargs):
     if instance.identificador is None:  # Si el identificador no ha sido asignado aún
         # Obtener el número máximo de identificador actual para la misma cofradía

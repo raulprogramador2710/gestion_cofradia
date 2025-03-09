@@ -464,7 +464,7 @@ def crear_inventario(request):
     return render(request, 'crear/crear_inventario.html', {'form': form})
 
 @login_required
-def lista_inventario(request):
+def lista_inventarios(request):
     # Obtener el parámetro de ordenación (por defecto será por 'id')
     order_by = request.GET.get('order_by', 'identificador')  # Si no se especifica, se ordena por 'id'
     valid_order_fields = ['id', 'identificador', 'nombre', 'descripcion', 'cantidad_total', 'cantidad_disponible', 'ubicacion']

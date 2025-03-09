@@ -28,16 +28,25 @@ class HermanoForm(forms.ModelForm):
     class Meta:
         model = Hermano
         fields = ['numero_hermano', 'dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'fecha_inicio', 'fecha_ultimo_pago', 'email', 'iban', 'estado', 'forma_pago', 'forma_comunicacion']
-         
+        widgets = {
+            'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
+        }
+
 class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
-        fields = ['nombre', 'fecha', 'tipo']       
+        fields = ['nombre', 'fecha', 'tipo']  
+        widgets = {
+            'fecha': forms.DateInput(attrs={'type': 'date'}),
+        }     
     
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea
         fields = ['titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
+        widgets = {
+            'fecha_limite': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 class InventarioForm(forms.ModelForm):
     class Meta:
