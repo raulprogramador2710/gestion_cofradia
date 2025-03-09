@@ -7,6 +7,13 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Guardar cambios</button>
+    <div class="text-center mt-3">
+      <button type="submit" class="btn btn-primary px-4">
+          💾 Guardar Cambios
+      </button>
+      <a href="{% url 'lista_prestamos' %}" class="btn btn-secondary px-4">
+          ⬅️ Volver
+      </a>
+  </div>
   </form>
 {% endblock %}

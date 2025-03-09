@@ -3,10 +3,42 @@
 {% block title %}Crear Inventario{% endblock %}
 
 {% block content %}
-  <h1>Crear Inventario</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar</button>
-  </form>
+{% load widget_tweaks %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Crear Inventario</h1>
+        
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Campo Nombre -->
+            <div class="mb-3">
+                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre</label>
+                {{ form.nombre|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Descripción -->
+            <div class="mb-3">
+                <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción</label>
+                {{ form.descripcion|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Cantidad Disponible -->
+            <div class="mb-3">
+                <label for="{{ form.cantidad_disponible.id_for_label }}" class="form-label">Cantidad Disponible</label>
+                {{ form.cantidad_disponible|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Ubicación -->
+            <div class="mb-3">
+                <label for="{{ form.ubicacion.id_for_label }}" class="form-label">Ubicación</label>
+                {{ form.ubicacion|add_class:"form-control" }}
+            </div>
+
+            <!-- Botón de Enviar -->
+            <button type="submit" class="btn btn-primary">Crear Inventario</button>
+        </form>
+        <div class="text-center mt-4">
+            <a href="{% url 'lista_inventarios' %}" class="btn btn-secondary">⬅️ Volver</a>
+        </div>
+    </div>
 {% endblock %}

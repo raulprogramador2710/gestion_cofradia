@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from django.db import transaction
 from django.db.models import Q, Sum
 from django.conf import settings
@@ -135,7 +135,9 @@ def crear_hermano(request):
             # Crear usuario solo si hay DNI
             if hermano.dni and not User.objects.filter(username=hermano.dni).exists():
                 user = User.objects.create_user(username=hermano.dni, password=hermano.dni, email=hermano.email)
-                PerfilUsuario.objects.create(usuario=user, cofradia=perfil_usuario.cofradia, cargo=Cargo.objects.get_or_create(cargo='Hermano'))
+                # Obtener la instancia de Cargo
+                cargo_obj = Cargo.objects.get(nombre="Hermano")  # O lo que sea que identifique al cargo
+                PerfilUsuario.objects.create(usuario=user, cofradia=perfil_usuario.cofradia, cargo=cargo_obj)
                 user.set_password(hermano.dni)  # Guardar contraseña de forma segura
                 user.save()
 
@@ -204,12 +206,15 @@ def editar_hermano(request, pk):
         if form.is_valid():
             hermano = form.save(commit=False)
 
-            user = User.objects.filter(username=form.dni)
-            user.email =form.email
+            # Actualizamos el usuario asociado con el hermano
+            user = User.objects.filter(username=form.cleaned_data['dni']).first()  # Usamos 'first()' para obtener un solo usuario
+            if user:
+                user.email = form.cleaned_data['email']
+                user.save()
 
             hermano.save()
-            user.save()
 
+            # Registrar la auditoría
             AuditoriaHermano.objects.create(
                 hermano=hermano,
                 accion="MODIFICAR",
@@ -219,102 +224,16 @@ def editar_hermano(request, pk):
 
             return redirect('lista_hermanos')
     else:
+        # Asegurarse de que las fechas estén bien formateadas antes de mostrarlas
+        hermano.fecha_nacimiento = hermano.fecha_nacimiento.strftime('%d/%m/%Y')
+
         form = HermanoForm(instance=hermano)
 
     return render(request, 'editar/editar_hermano.html', {'form': form})
 
 
 
-#Tareas
-@login_required
-def crear_tarea(request):
-    if request.method == 'POST':
-        form = TareaForm(request.POST)
-        if form.is_valid():
 
-            perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
-            tarea = form.save(commit=False)
-            tarea.cofradia = perfil_usuario.cofradia  # Asignar la cofradía del usuario logueado
-            tarea.save()
-            return redirect('lista_tareas')
-    else:
-        form = TareaForm()
-    return render(request, 'crear/crear_tarea.html', {'form': form})
-
-@login_required
-def lista_tareas(request):
-    # Obtener el parámetro de ordenación (por defecto será por 'id')
-    order_by = request.GET.get('order_by', 'identificador')  # Si no se especifica, se ordena por 'id'
-    valid_order_fields = ['id', 'identificador', 'titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
-    
-    # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
-    if order_by not in valid_order_fields:
-        order_by = 'identificador'  # Orden por defecto en caso de un parámetro no válido
-    
-    # Filtros
-    titulo_filter = request.GET.get('titulo', '')
-    estado_filter = request.GET.get('estado', '')
-    prioridad_filter = request.GET.get('estado', '')
-
-    # Consultar todos los hermanos
-    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
-    tareas = Tarea.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
-
-    # Aplicar filtros
-    if titulo_filter:
-        tareas = tareas.filter(Q(titulo__icontains=titulo_filter))
-    if estado_filter:
-        tareas = tareas.filter(Q(estado__icontains=estado_filter))
-    if prioridad_filter:
-        tareas = tareas.filter(Q(prioridad__icontains=prioridad_filter))
-
-    # Ordenar según el 'order_by'
-    tareas = tareas.order_by(order_by)
-
-    return render(request, 'lista/lista_tareas.html', {
-        'tareas': tareas,
-        'order_by': order_by,
-        'titulo_filter': titulo_filter,
-        'estado_filter': estado_filter,
-        'prioridad_filter': prioridad_filter,
-    })
-
-login_required
-def detalle_tarea(request, pk):
-    tarea = get_object_or_404(Tarea, pk=pk)
-    return render(request, 'detalle/detalle_tarea.html', {'tarea': tarea})
-
-@login_required
-def editar_tarea(request, pk):
-    tarea = get_object_or_404(Tarea, pk=pk)
-
-    if request.method == "POST":
-        form = TareaForm(request.POST, instance=tarea)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_tareas')
-    else:
-        form = TareaForm(instance=tarea)
-
-    return render(request, 'editar/editar_tarea.html', {'form': form})
-
-@login_required
-def eliminar_tarea(request, pk):
-    # Obtener la tarea a eliminar
-    tarea = get_object_or_404(Tarea, id=pk)
-    
-    # Verificar que la solicitud sea un POST (para evitar eliminar accidentalmente con GET)
-    if request.method == 'POST':
-        tarea.delete()  # Eliminar la tarea
-
-        # Mostrar un mensaje de éxito
-        messages.success(request, f'La tarea "{tarea.titulo}" ha sido eliminada con éxito.')
-
-        # Redirigir al usuario de vuelta a la lista de tareas
-        return redirect('lista/lista_tareas')  # Asegúrate de que 'lista_tareas' es el nombre correcto de la vista
-
-    # Si la solicitud no es un POST, redirigir al usuario de vuelta (aunque no debería llegar aquí por el tipo de formulario)
-    return redirect('lista/lista_tareas')
 
 
 
@@ -336,19 +255,20 @@ def crear_evento(request):
 
 @login_required
 def lista_eventos(request):
-    # Obtener el parámetro de ordenación (por defecto será por 'id')
+    # Obtener el parámetro de ordenación (por defecto será por 'fecha')
     order_by = request.GET.get('order_by', 'fecha')  # Si no se especifica, se ordena por 'id'
     order_direction = request.GET.get('order_direction', 'desc')  # 'asc' o 'desc'
     valid_order_fields = ['id', 'identificador', 'nombre', 'fecha', 'tipo']
-    
+
     # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
     if order_by not in valid_order_fields:
         order_by = 'id'  # Orden por defecto en caso de un parámetro no válido
-    
+
     # Filtros
     nombre_filter = request.GET.get('nombre', '')
+    vigentes = request.GET.get('vigentes', '1')  # Comprobar si el filtro de 'vigentes' está activo
 
-    # Consultar todos los hermanos
+    # Consultar todos los eventos
     perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
     eventos = Evento.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
 
@@ -356,16 +276,25 @@ def lista_eventos(request):
     if nombre_filter:
         eventos = eventos.filter(Q(nombre__icontains=nombre_filter))
 
+    if vigentes == '1':  # Si "Vigentes" está activado
+        eventos = eventos.filter(fecha__gte=date.today())  # Solo los eventos cuya fecha es mayor o igual a hoy
+
     # Ordenar según el 'order_by'
     if order_direction == 'desc':
         eventos = eventos.order_by(f'-{order_by}')
     else:
         eventos = eventos.order_by(order_by)
 
+    # Paginación
+    paginator = Paginator(eventos, 10)  # 10 eventos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'lista/lista_eventos.html', {
-        'eventos': eventos,
+        'eventos': page_obj,
         'order_by': order_by,
         'nombre_filter': nombre_filter,
+        'vigentes': vigentes,  # Para mantener el estado del filtro en el HTML
     })
 
 login_required
@@ -407,6 +336,118 @@ def eliminar_evento(request, pk):
 
 
 
+#Tareas
+@login_required
+def crear_tarea(request):
+    if request.method == 'POST':
+        form = TareaForm(request.POST)
+        if form.is_valid():
+
+            perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+            tarea = form.save(commit=False)
+            tarea.cofradia = perfil_usuario.cofradia  # Asignar la cofradía del usuario logueado
+            tarea.save()
+            return redirect('lista_tareas')
+    else:
+        form = TareaForm()
+    return render(request, 'crear/crear_tarea.html', {'form': form})
+
+@login_required
+def lista_tareas(request):
+    today = date.today()
+
+    # Obtener el parámetro de ordenación (por defecto será por 'identificador')
+    order_by = request.GET.get('order_by', 'identificador')  # Si no se especifica, se ordena por 'identificador'
+    valid_order_fields = ['id', 'identificador', 'titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
+    
+    # Si el 'order_by' no está en los campos válidos, usar 'identificador' como valor por defecto
+    if order_by not in valid_order_fields:
+        order_by = 'identificador'  # Orden por defecto en caso de un parámetro no válido
+    
+    # Filtros
+    titulo_filter = request.GET.get('titulo', '')
+    estado_filter = request.GET.get('estado', '')
+    prioridad_filter = request.GET.get('prioridad', '')
+    vigentes = request.GET.get('vigentes', '1')  # Obtener el parámetro de 'vigentes'
+
+    # Consultar todas las tareas
+    perfil_usuario = PerfilUsuario.objects.get(usuario=request.user)
+    tareas = Tarea.objects.filter(cofradia__nombre=perfil_usuario.cofradia)
+
+    # Aplicar filtros por título, estado y prioridad
+    if titulo_filter:
+        tareas = tareas.filter(Q(titulo__icontains=titulo_filter))
+    if estado_filter:
+        tareas = tareas.filter(Q(estado__icontains=estado_filter))
+    if prioridad_filter:
+        tareas = tareas.filter(Q(prioridad__icontains=prioridad_filter))
+
+    # Aplicar filtro de "vigentes"
+    if vigentes == '1':  # Si "Vigentes" está activado
+        # Mostrar las tareas cuya fecha de límite es mayor o igual a hoy
+        # o aquellas que ya están vencidas pero no están en estado "Completada"
+        tareas = tareas.filter(
+            Q(fecha_limite__gte=date.today()) |  # Fecha de limite mayor o igual a hoy
+            (Q(fecha_limite__lt=date.today()) & ~Q(estado='Completada'))  # Fecha pasada pero estado diferente a "Completada"
+        )
+
+    # Ordenar según el 'order_by'
+    tareas = tareas.order_by(order_by)
+
+    # Paginación: 10 elementos por página
+    paginator = Paginator(tareas, 10)  # 10 eventos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'lista/lista_tareas.html', {
+        'tareas': page_obj,
+        'order_by': order_by,
+        'titulo_filter': titulo_filter,
+        'estado_filter': estado_filter,
+        'prioridad_filter': prioridad_filter,
+        'vigentes': vigentes,  # Para mantener el estado del filtro en el HTML
+        'today': today,
+    })
+
+login_required
+def detalle_tarea(request, pk):
+    tarea = get_object_or_404(Tarea, pk=pk)
+    return render(request, 'detalle/detalle_tarea.html', {'tarea': tarea})
+
+@login_required
+def editar_tarea(request, pk):
+    tarea = get_object_or_404(Tarea, pk=pk)
+
+    if request.method == "POST":
+        form = TareaForm(request.POST, instance=tarea)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_tareas')
+    else:
+        form = TareaForm(instance=tarea)
+
+    return render(request, 'editar/editar_tarea.html', {'form': form})
+
+@login_required
+def eliminar_tarea(request, pk):
+    # Obtener la tarea a eliminar
+    tarea = get_object_or_404(Tarea, id=pk)
+    
+    # Verificar que la solicitud sea un POST (para evitar eliminar accidentalmente con GET)
+    if request.method == 'POST':
+        tarea.delete()  # Eliminar la tarea
+
+        # Mostrar un mensaje de éxito
+        messages.success(request, f'La tarea "{tarea.titulo}" ha sido eliminada con éxito.')
+
+        # Redirigir al usuario de vuelta a la lista de tareas
+        return redirect('lista/lista_tareas')  # Asegúrate de que 'lista_tareas' es el nombre correcto de la vista
+
+    # Si la solicitud no es un POST, redirigir al usuario de vuelta (aunque no debería llegar aquí por el tipo de formulario)
+    return redirect('lista/lista_tareas')
+
+
+
 #Inventario
 @login_required
 def crear_inventario(request):
@@ -426,7 +467,7 @@ def crear_inventario(request):
 def lista_inventario(request):
     # Obtener el parámetro de ordenación (por defecto será por 'id')
     order_by = request.GET.get('order_by', 'identificador')  # Si no se especifica, se ordena por 'id'
-    valid_order_fields = ['id', 'identificador', 'nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
+    valid_order_fields = ['id', 'identificador', 'nombre', 'descripcion', 'cantidad_total', 'cantidad_disponible', 'ubicacion']
     
     # Si el 'order_by' no está en los campos válidos, usar 'id' como valor por defecto
     if order_by not in valid_order_fields:
@@ -446,8 +487,13 @@ def lista_inventario(request):
     # Ordenar según el 'order_by'
     inventarios = inventarios.order_by(order_by)
 
+    # Paginación: 10 elementos por página
+    paginator = Paginator(inventarios, 10)  # 10 eventos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'lista/lista_inventario.html', {
-        'inventarios': inventarios,
+        'inventarios': page_obj,
         'order_by': order_by,
         'nombre_filter': nombre_filter,
     })
@@ -493,15 +539,18 @@ def crear_prestamo(request):
         form = PrestamoForm(request.POST)
         if form.is_valid():
             prestamo = form.save(commit=False)
-            # Definir la fecha de préstamo
-            prestamo.fecha_prestamo = request.POST.get('fecha_prestamo', None) or None
-            prestamo.save()
+            prestamo.save()  # Guardamos el préstamo
+
             # Reducir la cantidad disponible del material prestado
             inventario = prestamo.inventario
             inventario.cantidad_disponible -= 1
             inventario.save()
+
             messages.success(request, 'Préstamo registrado correctamente.')
             return redirect('lista_prestamos')
+        else:
+            # Mostrar errores si el formulario no es válido
+            messages.error(request, f"Error en el formulario: {form.errors}")
     else:
         form = PrestamoForm()
 

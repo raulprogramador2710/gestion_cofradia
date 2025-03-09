@@ -94,14 +94,11 @@
                 {{ form.forma_comunicacion|add_class:"form-select" }}
             </div>
 
-            <!-- Campo Cofradía -->
-            <div class="mb-3">
-                <label for="{{ form.cofradia.id_for_label }}" class="form-label">Cofradía</label>
-                {{ form.cofradia|add_class:"form-select" }}
-            </div>
-
             <!-- Botón de Enviar -->
             <button type="submit" class="btn btn-primary">Crear Hermano</button>
         </form>
+        <div class="text-center mt-4">
+            <a href="{% url 'lista_hermanos' %}" class="btn btn-secondary">⬅️ Volver</a>
+        </div>
     </div>
 {% endblock %}

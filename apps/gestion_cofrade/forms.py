@@ -2,57 +2,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Hermano, Estado, FormaPago, FormaComunicacion, Cofradia, Tarea, Evento, Inventario, Prestamo, Donacion
 
-class HermanoForm(forms.ModelForm):
-    class Meta:
-        model = Hermano
-        fields = ['numero_hermano', 'dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'fecha_inicio', 'fecha_ultimo_pago', 'email', 'iban', 'estado', 'forma_pago', 'forma_comunicacion', 'cofradia']
-        widgets = {
-            'fecha_nacimiento': forms.DateInput(format='%d/%m/%Y', attrs={'type': 'date'}),
-        }
-    
-    def clean_fecha_nacimiento(self):
-        fecha = self.cleaned_data['fecha_nacimiento']
-        try:
-            # Aquí aseguramos que la fecha se esté validando en el formato correcto
-            fecha_formateada = fecha.strftime('%d/%m/%Y')
-        except ValueError:
-            raise ValidationError("La fecha de nacimiento no tiene el formato correcto (dd/mm/yyyy).")
-        return fecha
-    
-class EventoForm(forms.ModelForm):
-    class Meta:
-        model = Evento
-        fields = ['identificador', 'nombre', 'fecha', 'tipo']
-        widgets = {
-            'fecha': forms.DateInput(format='%d/%m/%Y', attrs={'type': 'date'}),
-        }
-    
-    def clean_fecha(self):
-        fecha = self.cleaned_data['fecha']
-        try:
-            # Aquí aseguramos que la fecha se esté validando en el formato correcto
-            fecha_formateada = fecha.strftime('%d/%m/%Y')
-        except ValueError:
-            raise ValidationError("La fecha no tiene el formato correcto (dd/mm/yyyy).")
-        return fecha
-    
-class TareaForm(forms.ModelForm):
-    class Meta:
-        model = Tarea
-        fields = ['identificador', 'titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
-        widgets = {
-            'fecha_limite': forms.DateInput(format='%d/%m/%Y', attrs={'type': 'date'}),
-        }
-    
-    def clean_fecha_limite(self):
-        fecha = self.cleaned_data['fecha_limite']
-        try:
-            # Aquí aseguramos que la fecha se esté validando en el formato correcto
-            fecha_formateada = fecha.strftime('%d/%m/%Y')
-        except ValueError:
-            raise ValidationError("La fecha no tiene el formato correcto (dd/mm/yyyy).")
-        return fecha
-
 class EstadoForm(forms.ModelForm):
     class Meta:
         model = Estado
@@ -73,26 +22,57 @@ class CofradiaForm(forms.ModelForm):
         model = Cofradia
         fields = ['nombre', 'descripcion', 'color']
 
-class CargarExcelForm(forms.Form):
-    archivo_excel = forms.FileField(label="Seleccionar archivo Excel", widget=forms.ClearableFileInput(attrs={'accept': '.xlsx, .xls'}))
+
+
+class HermanoForm(forms.ModelForm):
+    class Meta:
+        model = Hermano
+        fields = ['numero_hermano', 'dni', 'nombre', 'apellidos', 'telefono', 'direccion', 'localidad', 'fecha_nacimiento', 'fecha_inicio', 'fecha_ultimo_pago', 'email', 'iban', 'estado', 'forma_pago', 'forma_comunicacion']
+         
+class EventoForm(forms.ModelForm):
+    class Meta:
+        model = Evento
+        fields = ['nombre', 'fecha', 'tipo']       
+    
+class TareaForm(forms.ModelForm):
+    class Meta:
+        model = Tarea
+        fields = ['titulo', 'descripcion', 'asignado_a', 'fecha_limite', 'estado', 'prioridad']
 
 class InventarioForm(forms.ModelForm):
     class Meta:
         model = Inventario
-        fields = ['identificador', 'nombre', 'descripcion', 'cantidad_disponible', 'ubicacion']
+        fields = ['nombre', 'descripcion', 'cantidad_total', 'cantidad_disponible', 'ubicacion']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'rows': 4}),
+        }
 
 class PrestamoForm(forms.ModelForm):
     class Meta:
         model = Prestamo
-        fields = ['identificador', 'hermano', 'inventario', 'fecha_devolucion', 'estado_material', 'comentario', 'fianza']
+        fields = ['hermano', 'inventario', 'fecha_prestamo', 'fecha_devolucion', 'estado_material', 'comentario', 'fianza', 'cofradia']
         widgets = {
-            'fecha_prestamo': forms.HiddenInput(),
+            'fecha_prestamo': forms.DateInput(attrs={'type': 'date'}),
+            'fecha_devolucion': forms.DateInput(attrs={'type': 'date'}),
+            'comentario': forms.Textarea(attrs={'rows': 3}),
         }
 
 class DonacionForm(forms.ModelForm):
     class Meta:
         model = Donacion
-        fields = ['identificador', 'donante', 'cantidad', 'cofradia', 'evento']
+        fields = ['donante', 'cantidad', 'fecha', 'cofradia', 'evento']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['evento'].queryset = Evento.objects.all()  # Asegura que carga eventos
+        self.fields['evento'].label_from_instance = lambda obj: obj.nombre  # Muestra el nombre del evento
+
+
+
+
+
+class CargarExcelForm(forms.Form):
+    archivo_excel = forms.FileField(label="Seleccionar archivo Excel", widget=forms.ClearableFileInput(attrs={'accept': '.xlsx, .xls'}))

@@ -1,14 +1,44 @@
 {% extends 'base.html' %}
 
-{% block title %}Registrar Donación{% endblock %}
+{% block title %}Crear Donación{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Registrar Donación</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Registrar Donación</button>
-    </form>
-</div>
+{% load widget_tweaks %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Crear Donación</h1>
+        
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Campo Donante (Obligatorio) -->
+            <div class="mb-3">
+                <label for="{{ form.donante.id_for_label }}" class="form-label">Donante *</label>
+                {{ form.donante|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Cantidad (Obligatorio) -->
+            <div class="mb-3">
+                <label for="{{ form.cantidad.id_for_label }}" class="form-label">Cantidad (€) *</label>
+                {{ form.cantidad|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Fecha (Obligatorio) -->
+            <div class="mb-3">
+                <label for="{{ form.fecha.id_for_label }}" class="form-label">Fecha de Donación *</label>
+                {{ form.fecha|add_class:"form-control" }}
+            </div>
+
+            <!-- Campo Evento (Opcional) -->
+            <div class="mb-3">
+                <label for="{{ form.evento.id_for_label }}" class="form-label">Evento (Opcional)</label>
+                {{ form.evento|add_class:"form-select" }}
+            </div>
+
+            <!-- Botón de Enviar -->
+            <button type="submit" class="btn btn-primary">Crear Donación</button>
+        </form>
+        <div class="text-center mt-4">
+            <a href="{% url 'lista_donaciones' %}" class="btn btn-secondary">⬅️ Volver</a>
+        </div>
+    </div>
 {% endblock %}

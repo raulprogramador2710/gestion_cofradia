@@ -23,21 +23,30 @@
             </div>
         </form>
 
+        <!-- Botón de "Vigentes" -->
+        <div class="mb-3">
+            {% if vigentes == '1' %}
+                <a href="?vigentes=0&order_by={{ order_by }}&order_direction={{ order_direction }}&page=1" class="btn btn-secondary">Ver Todos</a>
+            {% else %}
+                <a href="?vigentes=1&order_by={{ order_by }}&order_direction={{ order_direction }}&page=1" class="btn btn-warning">Ver Vigentes</a>
+            {% endif %}
+        </div>
+
         {% if eventos %}
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col">
-                            <a href="?order_by=id" class="{% if order_by == 'id' %}text-primary{% endif %}">ID</a>
+                            <a href="?order_by=id&vigentes={{ vigentes }}" class="{% if order_by == 'id' %}text-primary{% endif %}">ID</a>
                         </th>
                         <th scope="col">
-                            <a href="?order_by=nombre" class="{% if order_by == 'nombre' %}text-primary{% endif %}">Nombre</a>
+                            <a href="?order_by=nombre&vigentes={{ vigentes }}" class="{% if order_by == 'nombre' %}text-primary{% endif %}">Nombre</a>
                         </th>
                         <th scope="col">
-                            <a href="?order_by=fecha" class="{% if order_by == 'fecha' %}text-primary{% endif %}">Fecha</a>
+                            <a href="?order_by=fecha&vigentes={{ vigentes }}" class="{% if order_by == 'fecha' %}text-primary{% endif %}">Fecha</a>
                         </th>
                         <th scope="col">
-                            <a href="?order_by=tipo" class="{% if order_by == 'tipo' %}text-primary{% endif %}">Tipo</a>
+                            <a href="?order_by=tipo&vigentes={{ vigentes }}" class="{% if order_by == 'tipo' %}text-primary{% endif %}">Tipo</a>
                         </th>
                         <th scope="col">Acciones</th>
                     </tr>
@@ -59,34 +68,26 @@
                                 </div>
                             </td>
                         </tr>
-
-                        <!-- Modal de Confirmación de eliminación -->
-                        <div class="modal fade" id="confirmarEliminar{{ evento.id }}" tabindex="-1" aria-labelledby="modalLabel{{ evento.id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalLabel{{ evento.id }}">Confirmar Eliminación</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        ¿Estás seguro de que deseas eliminar el evento <strong>{{ evento.nombre }}</strong>? Esta acción no se puede deshacer.
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        
-                                        <!-- Formulario para eliminar -->
-                                        <form method="POST" action="{% url 'eliminar_evento' evento.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Paginación -->
+            <div class="d-flex justify-content-center">
+                <div>
+                    {% if eventos.has_previous %}
+                        <a href="?page=1&vigentes={{ vigentes }}&order_by={{ order_by }}&order_direction={{ order_direction }}" class="btn btn-secondary">Primera</a>
+                        <a href="?page={{ eventos.previous_page_number }}&vigentes={{ vigentes }}&order_by={{ order_by }}&order_direction={{ order_direction }}" class="btn btn-secondary">Anterior</a>
+                    {% endif %}
+                    
+                    <span class="mx-2">Página {{ eventos.number }} de {{ eventos.paginator.num_pages }}</span>
+
+                    {% if eventos.has_next %}
+                        <a href="?page={{ eventos.next_page_number }}&vigentes={{ vigentes }}&order_by={{ order_by }}&order_direction={{ order_direction }}" class="btn btn-secondary">Siguiente</a>
+                        <a href="?page={{ eventos.paginator.num_pages }}&vigentes={{ vigentes }}&order_by={{ order_by }}&order_direction={{ order_direction }}" class="btn btn-secondary">Última</a>
+                    {% endif %}
+                </div>
+            </div>
         {% else %}
             <p>No hay eventos registrados.</p>
         {% endif %}

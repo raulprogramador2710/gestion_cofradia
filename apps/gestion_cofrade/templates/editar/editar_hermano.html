@@ -13,7 +13,7 @@
                 {% for field in form %}
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">{{ field.label }}</label>
-                        {{ field }}
+                        {{ field }}  <!-- El campo de fecha se renderiza automáticamente con el formato 'dd/mm/yyyy' -->
                         <div class="text-danger small">{{ field.errors }}</div>
                     </div>
                 {% endfor %}

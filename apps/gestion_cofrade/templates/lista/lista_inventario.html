@@ -28,7 +28,8 @@
                         <th><a href="?order_by=id{% if order_by != 'id' %}&order_by=id{% endif %}">ID</a></th>
                         <th><a href="?order_by=nombre{% if order_by != 'nombre' %}&order_by=nombre{% endif %}">Nombre</a></th>
                         <th><a href="?order_by=descripcion{% if order_by != 'descripcion' %}&order_by=descripcion{% endif %}">Descripción</a></th>
-                        <th><a href="?order_by=cantidad_disponible{% if order_by != 'cantidad_disponible' %}&order_by=cantidad_disponible{% endif %}">Cantidad</a></th>
+                        <th><a href="?order_by=cantidad_total{% if order_by != 'cantidad_total' %}&order_by=cantidad_total{% endif %}">Cantidad total</a></th>
+                        <th><a href="?order_by=cantidad_disponible{% if order_by != 'cantidad_disponible' %}&order_by=cantidad_disponible{% endif %}">Cantidad disponible</a></th>
                         <th><a href="?order_by=ubicacion{% if order_by != 'ubicacion' %}&order_by=ubicacion{% endif %}">Ubicación</a></th>
                         <th>Acciones</th>
                     </tr>
@@ -39,6 +40,7 @@
                             <td>{{ item.identificador }}</td>
                             <td>{{ item.nombre }}</td>
                             <td>{{ item.descripcion }}</td>
+                            <td>{{ item.cantidad_total }}</td>
                             <td>{{ item.cantidad_disponible }}</td>
                             <td>{{ item.ubicacion }}</td>
                             <td>
@@ -76,6 +78,23 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <!-- Paginación -->
+            <div class="d-flex justify-content-center">
+               <div>
+                   {% if inventarios.has_previous %}
+                   <a class="page-link" href="?page=1&order_by={{ order_by }}&nombre={{ nombre_filter }}">Primero</a>
+                       <a class="page-link" href="?page={{ inventarios.previous_page_number }}&order_by={{ order_by }}&nombre={{ nombre_filter }}">Anterior</a>
+                   {% endif %}
+                   
+                   <span class="mx-2">Página {{ inventarios.number }} de {{ inventarios.paginator.num_pages }}</span>
+                   
+
+                   {% if inventarios.has_next %}
+                   <a class="page-link" href="?page={{ inventarios.next_page_number }}&order_by={{ order_by }}&nombre={{ nombre_filter }}">Siguiente</a>
+                       <a class="page-link" href="?page={{ inventarios.paginator.num_pages }}&order_by={{ order_by }}&nombre={{ nombre_filter }}">Última</a>
+                   {% endif %}
+               </div>
+           </div>
         {% else %}
             <p>No hay elementos en el inventario.</p>
         {% endif %}

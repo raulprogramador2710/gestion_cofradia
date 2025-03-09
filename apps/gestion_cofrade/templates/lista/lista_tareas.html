@@ -13,7 +13,7 @@
 
         <!-- Filtros -->
         <form method="GET" class="mb-4">
-            <div class="row d-flex align-items-end"> <!-- Alinea todo en la parte inferior -->
+            <div class="row d-flex align-items-end">
                 <div class="col-md-3">
                     <input type="text" name="titulo" class="form-control" placeholder="Buscar por título" value="{{ titulo_filter }}">
                 </div>
@@ -39,7 +39,15 @@
                 </div>
             </div>
         </form>
-        
+
+        <!-- Botón de "Vigentes" -->
+        <div class="mb-3">
+            {% if vigentes == '1' %}
+                <a href="?vigentes=0&order_by={{ order_by }}&estado={{ estado_filter }}&prioridad={{ prioridad_filter }}&page=1" class="btn btn-secondary">Ver Todos</a>
+            {% else %}
+                <a href="?vigentes=1&order_by={{ order_by }}&estado={{ estado_filter }}&prioridad={{ prioridad_filter }}&page=1" class="btn btn-warning">Ver Vigentes</a>
+            {% endif %}
+        </div>
 
         {% if tareas %}
             <table class="table table-striped">
@@ -71,7 +79,7 @@
                 </thead>
                 <tbody>
                     {% for tarea in tareas %}
-                        <tr>
+                        <tr {% if tarea.fecha_limite < today and tarea.estado != 'Completada' %}class="table-danger"{% endif %}>
                             <td>{{ tarea.identificador }}</td>
                             <td>{{ tarea.titulo }}</td>
                             <td>{{ tarea.descripcion }}</td>
@@ -89,35 +97,28 @@
                                 </div>
                             </td>
                         </tr>
-
-                        <!-- Modal de Confirmación de eliminación -->
-                        <div class="modal fade" id="confirmarEliminar{{ tarea.id }}" tabindex="-1" aria-labelledby="modalLabel{{ tarea.id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalLabel{{ tarea.id }}">Confirmar Eliminación</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        ¿Estás seguro de que deseas eliminar la tarea <strong>{{ tarea.titulo }}</strong>? Esta acción no se puede deshacer.
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        
-                                        <!-- Formulario para eliminar -->
-                                        <form method="POST" action="{% url 'eliminar_tarea' tarea.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     {% endfor %}
                 </tbody>
             </table>
+             <!-- Paginación -->
+             <div class="d-flex justify-content-center">
+                <div>
+                    {% if eventos.has_previous %}
+                    <a class="page-link" href="?page=1&order_by={{ order_by }}&estado={{ estado_filter }}&prioridad={{ prioridad_filter }}">Primero</a>
+                        <a class="page-link" href="?page={{ tareas.previous_page_number }}&order_by={{ order_by }}&estado={{ estado_filter }}&prioridad={{ prioridad_filter }}">Anterior</a>
+                    {% endif %}
+                    
+                    <span class="mx-2">Página {{ tareas.number }} de {{ tareas.paginator.num_pages }}</span>
+                    
+
+                    {% if eventos.has_next %}
+                    <a class="page-link" href="?page={{ tareas.next_page_number }}&order_by={{ order_by }}&estado={{ estado_filter }}&prioridad={{ prioridad_filter }}">Siguiente</a>
+                        <a class="page-link" href="?page={{ tareas.paginator.num_pages }}&order_by={{ order_by }}&estado={{ estado_filter }}&prioridad={{ prioridad_filter }}">Última</a>
+                    {% endif %}
+                </div>
+            </div>
         {% else %}
-            <p>No hay tareas registrados.</p>
+            <p>No hay tareas registradas.</p>
         {% endif %}
     </div>
 {% endblock %}
