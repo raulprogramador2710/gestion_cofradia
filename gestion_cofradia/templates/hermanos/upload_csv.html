@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Importar Hermanos desde CSV{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-file-upload me-2"></i>
+                        Importar Hermanos desde CSV
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Información sobre el formato del CSV -->
+                    <div class="alert alert-info" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Formato del archivo CSV
+                        </h5>
+                        <p class="mb-2">El archivo CSV debe contener las siguientes columnas en este orden:</p>
+                        <code>ID, DNI, NOMBRE, APELLIDOS, TELEFONO, DIRECCION, LOCALIDAD, FECHA_NACIMIENTO, FECHA_INICIO, FECHA_ULTIMO_PAGO, ESTADO, FORMA_PAGO, FORMA_COMUNICACION, EMAIL, IBAN</code>
+                        <hr>
+                        <p class="mb-0">
+                            <strong>Notas importantes:</strong>
+                        </p>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>ID:</strong> Número único del hermano en la cofradía</li>
+                            <li><strong>FECHA_NACIMIENTO:</strong> Formato DD/MM/AAAA (ej: 15/03/1985)</li>
+                            <li><strong>FECHA_INICIO:</strong> Año de inicio en la cofradía (ej: 2020)</li>
+                            <li><strong>FECHA_ULTIMO_PAGO:</strong> Año del último pago (ej: 2024)</li>
+                            <li><strong>ESTADO:</strong> activo, no_pagado, baja, o fallecido</li>
+                            <li><strong>ROL:</strong> Se asignará automáticamente como "hermano"</li>
+                        </ul>
+                    </div>
+
+                    <!-- Formulario de subida -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="csv_file" class="form-label">
+                                <i class="fas fa-file-csv me-2"></i>
+                                Seleccionar archivo CSV
+                            </label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="csv_file" 
+                                   name="csv_file" 
+                                   accept=".csv"
+                                   required>
+                            <div class="form-text">
+                                Solo se permiten archivos con extensión .csv
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-2"></i>
+                                Importar Hermanos
+                            </button>
+                            <a href="{% url 'gestion_cofradia:lista_hermanos' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Volver a Hermanos
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Ejemplo de CSV -->
+                    <div class="mt-5">
+                        <h5>
+                            <i class="fas fa-file-alt me-2"></i>
+                            Ejemplo de archivo CSV
+                        </h5>
+                        <div class="bg-light p-3 rounded">
+                            <pre class="mb-0"><code>ID,DNI,NOMBRE,APELLIDOS,TELEFONO,DIRECCION,LOCALIDAD,FECHA_NACIMIENTO,FECHA_INICIO,FECHA_ULTIMO_PAGO,ESTADO,FORMA_PAGO,FORMA_COMUNICACION,EMAIL,IBAN
+                                1,12345678A,Juan,Pérez García,666123456,Calle Mayor 1,Sevilla,15/03/1985,2010,2024,activo,Transferencia,Email,juan.perez@email.com,ES1234567890123456789012
+                                2,87654321B,María,López Ruiz,666654321,Avenida Constitución 25,Sevilla,22/07/1990,2015,2023,no_pagado,Efectivo,Teléfono,maria.lopez@email.com,ES9876543210987654321098</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Advertencias -->
+                    <div class="alert alert-warning mt-4" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Advertencias
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Se crearán usuarios automáticamente con el DNI como nombre de usuario y contraseña</li>
+                            <li>Si una forma de pago o comunicación no existe, se creará automáticamente</li>
+                            <li>Los hermanos se asignarán automáticamente a tu cofradía</li>
+                            <li>Si ya existe un hermano con el mismo número, no se duplicará</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

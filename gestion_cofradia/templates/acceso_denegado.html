@@ -1,0 +1,21 @@
+{# gestion_cofradia/templates/acceso_denegado.html #}
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Acceso Denegado</h4>
+        <p>Lo sentimos, no tienes permisos para acceder a esta sección.</p>
+        <hr>
+        <p>
+            <strong>Tu rol actual:</strong>
+            <span class="badge bg-secondary">{{ rol_usuario }}</span>
+        </p>
+        <p>
+            <strong>Roles permitidos para esta sección:</strong>
+            {% for rol in roles_permitidos %}
+                <span class="badge bg-info text-dark">{{ rol }}</span>
+            {% endfor %}
+        </p>
+    </div>
+</div>
+{% endblock %}

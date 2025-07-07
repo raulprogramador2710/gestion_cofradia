@@ -1,0 +1,203 @@
+{% extends "base_portal.html" %}
+
+{% block title %}Mis Datos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Mis Datos Personales</h2>
+  <div class="row g-3">
+    <!-- Tarjeta general -->
+    <div class="col-12">
+      <div class="card shadow-sm p-3">
+        <div class="row g-3">
+          <!-- Cada dato en su tarjeta pequeña -->
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-id-badge fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Número Hermano</h6>
+                <p class="mb-0">{{ hermano.num_hermano }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-user fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Nombre</h6>
+                <p class="mb-0">{{ hermano.nombre }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-users fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Apellidos</h6>
+                <p class="mb-0">{{ hermano.apellidos }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Repite para cada campo con icono adecuado -->
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-id-card fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">DNI</h6>
+                <p class="mb-0">{{ hermano.dni|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-phone fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Teléfono</h6>
+                <p class="mb-0">{{ hermano.telefono|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Dirección</h6>
+                <p class="mb-0">{{ hermano.direccion|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-city fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Localidad</h6>
+                <p class="mb-0">{{ hermano.localidad|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-birthday-cake fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Fecha de Nacimiento</h6>
+                <p class="mb-0">
+                  {% if hermano.fecha_nacimiento %}
+                    {{ hermano.fecha_nacimiento|date:"d/m/Y" }}
+                  {% else %}
+                    No disponible
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-calendar-check fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Fecha Inicio Cofradía</h6>
+                <p class="mb-0">{{ hermano.fecha_inicio_cofradia|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-calendar-alt fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Fecha Último Pago</h6>
+                <p class="mb-0">{{ hermano.fecha_ultimo_pago|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-info-circle fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Estado</h6>
+                <p class="mb-0">{{ hermano.estado.nombre|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-money-bill-wave fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Forma de Pago</h6>
+                <p class="mb-0">{{ hermano.forma_pago.nombre|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-comments fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Forma de Comunicación</h6>
+                <p class="mb-0">{{ hermano.forma_comunicacion.nombre|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-envelope fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Email</h6>
+                <p class="mb-0">{{ hermano.email|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-user-tag fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Rol</h6>
+                <p class="mb-0">{{ hermano.get_rol_display }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-file-invoice-dollar fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">IBAN</h6>
+                <p class="mb-0">{{ hermano.iban|default:"No disponible" }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="d-flex align-items-center gap-3 border rounded p-3 h-100">
+              <i class="fas fa-file fa-2x text-primary"></i>
+              <div>
+                <h6 class="mb-1">Archivo LOPD</h6>
+                <p class="mb-0">
+                  {% if hermano.lopd %}
+                    <a href="{{ hermano.lopd.url }}" target="_blank" rel="noopener noreferrer">Ver archivo</a>
+                  {% else %}
+                    No disponible
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

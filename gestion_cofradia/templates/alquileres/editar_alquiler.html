@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Editar Alquiler</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+      {{ form.hermano.label_tag }} {{ form.hermano }}
+      {{ form.hermano.errors }}
+    </div>
+    <div class="mb-3">
+      {{ form.enser.label_tag }} {{ form.enser }}
+      {{ form.enser.errors }}
+    </div>
+    <div class="mb-3">
+      {{ form.evento.label_tag }} {{ form.evento }}
+      {{ form.evento.errors }}
+    </div>
+    <div class="mb-3">
+      {{ form.fecha_entrega.label_tag }} {{ form.fecha_entrega }}
+      {{ form.fecha_entrega.errors }}
+    </div>
+    <div class="mb-3">
+      {{ form.fecha_devolucion.label_tag }} {{ form.fecha_devolucion }}
+      {{ form.fecha_devolucion.errors }}
+    </div>
+    <div class="mb-3">
+      {{ form.fianza.label_tag }} {{ form.fianza }}
+      {{ form.fianza.errors }}
+    </div>
+    <div class="mb-3">
+      {{ form.estado.label_tag }} {{ form.estado }}
+      {{ form.estado.errors }}
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a href="{% url 'gestion_cofradia:detalle_alquiler' alquiler.id %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

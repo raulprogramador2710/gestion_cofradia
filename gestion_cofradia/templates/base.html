@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Mi Cofradía{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+  {% url 'gestion_cofradia:inicio' as url_inicio %}
+  {% url 'gestion_cofradia:lista_hermanos' as url_hermanos %}
+  {% url 'gestion_cofradia:lista_cuotas' as url_cuotas %}
+  {% url 'gestion_cofradia:lista_eventos' as url_eventos %}
+  {% url 'gestion_cofradia:lista_notificaciones' as url_notificaciones %}
+  {% url 'gestion_cofradia:lista_tareas' as url_tareas %}
+  {% url 'gestion_cofradia:lista_documentos' as url_documentos %}
+  {% url 'gestion_cofradia:lista_alquileres' as url_alquileres %}
+  {% url 'gestion_cofradia:logout' as url_logout %}
+
+  <!-- HEADER PC -->
+  <header class="header-pc" role="banner">
+    <div class="nav-container-pc">
+      <div class="nav-brand-pc">
+        <i class="fas fa-church" aria-hidden="true"></i>
+        <span>
+          {% if request.path == '/admin/' %}
+            Administración
+          {% else %}
+            {{ user.perfil.cofradia.nombre }}
+          {% endif %}
+        </span>
+      </div>
+      <nav class="nav-menu-pc" role="navigation" aria-label="Menú principal">
+        <ul class="nav-list-pc">
+          <!-- Inicio -->
+          <li class="nav-item-pc">
+            <a href="{{ url_inicio }}" class="nav-link-pc {% if request.path == url_inicio %}active{% endif %}" aria-current="{% if request.path == url_inicio %}page{% endif %}">
+              <i class="fas fa-home" aria-hidden="true"></i>
+              <span>Inicio</span>
+            </a>
+          </li>
+
+          <!-- Gestión Hermanos -->
+          <li class="nav-item-pc">
+            <a href="{{ url_hermanos }}" class="nav-link-pc {% if request.path == url_hermanos %}active{% endif %}" aria-current="{% if request.path == url_hermanos %}page{% endif %}">
+              <i class="fas fa-users" aria-hidden="true"></i>
+              <span>Hermanos</span>
+            </a>
+          </li>
+
+          <!-- Cuotas -->
+          <li class="nav-item-pc">
+            <a href="{{ url_cuotas }}" class="nav-link-pc {% if request.path == url_cuotas %}active{% endif %}" aria-current="{% if request.path == url_cuotas %}page{% endif %}">
+              <i class="fas fa-euro-sign" aria-hidden="true"></i>
+              <span>Cuotas</span>
+            </a>
+          </li>
+
+          <!-- Eventos -->
+          <li class="nav-item-pc">
+            <a href="{{ url_eventos }}" class="nav-link-pc {% if request.path == url_eventos %}active{% endif %}" aria-current="{% if request.path == url_eventos %}page{% endif %}">
+              <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+              <span>Eventos</span>
+            </a>
+          </li>
+
+          <!-- Notificaciones -->
+          <li class="nav-item-pc">
+            <a href="{{ url_notificaciones }}" class="nav-link-pc {% if request.path == url_notificaciones %}active{% endif %}" aria-current="{% if request.path == url_notificaciones %}page{% endif %}">
+              <i class="fas fa-bell" aria-hidden="true"></i>
+              <span>Notificaciones</span>
+            </a>
+          </li>
+
+          <!-- Tareas -->
+          <li class="nav-item-pc">
+            <a href="{{ url_tareas }}" class="nav-link-pc {% if request.path == url_tareas %}active{% endif %}" aria-current="{% if request.path == url_tareas %}page{% endif %}">
+              <i class="fas fa-tasks" aria-hidden="true"></i>
+              <span>Tareas</span>
+            </a>
+          </li>
+
+          <!-- Documentos -->
+          <li class="nav-item-pc">
+            <a href="{{ url_documentos }}" class="nav-link-pc {% if request.path == url_documentos %}active{% endif %}" aria-current="{% if request.path == url_documentos %}page{% endif %}">
+              <i class="fas fa-file-alt" aria-hidden="true"></i>
+              <span>Documentos</span>
+            </a>
+          </li>
+
+          <!-- Alquileres -->
+          <li class="nav-item-pc">
+            <a href="{{ url_alquileres }}" class="nav-link-pc {% if request.path == url_alquileres %}active{% endif %}" aria-current="{% if request.path == url_alquileres %}page{% endif %}">
+              <i class="fas fa-key" aria-hidden="true"></i>
+              <span>Alquileres</span>
+            </a>
+          </li>
+
+          <!-- Logout -->
+          <li class="nav-item-pc">
+            <a href="{{ url_logout }}" class="nav-link-pc">
+              <i class="fas fa-sign-out-alt me-2" aria-hidden="true"></i>
+              <span>Cerrar Sesión</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HEADER MÓVIL -->
+  <header class="header-mobile" role="banner">
+    <div class="nav-container-mobile">
+      <div class="nav-brand-mobile">
+        <i class="fas fa-church" aria-hidden="true"></i>
+        <span>
+          {% if request.path == '/admin/' %}
+            Administración
+          {% else %}
+            {{ user.perfil.cofradia.nombre }}
+          {% endif %}
+        </span>
+      </div>
+
+      <button class="nav-toggle-mobile" id="nav-toggle-mobile" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="nav-menu-mobile" type="button">
+        <span class="hamburger"></span>
+        <span class="hamburger"></span>
+        <span class="hamburger"></span>
+      </button>
+
+      <nav class="nav-menu-mobile" id="nav-menu-mobile" role="navigation" aria-label="Menú principal">
+        <ul class="nav-list-mobile">
+          <li class="nav-item-mobile">
+            <a href="{{ url_inicio }}" class="nav-link-mobile {% if request.path == url_inicio %}active{% endif %}" aria-current="{% if request.path == url_inicio %}page{% endif %}">
+              <i class="fas fa-home" aria-hidden="true"></i>
+              <span>Inicio</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_hermanos }}" class="nav-link-mobile {% if request.path == url_hermanos %}active{% endif %}" aria-current="{% if request.path == url_hermanos %}page{% endif %}">
+              <i class="fas fa-users" aria-hidden="true"></i>
+              <span>Hermanos</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_cuotas }}" class="nav-link-mobile {% if request.path == url_cuotas %}active{% endif %}" aria-current="{% if request.path == url_cuotas %}page{% endif %}">
+              <i class="fas fa-euro-sign" aria-hidden="true"></i>
+              <span>Cuotas</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_eventos }}" class="nav-link-mobile {% if request.path == url_eventos %}active{% endif %}" aria-current="{% if request.path == url_eventos %}page{% endif %}">
+              <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+              <span>Eventos</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_notificaciones }}" class="nav-link-mobile {% if request.path == url_notificaciones %}active{% endif %}" aria-current="{% if request.path == url_notificaciones %}page{% endif %}">
+              <i class="fas fa-bell" aria-hidden="true"></i>
+              <span>Notificaciones</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_tareas }}" class="nav-link-mobile {% if request.path == url_tareas %}active{% endif %}" aria-current="{% if request.path == url_tareas %}page{% endif %}">
+              <i class="fas fa-tasks" aria-hidden="true"></i>
+              <span>Tareas</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_documentos }}" class="nav-link-mobile {% if request.path == url_documentos %}active{% endif %}" aria-current="{% if request.path == url_documentos %}page{% endif %}">
+              <i class="fas fa-file-alt" aria-hidden="true"></i>
+              <span>Documentos</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_alquileres }}" class="nav-link-mobile {% if request.path == url_alquileres %}active{% endif %}" aria-current="{% if request.path == url_alquileres %}page{% endif %}">
+              <i class="fas fa-key" aria-hidden="true"></i>
+              <span>Alquileres</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_logout }}" class="nav-link-mobile">
+              <i class="fas fa-sign-out-alt me-2" aria-hidden="true"></i>
+              <span>Cerrar Sesión</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content" role="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-content">
+      <p>&copy; 2024 Gestión cofradia. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT PARA EL MENÚ MÓVIL -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navToggleMobile = document.getElementById('nav-toggle-mobile');
+      const navMenuMobile = document.getElementById('nav-menu-mobile');
+
+      navToggleMobile.addEventListener('click', function() {
+        const expanded = this.getAttribute('aria-expanded') === 'true' || false;
+        this.setAttribute('aria-expanded', !expanded);
+        navMenuMobile.classList.toggle('active');
+        navToggleMobile.classList.toggle('active');
+      });
+
+      // Cerrar menú al hacer clic en un enlace (móvil)
+      document.querySelectorAll('.nav-link-mobile').forEach(link => {
+        link.addEventListener('click', () => {
+          navMenuMobile.classList.remove('active');
+          navToggleMobile.classList.remove('active');
+          navToggleMobile.setAttribute('aria-expanded', false);
+        });
+      });
+
+      // Cerrar menú al hacer clic fuera (móvil)
+      document.addEventListener('click', function(e) {
+        if (!navToggleMobile.contains(e.target) && !navMenuMobile.contains(e.target)) {
+          navMenuMobile.classList.remove('active');
+          navToggleMobile.classList.remove('active');
+          navToggleMobile.setAttribute('aria-expanded', false);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

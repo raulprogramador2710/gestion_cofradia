@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Eliminar Alquiler</h2>
+  <p>¿Estás seguro de que quieres eliminar el alquiler del enser <strong>{{ alquiler.enser.nombre }}</strong> entregado a <strong>{{ alquiler.hermano.nombre }} {{ alquiler.hermano.apellidos }}</strong>?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'gestion_cofradia:listar_alquileres' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

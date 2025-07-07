@@ -1,0 +1,15 @@
+{% extends "base_portal.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <div class="alert alert-warning">
+        <h3>No se encontró información de hermano asociada a tu usuario.</h3>
+        <p>Por favor, contacta con el administrador para resolver este problema.</p>
+        <a href="{% url 'portal_hermano:dashboard' %}" class="btn btn-primary mt-3">
+            Volver al inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

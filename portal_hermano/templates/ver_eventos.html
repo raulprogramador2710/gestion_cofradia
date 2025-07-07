@@ -1,0 +1,32 @@
+{% extends "base_portal.html" %}
+
+{% block content %}
+<h2>Eventos próximos 30 días</h2>
+
+{% if eventos %}
+  <ul>
+    {% for evento in eventos %}
+      <li>
+        <strong>{{ evento.titulo }}</strong> - Fecha: {{ evento.fecha|date:"d/m/Y" }}
+        <br>
+        {{ evento.descripcion|linebreaks }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="pagination">
+    {% if eventos.has_previous %}
+      <a href="?page={{ eventos.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    <span>Página {{ eventos.number }} de {{ eventos.paginator.num_pages }}</span>
+
+    {% if eventos.has_next %}
+      <a href="?page={{ eventos.next_page_number }}">Siguiente</a>
+    {% endif %}
+  </div>
+{% else %}
+  <p>No hay eventos próximos.</p>
+{% endif %}
+
+{% endblock %}

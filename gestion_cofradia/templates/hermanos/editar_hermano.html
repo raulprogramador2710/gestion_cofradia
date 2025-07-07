@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar Hermano{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fa-solid fa-user-pen fa-2x me-3"></i>
+                    <div>
+                        <h3 class="mb-0">Editar Hermano #{{ hermano.num_hermano }}</h3>
+                        <small class="text-light">Modifica los datos del hermano</small>
+                    </div>
+                </div>
+                <div class="card-body bg-light">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">DNI</label>
+                                {{ form.dni }}
+                                {% if form.dni.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.dni.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre</label>
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.nombre.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellidos</label>
+                                {{ form.apellidos }}
+                                {% if form.apellidos.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.apellidos.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.telefono.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.email.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha de Nacimiento</label>
+                                {{ form.fecha_nacimiento }}
+                                {% if form.fecha_nacimiento.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.fecha_nacimiento.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Dirección</label>
+                                {{ form.direccion }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Localidad</label>
+                                {{ form.localidad }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">IBAN</label>
+                                {{ form.iban }}
+                                {% if form.iban.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.iban.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Año Inicio Cofradía</label>
+                                {{ form.fecha_inicio_cofradia }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Año Último Pago</label>
+                                {{ form.fecha_ultimo_pago }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                {{ form.estado }}
+                                {% if form.estado.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.estado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rol</label>
+                                {{ form.rol }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Forma de Pago</label>
+                                {{ form.forma_pago }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Forma de Comunicación</label>
+                                {{ form.forma_comunicacion }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Documento LOPD</label>
+                                {{ form.lopd }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-save me-1"></i> Guardar Cambios
+                        </button>
+                        <a href="{% url 'gestion_cofradia:ver_hermano' hermano.id %}" class="btn btn-secondary">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

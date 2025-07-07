@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notificar Hermano - {{ hermano.nombre }} {{ hermano.apellidos }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-bell me-2"></i>
+                        Enviar Notificación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Información del hermano -->
+                    <div class="alert alert-info mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong><i class="fas fa-user me-2"></i>Destinatario:</strong><br>
+                                {{ hermano.nombre }} {{ hermano.apellidos }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong><i class="fas fa-id-badge me-2"></i>Nº Hermano:</strong><br>
+                                {{ hermano.num_hermano }}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <strong><i class="fas fa-envelope me-2"></i>Email:</strong><br>
+                                {{ hermano.email|default:"No registrado" }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong><i class="fas fa-comments me-2"></i>Canal preferido:</strong><br>
+                                {{ hermano.forma_comunicacion|default:"No definido" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario -->
+                    <form method="post" id="notificacionForm">
+                        {% csrf_token %}
+                        
+                        <!-- Campo oculto para destinatario -->
+                        <input type="hidden" name="destinatario" value="{{ hermano.pk }}">
+                        
+                        <!-- Título -->
+                        <div class="mb-3">
+                            <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                <i class="fas fa-heading me-2"></i>Asunto
+                            </label>
+                            {{ form.titulo }}
+                            {% if form.titulo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.titulo.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Cuerpo del mensaje -->
+                        <div class="mb-3">
+                            <label for="{{ form.cuerpo.id_for_label }}" class="form-label">
+                                <i class="fas fa-edit me-2"></i>Mensaje
+                            </label>
+                            {{ form.cuerpo }}
+                            {% if form.cuerpo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.cuerpo.errors }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                La notificación se enviará por {{ hermano.forma_comunicacion|default:"el canal por defecto" }}.
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'gestion_cofradia:ver_hermano' hermano.pk %}" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="btnEnviar">
+                                <i class="fas fa-paper-plane me-2"></i>Enviar Notificación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript para mejorar la experiencia -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('notificacionForm');
+    const btnEnviar = document.getElementById('btnEnviar');
+    
+    // Añadir clases Bootstrap a los campos del formulario
+    const inputs = form.querySelectorAll('input[type="text"], textarea, select');
+    inputs.forEach(input => {
+        input.classList.add('form-control');
+    });
+    
+    // Confirmar antes de enviar
+    form.addEventListener('submit', function(e) {
+        const titulo = form.querySelector('[name="titulo"]').value;
+        const cuerpo = form.querySelector('[name="cuerpo"]').value;
+        
+        if (!titulo.trim() || !cuerpo.trim()) {
+            e.preventDefault();
+            alert('Por favor, completa todos los campos obligatorios.');
+            return;
+        }
+        
+        const confirmacion = confirm('¿Estás seguro de que quieres enviar esta notificación?');
+        if (!confirmacion) {
+            e.preventDefault();
+        } else {
+            // Cambiar el botón para mostrar que se está procesando
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+            btnEnviar.disabled = true;
+        }
+    });
+});
+</script>
+{% endblock %}

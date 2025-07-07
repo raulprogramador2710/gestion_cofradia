@@ -1,0 +1,32 @@
+{% extends "base_portal.html" %}
+
+{% block content %}
+<h2>Tareas asignadas</h2>
+
+{% if tareas %}
+  <ul>
+    {% for tarea in tareas %}
+      <li>
+        <strong>{{ tarea.titulo }}</strong> - Estado: {{ tarea.estado }} - Fecha límite: {{ tarea.fecha_limite|date:"d/m/Y" }}
+        <br>
+        {{ tarea.descripcion|linebreaks }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="pagination">
+    {% if tareas.has_previous %}
+      <a href="?page={{ tareas.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    <span>Página {{ tareas.number }} de {{ tareas.paginator.num_pages }}</span>
+
+    {% if tareas.has_next %}
+      <a href="?page={{ tareas.next_page_number }}">Siguiente</a>
+    {% endif %}
+  </div>
+{% else %}
+  <p>No tienes tareas asignadas.</p>
+{% endif %}
+
+{% endblock %}

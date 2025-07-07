@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <div class="card card-info mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0"><i class="fa-solid fa-file-alt"></i> Documentos de la Cofradía</h2>
+        <div>
+          <a href="{% url 'gestion_cofradia:crear_documento' %}" class="btn btn-success me-2">
+            <i class="fa-solid fa-upload"></i> Subir documento
+          </a>
+
+          <div class="btn-group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-file-lines"></i> Descargar informe
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'gestion_cofradia:descargar_informe' 'hermanos_activos_mayores' %}">
+                  Hermanos activos mayores de 18 años
+                </a>
+              </li>
+              <!-- Aquí puedes añadir más informes en el futuro -->
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="thead-light">
+              <tr>
+                <th>Título</th>
+                <th>Fecha de Subida</th>
+                <th>Visibilidad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for documento in documentos %}
+                <tr>
+                  <td>
+                    <a href="{% url 'gestion_cofradia:ver_documento' documento.id %}">
+                      <i class="fa-solid fa-file"></i> {{ documento.titulo }}
+                    </a>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">
+                      {{ documento.fecha_subida|date:"d/m/Y H:i" }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if documento.visibilidad == 'privado' %}
+                      <span class="badge bg-danger">Privado</span>
+                    {% elif documento.visibilidad == 'hermanos' %}
+                      <span class="badge bg-warning text-dark">Solo hermanos</span>
+                    {% else %}
+                      <span class="badge bg-success">Público</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'gestion_cofradia:editar_documento' documento.id %}" class="btn btn-sm btn-warning me-1">
+                      <i class="fa-solid fa-pen"></i> Editar
+                    </a>
+                    <a href="{% url 'gestion_cofradia:eliminar_documento' documento.id %}" class="btn btn-sm btn-danger">
+                      <i class="fa-solid fa-trash"></i> Eliminar
+                    </a>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted">No hay documentos subidos.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

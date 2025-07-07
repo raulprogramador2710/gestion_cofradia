@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card card-info mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="mb-0"><i class="fa-solid fa-list-check"></i> Tareas</h2>
+      <a href="{% url 'gestion_cofradia:crear_tarea' %}" class="btn btn-success">
+        <i class="fa-solid fa-plus"></i> Nueva tarea
+      </a>
+    </div>
+    <div class="card-body p-0">
+      <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+          <i class="fa-solid fa-hourglass-half"></i> Pendientes / En progreso
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for tarea in tareas_pendientes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <strong>{{ tarea.titulo }}</strong>
+                {% if tarea.fecha_limite %}
+                  <span class="badge bg-warning text-dark ms-2">
+                    <i class="fa-solid fa-calendar-day"></i> Límite: {{ tarea.fecha_limite|date:"d/m/Y" }}
+                  </span>
+                {% endif %}
+                <br>
+                <small class="text-muted">{{ tarea.get_estado_display }}</small>
+              </div>
+              <div>
+                <a href="{% url 'gestion_cofradia:editar_tarea' tarea.id %}" class="btn btn-sm btn-outline-primary me-1">
+                  <i class="fa-solid fa-pen"></i> Editar
+                </a>
+                {% if tarea.estado != 'completada' %}
+                  <a href="{% url 'gestion_cofradia:completar_tarea' tarea.id %}" class="btn btn-sm btn-success">
+                    <i class="fa-solid fa-check"></i> Marcar como hecha
+                  </a>
+                {% endif %}
+              </div>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No hay tareas pendientes.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <i class="fa-solid fa-check"></i> Completadas
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for tarea in tareas_completadas %}
+            <li class="list-group-item">
+              <strong>{{ tarea.titulo }}</strong>
+              {% if tarea.fecha_completada %}
+                <span class="badge bg-success ms-2">
+                  <i class="fa-solid fa-calendar-check"></i> Completada: {{ tarea.fecha_completada|date:"d/m/Y" }}
+                </span>
+              {% endif %}
+            </li>
+          {% empty %}
+            <li class="list-group-item text-muted">No hay tareas completadas.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

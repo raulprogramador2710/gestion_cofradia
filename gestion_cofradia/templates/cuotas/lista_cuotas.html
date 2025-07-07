@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card card-info mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="mb-0"><i class="fa-solid fa-euro-sign"></i> Cuotas</h2>
+      <a href="{% url 'gestion_cofradia:crear_cuota' %}" class="btn btn-success">
+        <i class="fa-solid fa-plus"></i> Nueva cuota
+      </a>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="thead-light">
+            <tr>
+              <th>Tipo</th>
+              <th>Año</th>
+              <th>Importe</th>
+              <th>Vencimiento</th>
+              <th>Activa</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cuota in cuotas %}
+            <tr>
+              <td>{{ cuota.get_tipo_display }}</td>
+              <td>{{ cuota.anio }}</td>
+              <td><span class="badge bg-primary">{{ cuota.importe }} €</span></td>
+              <td>{{ cuota.fecha_vencimiento|date:"d/m/Y" }}</td>
+              <td>
+                {% if cuota.activa %}
+                  <span class="badge bg-success">Sí</span>
+                {% else %}
+                  <span class="badge bg-secondary">No</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'gestion_cofradia:editar_cuota' pk=cuota.pk %}" class="btn btn-sm btn-warning me-1">
+                  <i class="fa-solid fa-pen"></i> Editar
+                </a>
+                <a href="{% url 'gestion_cofradia:eliminar_cuota' pk=cuota.pk %}" class="btn btn-sm btn-danger">
+                  <i class="fa-solid fa-trash"></i> Eliminar
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted">No hay cuotas registradas.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

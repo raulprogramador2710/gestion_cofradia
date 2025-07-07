@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalle de Notificación{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-info text-white d-flex align-items-center">
+          <i class="fa-solid fa-bell fa-2x me-3"></i>
+          <div>
+            <h3 class="mb-0">Detalle de Notificación</h3>
+            <small>Información detallada de la notificación</small>
+          </div>
+        </div>
+        <div class="card-body bg-light">
+          <div class="mb-3">
+            <i class="fa-solid fa-user me-2 text-info"></i>
+            <strong>Destinatario:</strong> {{ notificacion.destinatario.first_name }} {{ notificacion.destinatario.last_name }} ({{ notificacion.destinatario.username }})
+          </div>
+          <div class="mb-3">
+            <i class="fa-solid fa-heading me-2 text-info"></i>
+            <strong>Título:</strong> {{ notificacion.titulo }}
+          </div>
+          <div class="mb-3">
+            <i class="fa-solid fa-envelope me-2 text-info"></i>
+            <strong>Cuerpo:</strong> {{ notificacion.cuerpo }}
+          </div>
+          <div class="mb-3">
+            <i class="fa-solid fa-calendar-alt me-2 text-info"></i>
+            <strong>Fecha de creación:</strong> {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
+          </div>
+          <div class="mb-3">
+            <i class="fa-solid fa-eye me-2 text-info"></i>
+            <strong>Estado:</strong>
+            {% if notificacion.leida %}
+              <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>Leída</span>
+            {% else %}
+              <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i>Pendiente</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-footer bg-white text-end">
+          <a href="{% url 'gestion_cofradia:lista_notificaciones' %}" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i> Volver a la lista
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

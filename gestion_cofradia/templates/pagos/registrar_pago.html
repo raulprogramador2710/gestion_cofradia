@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Registrar Pago</h2>
+  <p>Hermano: {{ hermano }}</p>
+  <p>Cuota: {{ cuota }}</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.fecha_pago.label_tag }}
+      {{ form.fecha_pago }}
+    </div>
+    <div class="mb-3">
+      {{ form.metodo.label_tag }}
+      {{ form.metodo }}
+    </div>
+    <div class="mb-3">
+      {{ form.importe_pagado.label_tag }}
+      {{ form.importe_pagado }}
+    </div>
+    <div class="mb-3">
+      {{ form.observaciones.label_tag }}
+      {{ form.observaciones }}
+    </div>
+    <button type="submit" class="btn btn-success">Registrar Pago</button>
+    <a href="{% url 'gestion_cofradia:ver_hermano' pk=hermano.pk %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Lista de Pagos</h2>
+  <p>Hermano: {{ hermano }}</p>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+      <thead class="thead-dark">
+        <tr>
+          <th>Fecha</th>
+          <th>Método</th>
+          <th>Importe</th>
+          <th>Observaciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pago in pagos %}
+        <tr>
+          <td>{{ pago.fecha_pago|date:"d/m/Y" }}</td>
+          <td>{{ pago.get_metodo_display }}</td>
+          <td>{{ pago.importe_pagado }} €</td>
+          <td>{{ pago.observaciones }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">No hay pagos registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <a href="{% url 'gestion_cofradia:ver_hermano' hermano_pk=hermano.pk %}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

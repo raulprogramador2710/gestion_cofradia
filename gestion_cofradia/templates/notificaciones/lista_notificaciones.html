@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lista de Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card card-info mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <i class="fa-solid fa-bell fa-2x me-3"></i>
+        <div>
+          <h2 class="mb-0">Notificaciones</h2>
+          <small>Gestión de notificaciones de la cofradía</small>
+        </div>
+      </div>
+      <a href="{% url 'gestion_cofradia:crear_notificacion' %}" class="btn btn-success">
+        <i class="fa-solid fa-plus me-1"></i> Nueva Notificación
+      </a>
+    </div>
+    <div class="card-body p-0 bg-light">
+      {% if notificaciones %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th><i class="fa-solid fa-user me-1"></i>Destinatario</th>
+                <th><i class="fa-solid fa-heading me-1"></i>Título</th>
+                <th><i class="fa-solid fa-calendar me-1"></i>Fecha</th>
+                <th><i class="fa-solid fa-eye me-1"></i>Estado</th>
+                <th class="text-center"><i class="fa-solid fa-cogs me-1"></i>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for notificacion in notificaciones %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-user-circle me-2 text-info"></i>
+                    <div>
+                      <strong>{{ notificacion.destinatario.first_name }} {{ notificacion.destinatario.last_name }}</strong>
+                      <br><small class="text-muted">{{ notificacion.destinatario.username }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <strong>{{ notificacion.titulo }}</strong>
+                  <br><small class="text-muted">{{ notificacion.cuerpo|truncatechars:50 }}</small>
+                </td>
+                <td>
+                  <span class="badge bg-info">
+                    <i class="fa-solid fa-calendar-alt me-1"></i>
+                    {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
+                  </span>
+                </td>
+                <td>
+                  {% if notificacion.leida %}
+                    <span class="badge bg-success">
+                      <i class="fa-solid fa-check me-1"></i>Leída
+                    </span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">
+                      <i class="fa-solid fa-clock me-1"></i>Pendiente
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <div class="btn-group" role="group">
+                    <a href="{% url 'gestion_cofradia:ver_notificacion' notificacion.id %}" 
+                       class="btn btn-outline-primary btn-sm" title="Ver detalles">
+                      <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="{% url 'gestion_cofradia:editar_notificacion' notificacion.id %}" 
+                       class="btn btn-outline-warning btn-sm" title="Editar">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <a href="{% url 'gestion_cofradia:eliminar_notificacion' notificacion.id %}" 
+                       class="btn btn-outline-danger btn-sm" title="Eliminar"
+                       onclick="return confirm('¿Estás seguro de que quieres eliminar esta notificación?')">
+                      <i class="fa-solid fa-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <i class="fa-solid fa-bell-slash fa-4x text-muted mb-3"></i>
+          <h4 class="text-muted">No hay notificaciones</h4>
+          <p class="text-muted">Aún no se han creado notificaciones para esta cofradía.</p>
+          <a href="{% url 'gestion_cofradia:crear_notificacion' %}" class="btn btn-info">
+            <i class="fa-solid fa-plus me-1"></i> Crear Primera Notificación
+          </a>
+        </div>
+      {% endif %}
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+      <small class="text-muted">
+        <i class="fa-solid fa-info-circle me-1"></i>
+        Total: {{ notificaciones.count }} notificación{{ notificaciones.count|pluralize:"es" }}
+      </small>
+      <a href="{% url 'gestion_cofradia:inicio' %}" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i> Volver al Inicio
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

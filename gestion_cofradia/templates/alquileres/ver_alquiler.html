@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Detalle del Alquiler</h2>
+  <div class="card">
+    <div class="card-body">
+      <p><strong>Enser:</strong> {{ alquiler.enser.nombre }}</p>
+      <p><strong>Hermano:</strong> {{ alquiler.hermano.nombre }} {{ alquiler.hermano.apellidos }}</p>
+      <p><strong>Evento:</strong> {% if alquiler.evento %}{{ alquiler.evento.nombre }}{% else %}N/A{% endif %}</p>
+      <p><strong>Fecha de entrega:</strong> {{ alquiler.fecha_entrega|date:"d/m/Y" }}</p>
+      <p><strong>Fecha de devolución:</strong> {% if alquiler.fecha_devolucion %}{{ alquiler.fecha_devolucion|date:"d/m/Y" }}{% else %}Pendiente{% endif %}</p>
+      <p><strong>Estado:</strong> {{ alquiler.get_estado_display }}</p>
+      <p><strong>Fianza:</strong> {{ alquiler.fianza|floatformat:2 }} €</p>
+      <a href="{% url 'gestion_cofradia:listar_alquileres' %}" class="btn btn-secondary mt-3">Volver a lista</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
