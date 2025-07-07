@@ -11,17 +11,14 @@
           </a>
 
           <div class="btn-group">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa-solid fa-file-lines"></i> Descargar informe
             </button>
-            <ul class="dropdown-menu">
-              <li>
-                <a class="dropdown-item" href="{% url 'gestion_cofradia:descargar_informe' 'hermanos_activos_mayores' %}">
-                  Hermanos activos mayores de 18 años
-                </a>
-              </li>
-              <!-- Aquí puedes añadir más informes en el futuro -->
-            </ul>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="{% url 'gestion_cofradia:descargar_informe' 'hermanos_activos_mayores' %}">
+                Hermanos activos mayores de 18 años
+              </a>
+            </div>
           </div>
         </div>
       </div>

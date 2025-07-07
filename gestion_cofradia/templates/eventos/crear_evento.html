@@ -28,6 +28,16 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                                <i class="fas fa-list me-1"></i>{{ form.tipo.label }}
+                            </label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                                <div class="text-danger mt-1">{{ form.tipo.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
                             <label for="{{ form.descripcion.id_for_label }}" class="form-label">
                                 <i class="fas fa-align-left me-1"></i>{{ form.descripcion.label }}
                             </label>

@@ -1,4 +1,11 @@
-# gestion_cofradia/views.py
+# Python standard library
+import csv
+import json
+import logging
+from collections import Counter
+from datetime import date, timedelta
+from io import BytesIO
+
 # Django core
 from django.conf import settings
 from django.contrib import messages
@@ -6,27 +13,33 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db.models import Q, Sum
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
-from .utils import RoleRequiredMixin, role_required  # Importa el Mixin y el decorador
-from django.views import View  # Importa la clase View
+from django.utils.timezone import now
+from django.views import View
 
-
-from django.http import HttpResponse
-import csv
-from datetime import date
-
-# Python standard library
-import csv
-import json
-import logging
-from collections import Counter
-from datetime import timedelta
+# Third-party (reportlab)
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
+from reportlab.pdfgen import canvas
 
 # Local imports
-from .forms import HermanoForm, CuotaForm, PagoForm, EventoForm, NotificacionForm, TareaForm, DocumentoForm, UploadHermanosForm, AlquilerForm
-from .models import Hermano, Cuota, Pago, Evento, Notificacion, Tarea, FormaPago, FormaComunicacion, Documento, EstadoHermano, Alquiler, Cofradia
+from .utils import RoleRequiredMixin, role_required
+from .forms import (
+    HermanoForm, CuotaForm, PagoForm, EventoForm, NotificacionForm,
+    TareaForm, DocumentoForm, UploadHermanosForm, AlquilerForm
+)
+from .models import (
+    Hermano, Cuota, Pago, Evento, Notificacion, Tarea, FormaPago,
+    FormaComunicacion, Documento, EstadoHermano, Alquiler, Cofradia
+)
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +105,7 @@ def inicio(request):
         'tareas_proximas': tareas_proximas,
         'total_notificaciones': total_notificaciones,
         'enseres_pendientes': enseres_pendientes,
+        'perfil': perfil,
         # Pasamos la lista para el for en la plantilla
         'graficas': ['Estado', 'Comunicacion', 'Pago'],
     }
@@ -195,8 +209,8 @@ def lista_hermanos(request):
     if not perfil:
         return redirect('gestion_cofradia:login')
     cofradia_usuario = perfil.cofradia
-    hermanos = Hermano.objects.filter(cofradia=cofradia_usuario).order_by('apellidos', 'nombre')
 
+    # Importación CSV (si la usas)
     if request.method == 'POST' and request.FILES.get('csv_file'):
         csv_file = request.FILES['csv_file']
         try:
@@ -207,7 +221,7 @@ def lista_hermanos(request):
                 try:
                     hermano, created = Hermano.objects.get_or_create(
                         cofradia=cofradia_usuario,
-                        dni=row['dni'],  # Usa el campo que garantice unicidad
+                        dni=row['dni'],
                         defaults={
                             'numero': int(row['numero']),
                             'nombre': row['nombre'],
@@ -231,7 +245,113 @@ def lista_hermanos(request):
         except Exception as e:
             messages.error(request, f"Error al procesar el archivo: {e}")
 
-    return render(request, 'hermanos/lista_hermanos.html', {'hermanos': hermanos})
+    # Solo renderiza el template con la tabla vacía
+    # DataTables pedirá los datos a la vista hermanos_json
+    return render(request, 'hermanos/lista_hermanos.html')
+
+def hermanos_json(request):
+    columns = [
+        'num_hermano',
+        'dni',
+        'nombre',
+        'apellidos',
+        'telefono',
+        'estado__nombre',
+        'forma_pago__nombre',
+        'forma_comunicacion__nombre',
+    ]
+
+    # Paginación
+    start = int(request.GET.get('start', 0))
+    length = int(request.GET.get('length', 10))
+    page = (start // length) + 1
+    search_value = request.GET.get('search[value]', '')
+
+    # Ordenación
+    order_column = int(request.GET.get('order[0][column]', 0))
+    order_dir = request.GET.get('order[0][dir]', 'asc')
+    order_field = columns[order_column]
+    if order_dir == 'desc':
+        order_field = '-' + order_field
+
+    # Filtro por cofradía del usuario
+    perfil = request.user.perfil_set.first()
+    hermanos = Hermano.objects.filter(cofradia=perfil.cofradia)
+
+    # Búsqueda global
+    if search_value:
+        hermanos = hermanos.filter(
+            Q(num_hermano__icontains=search_value) |
+            Q(dni__icontains=search_value) |
+            Q(nombre__icontains=search_value) |
+            Q(apellidos__icontains=search_value) |
+            Q(telefono__icontains=search_value) |
+            Q(estado__nombre__icontains=search_value) |
+            Q(forma_pago__nombre__icontains=search_value) |
+            Q(forma_comunicacion__nombre__icontains=search_value)
+        )
+
+    total = hermanos.count()
+    hermanos = hermanos.order_by(order_field)[start:start+length]
+
+    # Calcular la página actual para los enlaces
+    page = (start // length) + 1
+
+    data = []
+    for h in hermanos:
+        data.append([
+            h.num_hermano,
+            h.dni,
+            h.nombre,
+            h.apellidos,
+            h.telefono,
+            get_estado_badge(h.estado),
+            get_pago_badge(h.forma_pago),
+            get_comunicacion_badge(h.forma_comunicacion),
+            f'''
+            <a href="/gestioncofradia/hermanos/{h.id}/?page={page}" class="btn btn-sm btn-outline-info me-1" data-bs-toggle="tooltip" title="Ver">
+                <i class="fa-solid fa-eye"></i>
+            </a>
+            <a href="/gestioncofradia/hermanos/{h.id}/editar/?page={page}" class="btn btn-sm btn-outline-success me-1" data-bs-toggle="tooltip" title="Editar">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+            <a href="/gestioncofradia/hermanos/{h.id}/notificar/?page={page}" class="btn btn-sm btn-outline-warning" data-bs-toggle="tooltip" title="Notificar">
+                <i class="fa-solid fa-bell"></i>
+            </a>
+            '''
+        ])
+
+    return JsonResponse({
+        'draw': int(request.GET.get('draw', 1)),
+        'recordsTotal': total,
+        'recordsFiltered': total,
+        'data': data,
+    })
+
+def get_estado_badge(estado):
+    if not estado:
+        return '<span class="badge bg-light text-dark">Sin estado</span>'
+    nombre = estado.nombre.lower()
+    if nombre == 'activo':
+        return f'<span class="badge bg-success">{estado.nombre}</span>'
+    elif nombre == 'no pagado':
+        return f'<span class="badge bg-warning text-dark">{estado.nombre}</span>'
+    elif nombre == 'baja':
+        return f'<span class="badge bg-secondary">{estado.nombre}</span>'
+    elif nombre == 'fallecido':
+        return f'<span class="badge bg-dark">{estado.nombre}</span>'
+    else:
+        return f'<span class="badge bg-light text-dark">{estado.nombre}</span>'
+
+def get_pago_badge(forma_pago):
+    if forma_pago:
+        return f'<span class="badge bg-info text-dark">{forma_pago.nombre}</span>'
+    return '<span class="badge bg-light text-dark">Sin definir</span>'
+
+def get_comunicacion_badge(forma_comunicacion):
+    if forma_comunicacion:
+        return f'<span class="badge bg-secondary">{forma_comunicacion.nombre}</span>'
+    return '<span class="badge bg-light text-dark">Sin definir</span>'
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -500,7 +620,7 @@ def upload_hermanos_csv(request):
                         'forma_comunicacion': forma_comunicacion,
                         'email': email,
                         'rol': 'hermano',
-                        'ibam': iban,
+                        'iban': iban,
                     }
                 )
                 if not created:
@@ -511,7 +631,7 @@ def upload_hermanos_csv(request):
                 messages.error(request, f"Error en la fila {row}: {e}")
 
         messages.success(request, "Importación completada.")
-        return redirect('gestion_cofradia:consulta_hermanos')
+        return redirect('gestion_cofradia:lista_hermanos')
 
     return render(request, 'hermanos/upload_csv.html')
 
@@ -637,7 +757,7 @@ def registrar_pago(request, hermano_pk, cuota_pk):
 
             return redirect('gestion_cofradia:ver_hermano', pk=hermano.pk)
     else:
-        form = PagoForm()
+        form = PagoForm(initial={'fecha_pago': timezone.now().date()})
 
     return render(request, 'pagos/registrar_pago.html', {'form': form, 'hermano': hermano, 'cuota': cuota})
 
@@ -882,28 +1002,60 @@ def descargar_informe(request, tipo):
     cofradia = perfil.cofradia
 
     if tipo == 'hermanos_activos_mayores':
-        # Generar CSV de hermanos activos mayores de 18 años
-        hoy = date.today()
+        hoy = now().date()
         edad_mayor = 18
+        fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
 
         hermanos = Hermano.objects.filter(
             cofradia=cofradia,
             estado__nombre__iexact='activo',
             fecha_nacimiento__isnull=False,
+            fecha_nacimiento__lte=fecha_limite
+        ).order_by('apellidos', 'nombre')
+
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter,
+                                rightMargin=40, leftMargin=40,
+                                topMargin=60, bottomMargin=40)
+
+        styles = getSampleStyleSheet()
+        style_title = ParagraphStyle(
+            name='Title',
+            fontSize=18,
+            leading=22,
+            alignment=TA_CENTER,
+            spaceAfter=20,
+            fontName='Helvetica-Bold'
         )
+        style_normal = styles['Normal']
 
-        # Crear respuesta CSV
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="hermanos_activos_mayores.csv"'
+        title = Paragraph(f"Hermanos activos mayores de {edad_mayor} años - Cofradía {cofradia.nombre}", style_title)
+        fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
 
-        writer = csv.writer(response)
-        writer.writerow(['Nombre', 'Apellidos', 'Fecha de nacimiento', 'Edad', 'Teléfono', 'Email'])
-
+        data = [['Apellidos', 'Nombre', 'DNI', 'Edad']]
         for h in hermanos:
             edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
-            if edad >= edad_mayor:
-                writer.writerow([h.nombre, h.apellidos, h.fecha_nacimiento.strftime('%d/%m/%Y'), edad, h.telefono, h.email])
+            data.append([h.apellidos or '', h.nombre or '', h.dni or '', str(edad)])
 
+        table = Table(data, colWidths=[2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
+        table_style = TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,0), 12),
+            ('BOTTOMPADDING', (0,0), (-1,0), 8),
+            ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+        ])
+        table.setStyle(table_style)
+
+        elements = [title, fecha, Spacer(1, 12), table]
+        doc.build(elements)
+
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="hermanos_activos_mayores.pdf"'
         return response
 
     else:
@@ -927,16 +1079,77 @@ def crear_evento(request):
     if not perfil:
         return redirect('gestion_cofradia:login')
     cofradia = perfil.cofradia
+
     if request.method == 'POST':
         form = EventoForm(request.POST, cofradia=cofradia)
         if form.is_valid():
             evento = form.save(commit=False)
             evento.cofradia = cofradia
             evento.save()
+
+            if evento.tipo == 'reunion':
+                fecha_corte = evento.fecha.date() - timedelta(days=18*365.25)
+
+                hermanos = Hermano.objects.filter(
+                    cofradia=cofradia,
+                    estado__nombre__iexact='activo',
+                    fecha_nacimiento__isnull=False,
+                    fecha_nacimiento__lte=fecha_corte,
+                ).filter(
+                    Q(nombre__isnull=False) & ~Q(nombre=''),
+                    Q(apellidos__isnull=False) & ~Q(apellidos=''),
+                    Q(dni__isnull=False) & ~Q(dni=''),
+                ).order_by('apellidos', 'nombre')
+
+                buffer = BytesIO()
+                doc = SimpleDocTemplate(buffer, pagesize=letter,
+                                        rightMargin=40, leftMargin=40,
+                                        topMargin=60, bottomMargin=40)
+
+                styles = getSampleStyleSheet()
+                style_title = ParagraphStyle(
+                    name='Title',
+                    fontSize=18,
+                    leading=22,
+                    alignment=TA_CENTER,
+                    spaceAfter=20,
+                    fontName='Helvetica-Bold'
+                )
+                style_normal = styles['Normal']
+
+                title = Paragraph(f"Hermanos activos mayores de 18 años para la reunión: {evento.nombre}", style_title)
+                fecha = Paragraph(f"Fecha del evento: {evento.fecha.strftime('%d/%m/%Y %H:%M')}", style_normal)
+
+                data = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad']]
+                hoy = evento.fecha.date()
+                for i, h in enumerate(hermanos, start=1):
+                    edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
+                    data.append([str(i), h.apellidos, h.nombre, h.dni, str(edad)])
+
+                table = Table(data, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
+                table_style = TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
+                    ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0,0), (-1,0), 12),
+                    ('BOTTOMPADDING', (0,0), (-1,0), 8),
+                    ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+                    ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                ])
+                table.setStyle(table_style)
+
+                elements = [title, fecha, Spacer(1, 12), table]
+                doc.build(elements)
+
+                buffer.seek(0)
+                return FileResponse(buffer, as_attachment=True, filename=f"hermanos_reunion_{evento.id}.pdf")
+
             messages.success(request, f'Evento "{evento.nombre}" creado exitosamente.')
             return redirect('gestion_cofradia:lista_eventos')
     else:
         form = EventoForm(cofradia=cofradia)
+
     return render(request, 'eventos/crear_evento.html', {'form': form})
 
 @login_required

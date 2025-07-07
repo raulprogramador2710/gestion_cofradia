@@ -42,7 +42,7 @@
       <div class="card-summary bg-success text-white d-flex flex-column justify-content-center align-items-center shadow-sm p-4 w-100">
         <h3 class="card-title mb-3"><i class="fa-solid fa-bell me-2"></i> Notificaciones</h3>
         <p class="card-text mb-3">{{ total_notificaciones }}</p>
-        {% if request.user.perfil.rol == 'hermano_mayor' or request.user.perfil.rol == 'secretario' %}
+        {% if perfil and perfil.rol == 'hermano_mayor' or perfil and perfil.rol == 'secretario' %}
           <a href="{% url 'gestion_cofradia:crear_notificacion' %}" class="btn btn-outline-light">Nueva notificación</a>
         {% endif %}
       </div>
@@ -58,7 +58,7 @@
   </div>
 
   <!-- Gráficas -->
-  {% if request.user.perfil.rol == 'hermano_mayor' or request.user.perfil.rol == 'secretario' %}
+  {% if perfil and perfil.rol == 'hermano_mayor' or perfil and perfil.rol == 'secretario' %}
   <div class="row g-4 mb-4">
     <div class="col-md-4">
       <div class="card-chart shadow-sm">
@@ -152,7 +152,7 @@
   </div>
 
   <!-- Recaudación y cuotas (solo hermano mayor y tesorero) -->
-  {% if request.user.perfil.rol == 'hermano_mayor' or request.user.perfil.rol == 'tesorero' %}
+  {% if perfil and perfil.rol == 'hermano_mayor' or perfil and perfil.rol == 'tesorero' %}
   <div class="row g-4">
     <div class="col-md-6">
       <div class="card-chart shadow-sm">
@@ -191,7 +191,7 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  {% if request.user.perfil.rol == 'hermano_mayor' or request.user.perfil.rol == 'secretario' %}
+  {% if perfil and perfil.rol == 'hermano_mayor' or perfil and perfil.rol == 'secretario' %}
     const estadoData = {{ hermanos_estado_json|default:"[]"|safe }};
     const comunicacionData = {{ hermanos_comunicacion_json|default:"[]"|safe }};
     const pagoData = {{ hermanos_pago_json|default:"[]"|safe }};
@@ -212,8 +212,8 @@
 
     const comunicacionColorsMap = {
       'Whatsapp': '#25d366',     // verde Wasap
-      'Carta Postal': '#ffc107',        // amarillo
-      'Email': '#007bff'        // azul
+      'Carta Postal': '#ffc107', // amarillo
+      'Email': '#007bff'         // azul
     };
 
     const pagoColorsMap = {
@@ -290,7 +290,7 @@
     })();
   {% endif %}
 
-  {% if request.user.perfil.rol == 'hermano_mayor' or request.user.perfil.rol == 'tesorero' %}
+  {% if perfil and perfil.rol == 'hermano_mayor' or perfil and perfil.rol == 'tesorero' %}
     // Donut recaudación
     (function() {
       const totalRecaudado = {{ total_recaudado|default:"0"|floatformat:2 }};

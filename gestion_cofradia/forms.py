@@ -212,9 +212,24 @@ class UploadHermanosForm(forms.Form):
         return csv_file
 
 class EventoForm(forms.ModelForm):
+    TIPO_EVENTO_CHOICES = [
+        ('reunion', 'Reunión'),
+        ('culto', 'Culto'),
+        ('misa', 'Misa'),
+        ('procesion', 'Procesión'),
+    ]
+
+    tipo = forms.ChoiceField(
+        choices=TIPO_EVENTO_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='Tipo de Evento',
+        initial='reunion',
+        required=True,
+    )
+
     class Meta:
         model = Evento
-        fields = ['nombre', 'descripcion', 'fecha', 'lugar', 'comentarios', 'es_interno', 'notificar', 'cuota_extra']
+        fields = ['nombre', 'descripcion', 'fecha', 'lugar', 'comentarios', 'es_interno', 'notificar', 'cuota_extra', 'tipo']
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -246,7 +261,10 @@ class EventoForm(forms.ModelForm):
             }),
             'cuota_extra': forms.Select(attrs={
                 'class': 'form-select'
-            })
+            }),
+            'tipo': forms.Select(attrs={
+                'class': 'form-select'
+            }),
         }
         labels = {
             'nombre': 'Nombre del Evento',
@@ -256,7 +274,8 @@ class EventoForm(forms.ModelForm):
             'comentarios': 'Comentarios',
             'es_interno': 'Evento Interno',
             'notificar': 'Notificar a Hermanos',
-            'cuota_extra': 'Cuota Extra Asociada'
+            'cuota_extra': 'Cuota Extra Asociada',
+            'tipo': 'Tipo de Evento',
         }
 
     def __init__(self, *args, **kwargs):
@@ -275,6 +294,7 @@ class EventoForm(forms.ModelForm):
         # Campos requeridos
         self.fields['nombre'].required = True
         self.fields['fecha'].required = True
+        self.fields['tipo'].required = True
 
 class AlquilerForm(forms.ModelForm):
     class Meta:

@@ -164,6 +164,13 @@ class Pago(models.Model):
         return f"Pago {self.cuota} por {self.hermano} - {self.importe_pagado}€"
 
 class Evento(models.Model):
+    TIPO_EVENTO_CHOICES = [
+        ('reunion', 'Reunión'),
+        ('culto', 'Culto'),
+        ('misa', 'Misa'),
+        ('procesion', 'Procesión'),
+    ]
+
     cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='eventos')
     nombre = models.CharField(max_length=150, db_index=True)
     descripcion = models.TextField(blank=True, null=True)
@@ -173,6 +180,7 @@ class Evento(models.Model):
     es_interno = models.BooleanField(default=False)
     notificar = models.BooleanField(default=True)
     cuota_extra = models.ForeignKey(Cuota, null=True, blank=True, on_delete=models.SET_NULL)
+    tipo = models.CharField(max_length=20, choices=TIPO_EVENTO_CHOICES, default='reunion')
 
     def __str__(self):
         return f"{self.nombre} ({self.fecha.strftime('%d/%m/%Y %H:%M')})"

@@ -14,6 +14,7 @@ urlpatterns = [
 
     #Hermanos
     path('hermanos/', views.lista_hermanos, name='lista_hermanos'),
+    path('hermanos/json/', views.hermanos_json, name='hermanos_json'),
     path('hermanos/crear/', views.crear_hermano, name='crear_hermano'),
     path('hermanos/<int:pk>/', views.ver_hermano, name='ver_hermano'),
     path('hermanos/<int:pk>/editar/', views.editar_hermano, name='editar_hermano'),
