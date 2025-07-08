@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Hermano, Cuota, Pago, Notificacion, Tarea, Documento, EstadoHermano, FormaComunicacion, Evento, Alquiler, Perfil
+from .models import Hermano, Cuota, Pago, Notificacion, Tarea, Documento, EstadoHermano, FormaComunicacion, Evento, Alquiler, Perfil, Enser
 import csv
 
 from django import forms
@@ -303,6 +303,14 @@ class AlquilerForm(forms.ModelForm):
         widgets = {
             'fecha_entrega': forms.DateInput(attrs={'type': 'date'}),
             'fecha_devolucion': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+class EnserForm(forms.ModelForm):
+    class Meta:
+        model = Enser
+        fields = ['nombre', 'descripcion', 'tipo', 'estado', 'identificador']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'rows': 3}),
         }
 
 

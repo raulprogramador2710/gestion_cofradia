@@ -52,9 +52,9 @@ urlpatterns = [
     path('documentos/<int:documento_id>/', views.ver_documento, name='ver_documento'),
     path('documentos/<int:documento_id>/editar/', views.editar_documento, name='editar_documento'),
     path('documentos/<int:documento_id>/eliminar/', views.eliminar_documento, name='eliminar_documento'),
-
     #INFORMES
-    path('informes/descargar/<str:tipo>/', views.descargar_informe, name='descargar_informe'),
+    path('documentos/informes/', views.lista_informes, name='lista_informes'),
+    path('documentos/informes/descargar/<str:tipo>/', views.descargar_informe, name='descargar_informe'),
 
     #Eventos
     path('eventos/', views.lista_eventos, name='lista_eventos'),
@@ -64,10 +64,17 @@ urlpatterns = [
     path('eventos/<int:evento_id>/eliminar/', views.eliminar_evento, name='eliminar_evento'),
 
     #Alquileres
-    path('alquileres/', views.listar_alquileres, name='listar_alquileres'),
+    path('alquileres/', views.lista_alquileres, name='lista_alquileres'),
     path('alquileres/crear/', views.crear_alquiler, name='crear_alquiler'),
     path('alquileres/<int:pk>/', views.ver_alquiler, name='ver_alquiler'),
     path('alquileres/<int:pk>/editar/', views.editar_alquiler, name='editar_alquiler'),
     path('alquileres/<int:pk>/eliminar/', views.eliminar_alquiler, name='eliminar_alquiler'), 
+
+    #Enseres
+    path('enseres/', views.lista_enseres, name='lista_enseres'),
+    path('enseres/crear/', views.crear_enser, name='crear_enser'),
+    path('enseres/<int:pk>/', views.ver_enser, name='ver_enser'),
+    path('enseres/<int:pk>/editar/', views.editar_enser, name='editar_enser'),
+    path('enseres/<int:pk>/borrar/', views.borrar_enser, name='borrar_enser'),
 
 ]

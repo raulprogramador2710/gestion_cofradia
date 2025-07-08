@@ -5,6 +5,7 @@ import logging
 from collections import Counter
 from datetime import date, timedelta
 from io import BytesIO
+from math import ceil
 
 # Django core
 from django.conf import settings
@@ -22,7 +23,7 @@ from django.utils.timezone import now
 from django.views import View
 
 # Third-party (reportlab)
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -34,11 +35,11 @@ from reportlab.pdfgen import canvas
 from .utils import RoleRequiredMixin, role_required
 from .forms import (
     HermanoForm, CuotaForm, PagoForm, EventoForm, NotificacionForm,
-    TareaForm, DocumentoForm, UploadHermanosForm, AlquilerForm
+    TareaForm, DocumentoForm, UploadHermanosForm, AlquilerForm, EnserForm
 )
 from .models import (
     Hermano, Cuota, Pago, Evento, Notificacion, Tarea, FormaPago,
-    FormaComunicacion, Documento, EstadoHermano, Alquiler, Cofradia
+    FormaComunicacion, Documento, EstadoHermano, Alquiler, Cofradia, Enser
 )
 
 logger = logging.getLogger(__name__)
@@ -995,71 +996,194 @@ def eliminar_documento(request, documento_id):
 #INFORMES
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def lista_informes(request):
+    return render(request, 'documentos/informes/lista_informes.html')
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
 def descargar_informe(request, tipo):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
+    print("DEBUG - perfil:", perfil)
+    print("DEBUG - perfil Cofradía:", perfil.cofradia)
     cofradia = perfil.cofradia
 
     if tipo == 'hermanos_activos_mayores':
-        hoy = now().date()
-        edad_mayor = 18
-        fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
+        return generar_pdf_hermanos_activos_mayores(cofradia)
 
-        hermanos = Hermano.objects.filter(
-            cofradia=cofradia,
-            estado__nombre__iexact='activo',
-            fecha_nacimiento__isnull=False,
-            fecha_nacimiento__lte=fecha_limite
-        ).order_by('apellidos', 'nombre')
-
-        buffer = BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=letter,
-                                rightMargin=40, leftMargin=40,
-                                topMargin=60, bottomMargin=40)
-
-        styles = getSampleStyleSheet()
-        style_title = ParagraphStyle(
-            name='Title',
-            fontSize=18,
-            leading=22,
-            alignment=TA_CENTER,
-            spaceAfter=20,
-            fontName='Helvetica-Bold'
-        )
-        style_normal = styles['Normal']
-
-        title = Paragraph(f"Hermanos activos mayores de {edad_mayor} años - Cofradía {cofradia.nombre}", style_title)
-        fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
-
-        data = [['Apellidos', 'Nombre', 'DNI', 'Edad']]
-        for h in hermanos:
-            edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
-            data.append([h.apellidos or '', h.nombre or '', h.dni or '', str(edad)])
-
-        table = Table(data, colWidths=[2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
-        table_style = TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
-            ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0,0), (-1,0), 12),
-            ('BOTTOMPADDING', (0,0), (-1,0), 8),
-            ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
-            ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
-        ])
-        table.setStyle(table_style)
-
-        elements = [title, fecha, Spacer(1, 12), table]
-        doc.build(elements)
-
-        buffer.seek(0)
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="hermanos_activos_mayores.pdf"'
-        return response
+    elif tipo == 'hermanos_carta_postal':
+        return generar_pdf_hermanos_carta_postal(cofradia)
 
     else:
         return HttpResponse("Informe no encontrado", status=404)
+
+def generar_pdf_hermanos_activos_mayores(cofradia):
+    hoy = now().date()
+    edad_mayor = 18
+    fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
+
+    hermanos = cofradia.hermanos.filter(
+        fecha_nacimiento__isnull=False,
+        fecha_nacimiento__lte=fecha_limite
+    ).order_by('apellidos', 'nombre')
+
+    # Hermanos activos con DNI
+    hermanos_activos_con_dni = hermanos.filter(
+        estado__nombre__iexact='activo',
+        dni__isnull=False
+    ).exclude(dni='')
+
+    # Hermanos que no están activos o sin DNI
+    hermanos_no_activos_o_sin_dni = hermanos.exclude(
+        id__in=hermanos_activos_con_dni.values_list('id', flat=True)
+    )
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
+                            rightMargin=40, leftMargin=40,
+                            topMargin=60, bottomMargin=40)
+
+    styles = getSampleStyleSheet()
+    style_title = ParagraphStyle(
+        name='Title',
+        fontSize=18,
+        leading=22,
+        alignment=TA_CENTER,
+        spaceAfter=20,
+        fontName='Helvetica-Bold'
+    )
+    style_normal = styles['Normal']
+
+    title = Paragraph(f"Hermanos mayores de {edad_mayor} años - Cofradía {cofradia.nombre}", style_title)
+    fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
+
+    # Tabla 1: Hermanos activos con DNI
+    data1 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad']]
+    for i, h in enumerate(hermanos_activos_con_dni, start=1):
+        edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
+        data1.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad)])
+
+    total1 = len(hermanos_activos_con_dni)
+    porcentaje1 = ceil(total1 * 0.2)
+    data1.append(['', '', '', 'Total:', str(total1)])
+    data1.append(['', '', '', '20% redondeado:', str(porcentaje1)])
+
+    table1 = Table(data1, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
+    table1.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 12),
+        ('BOTTOMPADDING', (0,0), (-1,0), 8),
+        ('BACKGROUND', (0,1), (-1,-3), colors.whitesmoke),
+        ('BACKGROUND', (0,-2), (-1,-1), colors.lightgrey),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+    ]))
+
+    # Tabla 2: Hermanos sin DNI o con cuota pendiente con columna condición
+    data2 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad', 'Condición']]
+    for i, h in enumerate(hermanos_no_activos_o_sin_dni, start=1):
+        edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
+        condicion = []
+        if not h.dni:
+            condicion.append("Falta DNI")
+        if h.estado.nombre.lower() != 'activo':
+            condicion.append("Cuota pendiente")
+        data2.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad), ", ".join(condicion)])
+
+    total2 = len(hermanos_no_activos_o_sin_dni)
+    porcentaje2 = ceil(total2 * 0.2)
+    data2.append(['', '', '', 'Total:', str(total2), ''])
+    data2.append(['', '', '', '20% redondeado:', str(porcentaje2), ''])
+
+    table2 = Table(data2, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch, 2*inch])
+    table2.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.lightcoral),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 12),
+        ('BOTTOMPADDING', (0,0), (-1,0), 8),
+        ('BACKGROUND', (0,1), (-1,-3), colors.lavenderblush),
+        ('BACKGROUND', (0,-2), (-1,-1), colors.lightgrey),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+    ]))
+
+    elements = [
+        title,
+        fecha,
+        Spacer(1, 12),
+        Paragraph("Hermanos activos con DNI", style_normal),
+        table1,
+        Spacer(1, 24),
+        Paragraph("Hermanos sin DNI o con cuota pendiente", style_normal),
+        table2
+    ]
+
+    doc.build(elements)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="hermanos_mayores.pdf"'
+    return response
+
+def generar_pdf_hermanos_carta_postal(cofradia):
+    hoy = now().date()
+
+    hermanos = cofradia.hermanos.filter(
+        estado__nombre__iexact='activo',
+        forma_comunicacion__nombre__iexact='carta postal'
+    ).order_by('localidad', 'direccion', 'apellidos')
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
+                            rightMargin=40, leftMargin=40,
+                            topMargin=60, bottomMargin=40)
+
+    styles = getSampleStyleSheet()
+    style_title = ParagraphStyle(
+        name='Title',
+        fontSize=18,
+        leading=22,
+        alignment=TA_CENTER,
+        spaceAfter=20,
+        fontName='Helvetica-Bold'
+    )
+    style_normal = styles['Normal']
+
+    title = Paragraph(f"Hermanos con forma de comunicación 'Carta Postal' - Cofradía {cofradia.nombre}", style_title)
+    fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
+
+    data = [['Apellidos', 'Nombre', 'Teléfono', 'Localidad', 'Dirección']]
+    for h in hermanos:
+        telefono = h.telefono or 'No disponible'
+        localidad = h.localidad or 'No disponible'
+        direccion = h.direccion or 'No disponible'
+        data.append([h.apellidos or '', h.nombre or '', telefono, localidad, direccion])
+
+    table = Table(data, colWidths=[2.1*inch, 1.8*inch, 1*inch, 2.5*inch, 3*inch])
+    table_style = TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 12),
+        ('BOTTOMPADDING', (0,0), (-1,0), 8),
+        ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+    ])
+    table.setStyle(table_style)
+
+    elements = [title, fecha, Spacer(1, 12), table]
+    doc.build(elements)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="hermanos_carta_postal.pdf"'
+    return response
+
 
 # EVENTOS
 @login_required
@@ -1088,21 +1212,28 @@ def crear_evento(request):
             evento.save()
 
             if evento.tipo == 'reunion':
-                fecha_corte = evento.fecha.date() - timedelta(days=18*365.25)
+                hoy = evento.fecha.date()
+                edad_mayor = 18
+                fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
 
-                hermanos = Hermano.objects.filter(
-                    cofradia=cofradia,
-                    estado__nombre__iexact='activo',
+                hermanos = cofradia.hermanos.filter(
                     fecha_nacimiento__isnull=False,
-                    fecha_nacimiento__lte=fecha_corte,
-                ).filter(
-                    Q(nombre__isnull=False) & ~Q(nombre=''),
-                    Q(apellidos__isnull=False) & ~Q(apellidos=''),
-                    Q(dni__isnull=False) & ~Q(dni=''),
+                    fecha_nacimiento__lte=fecha_limite
                 ).order_by('apellidos', 'nombre')
 
+                # Hermanos activos con DNI
+                hermanos_activos_con_dni = hermanos.filter(
+                    estado__nombre__iexact='activo',
+                    dni__isnull=False
+                ).exclude(dni='')
+
+                # Hermanos sin DNI o con cuota pendiente
+                hermanos_no_activos_o_sin_dni = hermanos.exclude(
+                    id__in=hermanos_activos_con_dni.values_list('id', flat=True)
+                )
+
                 buffer = BytesIO()
-                doc = SimpleDocTemplate(buffer, pagesize=letter,
+                doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
                                         rightMargin=40, leftMargin=40,
                                         topMargin=60, bottomMargin=40)
 
@@ -1117,29 +1248,73 @@ def crear_evento(request):
                 )
                 style_normal = styles['Normal']
 
-                title = Paragraph(f"Hermanos activos mayores de 18 años para la reunión: {evento.nombre}", style_title)
+                title = Paragraph(f"Hermanos mayores de {edad_mayor} años para la reunión: {evento.nombre}", style_title)
                 fecha = Paragraph(f"Fecha del evento: {evento.fecha.strftime('%d/%m/%Y %H:%M')}", style_normal)
 
-                data = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad']]
-                hoy = evento.fecha.date()
-                for i, h in enumerate(hermanos, start=1):
+                # Tabla 1: Hermanos activos con DNI
+                data1 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad']]
+                for i, h in enumerate(hermanos_activos_con_dni, start=1):
                     edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
-                    data.append([str(i), h.apellidos, h.nombre, h.dni, str(edad)])
+                    data1.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad)])
 
-                table = Table(data, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
-                table_style = TableStyle([
+                total1 = len(hermanos_activos_con_dni)
+                porcentaje1 = ceil(total1 * 0.2)
+                data1.append(['', '', '', 'Total:', str(total1)])
+                data1.append(['', '', '', '20% redondeado:', str(porcentaje1)])
+
+                table1 = Table(data1, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
+                table1.setStyle(TableStyle([
                     ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
                     ('TEXTCOLOR', (0,0), (-1,0), colors.white),
                     ('ALIGN', (0,0), (-1,-1), 'CENTER'),
                     ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
                     ('FONTSIZE', (0,0), (-1,0), 12),
                     ('BOTTOMPADDING', (0,0), (-1,0), 8),
-                    ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+                    ('BACKGROUND', (0,1), (-1,-3), colors.whitesmoke),
+                    ('BACKGROUND', (0,-2), (-1,-1), colors.lightgrey),
                     ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
-                ])
-                table.setStyle(table_style)
+                ]))
 
-                elements = [title, fecha, Spacer(1, 12), table]
+                # Tabla 2: Hermanos sin DNI o con cuota pendiente con columna condición
+                data2 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad', 'Condición']]
+                for i, h in enumerate(hermanos_no_activos_o_sin_dni, start=1):
+                    edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
+                    condicion = []
+                    if not h.dni:
+                        condicion.append("Falta DNI")
+                    if h.estado.nombre.lower() != 'activo':
+                        condicion.append("Cuota pendiente")
+                    data2.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad), ", ".join(condicion)])
+
+                total2 = len(hermanos_no_activos_o_sin_dni)
+                porcentaje2 = ceil(total2 * 0.2)
+                data2.append(['', '', '', 'Total:', str(total2), ''])
+                data2.append(['', '', '', '20% redondeado:', str(porcentaje2), ''])
+
+                table2 = Table(data2, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch, 2*inch])
+                table2.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.lightcoral),
+                    ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0,0), (-1,0), 12),
+                    ('BOTTOMPADDING', (0,0), (-1,0), 8),
+                    ('BACKGROUND', (0,1), (-1,-3), colors.lavenderblush),
+                    ('BACKGROUND', (0,-2), (-1,-1), colors.lightgrey),
+                    ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                ]))
+
+                elements = [
+                    title,
+                    fecha,
+                    Spacer(1, 12),
+                    Paragraph("Hermanos activos con DNI", style_normal),
+                    table1,
+                    Spacer(1, 24),
+                    Paragraph("Hermanos sin DNI o con cuota pendiente", style_normal),
+                    table2
+                ]
+
                 doc.build(elements)
 
                 buffer.seek(0)
@@ -1200,13 +1375,13 @@ def eliminar_evento(request, evento_id):
 #Alquileres
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
-def listar_alquileres(request):
+def lista_alquileres(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
     cofradia = perfil.cofradia
     alquileres = Alquiler.objects.filter(cofradia=cofradia).select_related('enser', 'hermano', 'evento').order_by('-fecha_entrega')
-    return render(request, 'gestion_cofradia/listar_alquileres.html', {'alquileres': alquileres})
+    return render(request, 'alquileres/lista_alquileres.html', {'alquileres': alquileres})
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -1216,7 +1391,7 @@ def ver_alquiler(request, pk):
         return redirect('gestion_cofradia:login')
     cofradia = perfil.cofradia
     alquiler = get_object_or_404(Alquiler, pk=pk, cofradia=cofradia)
-    return render(request, 'gestion_cofradia/ver_alquiler.html', {'alquiler': alquiler})
+    return render(request, 'alquileres/ver_alquiler.html', {'alquiler': alquiler})
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -1232,10 +1407,10 @@ def crear_alquiler(request):
             alquiler.cofradia = cofradia
             alquiler.save()
             messages.success(request, 'Alquiler creado correctamente.')
-            return redirect('gestion_cofradia:listar_alquileres')
+            return redirect('gestion_cofradia:lista_alquileres')
     else:
         form = AlquilerForm()
-    return render(request, 'gestion_cofradia/crear_alquiler.html', {'form': form})
+    return render(request, 'alquileres/crear_alquiler.html', {'form': form})
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -1250,10 +1425,10 @@ def editar_alquiler(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Alquiler actualizado correctamente.')
-            return redirect('gestion_cofradia:detalle_alquiler', pk=alquiler.pk)
+            return redirect('gestion_cofradia:ver_alquiler', pk=alquiler.pk)
     else:
         form = AlquilerForm(instance=alquiler)
-    return render(request, 'gestion_cofradia/editar_alquiler.html', {'form': form, 'alquiler': alquiler})
+    return render(request, 'alquileres/editar_alquiler.html', {'form': form, 'alquiler': alquiler})
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -1266,5 +1441,83 @@ def eliminar_alquiler(request, pk):
     if request.method == 'POST':
         alquiler.delete()
         messages.success(request, 'Alquiler eliminado correctamente.')
-        return redirect('gestion_cofradia:listar_alquileres')
-    return render(request, 'gestion_cofradia/eliminar_alquiler.html', {'alquiler': alquiler})
+        return redirect('gestion_cofradia:lista_alquileres')
+    return render(request, 'alquileres/eliminar_alquiler.html', {'alquiler': alquiler})
+
+
+#ENSERES
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def lista_enseres(request):
+    perfil = request.user.perfil_set.first()
+    if not perfil:
+        return redirect('gestion_cofradia:login')
+    cofradia = perfil.cofradia
+
+    ensers = Enser.objects.filter(cofradia=cofradia).order_by('nombre')
+    return render(request, 'enseres/lista_enseres.html', {'ensers': ensers})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def ver_enser(request, pk):
+    perfil = request.user.perfil_set.first()
+    if not perfil:
+        return redirect('gestion_cofradia:login')
+    cofradia = perfil.cofradia
+
+    enser = get_object_or_404(Enser, pk=pk, cofradia=cofradia)
+    return render(request, 'enseres/ver_enser.html', {'enser': enser})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def crear_enser(request):
+    perfil = request.user.perfil_set.first()
+    if not perfil:
+        return redirect('gestion_cofradia:login')
+    cofradia = perfil.cofradia
+
+    if request.method == 'POST':
+        form = EnserForm(request.POST)
+        if form.is_valid():
+            enser = form.save(commit=False)
+            enser.cofradia = cofradia
+            enser.save()
+            messages.success(request, f'Enser "{enser.nombre}" creado correctamente.')
+            return redirect('gestion_cofradia:lista_enseres')
+    else:
+        form = EnserForm()
+    return render(request, 'enseres/crear_enser.html', {'form': form})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def editar_enser(request, pk):
+    perfil = request.user.perfil_set.first()
+    if not perfil:
+        return redirect('gestion_cofradia:login')
+    cofradia = perfil.cofradia
+
+    enser = get_object_or_404(Enser, pk=pk, cofradia=cofradia)
+    if request.method == 'POST':
+        form = EnserForm(request.POST, instance=enser)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Enser "{enser.nombre}" actualizado correctamente.')
+            return redirect('gestion_cofradia:lista_enseres')
+    else:
+        form = EnserForm(instance=enser)
+    return render(request, 'enseres/editar_enser.html', {'form': form, 'enser': enser})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def borrar_enser(request, pk):
+    perfil = request.user.perfil_set.first()
+    if not perfil:
+        return redirect('gestion_cofradia:login')
+    cofradia = perfil.cofradia
+
+    enser = get_object_or_404(Enser, pk=pk, cofradia=cofradia)
+    if request.method == 'POST':
+        enser.delete()
+        messages.success(request, f'Enser "{enser.nombre}" borrado correctamente.')
+        return redirect('gestion_cofradia:lista_enseres')
+    return render(request, 'enseres/borrar_enser.html', {'enser': enser})

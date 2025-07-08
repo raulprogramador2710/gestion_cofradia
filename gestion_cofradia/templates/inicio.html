@@ -110,7 +110,7 @@
                   <small class="text-muted">Entregado a: {{ alquiler.hermano.nombre }} {{ alquiler.hermano.apellidos }}</small><br>
                   <small class="text-muted">Fecha entrega: {{ alquiler.fecha_entrega|date:"d/m/Y" }}</small>
                 </div>
-                <a href="{% url 'gestion_cofradia:detalle_alquiler' alquiler.id %}" class="btn btn-sm btn-outline-primary" title="Ver alquiler">
+                <a href="{% url 'gestion_cofradia:ver_alquiler' alquiler.id %}" class="btn btn-sm btn-outline-primary" title="Ver alquiler">
                   <i class="fas fa-eye"></i>
                 </a>
               </li>

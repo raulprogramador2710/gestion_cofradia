@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Informes Disponibles{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 500px;">
+  <h2 class="mb-4">Informes disponibles</h2>
+
+  <div class="d-grid gap-3">
+    <a href="{% url 'gestion_cofradia:descargar_informe' 'hermanos_activos_mayores' %}" class="btn btn-primary btn-lg">
+      Hermanos activos mayores de 18 años
+    </a>
+    <a href="{% url 'gestion_cofradia:descargar_informe' 'hermanos_carta_postal' %}" class="btn btn-primary btn-lg">
+      Hermanos con forma de comunicación Carta Postal
+    </a>
+    <!-- Añade más botones para otros informes aquí -->
+  </div>
+
+  <a href="{% url 'gestion_cofradia:lista_documentos' %}" class="btn btn-secondary mt-4">
+    Volver a Documentos
+  </a>
+</div>
+{% endblock %}

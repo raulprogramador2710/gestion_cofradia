@@ -29,7 +29,7 @@
         <td>{{ alquiler.get_estado_display }}</td>
         <td>{{ alquiler.fianza|floatformat:2 }}</td>
         <td>
-          <a href="{% url 'gestion_cofradia:detalle_alquiler' alquiler.id %}" class="btn btn-sm btn-primary">Ver</a>
+          <a href="{% url 'gestion_cofradia:ver_alquiler' alquiler.id %}" class="btn btn-sm btn-primary">Ver</a>
           <a href="{% url 'gestion_cofradia:editar_alquiler' alquiler.id %}" class="btn btn-sm btn-warning">Editar</a>
           <a href="{% url 'gestion_cofradia:eliminar_alquiler' alquiler.id %}" class="btn btn-sm btn-danger">Eliminar</a>
         </td>

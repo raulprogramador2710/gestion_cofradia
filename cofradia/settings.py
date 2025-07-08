@@ -50,11 +50,12 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # debe ir antes que tu middleware
+    'cofradia.middleware.MultiLoginMiddleware',  # tu middleware personalizado aquí
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'middleware.LoginRequiredMiddleware',  # <--- ¡Añade esto!
+    #'middleware.LoginRequiredMiddleware',  # si lo usas, ponlo después también
 ]
 
 ROOT_URLCONF = 'cofradia.urls'
@@ -135,7 +136,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = 'login'  # Usa el nombre de la URL 'login' definida en gestion_cofradia/urls.py
+#LOGIN_URL = 'login'  # Usa el nombre de la URL 'login' definida en gestion_cofradia/urls.py
 LOGIN_REDIRECT_URL = 'inicio'  # Usa el nombre de la URL 'inicio' definida en gestion_cofradia/urls.py
 LOGOUT_REDIRECT_URL = 'login'  # Usa el nombre de la URL 'login' definida en gestion_cofradia/urls.py
 

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Listado de Enseres{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="fas fa-boxes me-2"></i>Enseres</h2>
+    <a href="{% url 'gestion_cofradia:crear_enser' %}" class="btn btn-primary">
+      <i class="fas fa-plus"></i> Nuevo Enser
+    </a>
+  </div>
+
+  {% if ensers %}
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for enser in ensers %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ enser.nombre }}</h5>
+          <p><strong>Tipo:</strong> {{ enser.tipo }}</p>
+          <p><strong>Estado:</strong> {{ enser.estado }}</p>
+          <p><strong>ID:</strong> {{ enser.identificador }}</p>
+          <a href="{% url 'gestion_cofradia:ver_enser' enser.id %}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="fas fa-eye"></i> Ver
+          </a>
+          <a href="{% url 'gestion_cofradia:editar_enser' enser.id %}" class="btn btn-sm btn-outline-warning me-2">
+            <i class="fas fa-edit"></i> Editar
+          </a>
+          <a href="{% url 'gestion_cofradia:borrar_enser' enser.id %}" class="btn btn-sm btn-outline-danger"
+             onclick="return confirm('¿Seguro que quieres borrar este enser?');">
+            <i class="fas fa-trash"></i> Borrar
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No hay enseres registrados.</p>
+  {% endif %}
+</div>
+{% endblock %}

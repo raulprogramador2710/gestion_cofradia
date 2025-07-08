@@ -1,0 +1,33 @@
+{% extends "base_portal.html" %}
+
+{% block title %}Notificaciones{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Notificaciones</h2>
+
+{% if notificaciones %}
+  <ul class="list-group">
+    {% for notificacion in notificaciones %}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong>{{ notificacion.titulo }}</strong><br>
+            <small class="text-muted">{{ notificacion.fecha_envio|date:"d/m/Y H:i" }}</small>
+          </div>
+          {% if notificacion.leida %}
+            <span class="badge bg-success align-self-center">Leída</span>
+          {% else %}
+            <span class="badge bg-warning text-dark align-self-center">No leída</span>
+          {% endif %}
+        </div>
+        <p class="mt-2 mb-0">{{ notificacion.mensaje|linebreaksbr }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <div class="alert alert-info" role="alert">
+    No tienes notificaciones.
+  </div>
+{% endif %}
+
+{% endblock %}

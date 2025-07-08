@@ -24,6 +24,7 @@
   {% url 'gestion_cofradia:lista_notificaciones' as url_notificaciones %}
   {% url 'gestion_cofradia:lista_tareas' as url_tareas %}
   {% url 'gestion_cofradia:lista_documentos' as url_documentos %}
+  {% url 'gestion_cofradia:lista_enseres' as url_enseres %}
   {% url 'gestion_cofradia:lista_alquileres' as url_alquileres %}
   {% url 'gestion_cofradia:logout' as url_logout %}
 
@@ -95,6 +96,14 @@
             <a href="{{ url_documentos }}" class="nav-link-pc {% if request.path == url_documentos %}active{% endif %}" aria-current="{% if request.path == url_documentos %}page{% endif %}">
               <i class="fas fa-file-alt" aria-hidden="true"></i>
               <span>Documentos</span>
+            </a>
+          </li>
+
+          <!-- Enseres -->
+          <li class="nav-item-pc">
+            <a href="{{ url_enseres }}" class="nav-link-pc {% if request.path == url_enseres %}active{% endif %}" aria-current="{% if request.path == url_enseres %}page{% endif %}">
+              <i class="fas fa-key" aria-hidden="true"></i>
+              <span>Enseres</span>
             </a>
           </li>
 

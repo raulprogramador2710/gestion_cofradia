@@ -2,25 +2,18 @@
 
 {% block content %}
   <div class="container">
+    <div class="d-flex justify-content-end mb-3">
+      <a href="{% url 'gestion_cofradia:lista_informes' %}" class="btn btn-info">
+        <i class="fa-solid fa-file-pdf me-1"></i> Ver informes
+      </a>
+    </div>
+
     <div class="card card-info mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="mb-0"><i class="fa-solid fa-file-alt"></i> Documentos de la Cofradía</h2>
-        <div>
-          <a href="{% url 'gestion_cofradia:crear_documento' %}" class="btn btn-success me-2">
-            <i class="fa-solid fa-upload"></i> Subir documento
-          </a>
-
-          <div class="btn-group">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa-solid fa-file-lines"></i> Descargar informe
-            </button>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="{% url 'gestion_cofradia:descargar_informe' 'hermanos_activos_mayores' %}">
-                Hermanos activos mayores de 18 años
-              </a>
-            </div>
-          </div>
-        </div>
+        <a href="{% url 'gestion_cofradia:crear_documento' %}" class="btn btn-success">
+          <i class="fa-solid fa-upload me-1"></i> Subir documento
+        </a>
       </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -38,7 +31,7 @@
                 <tr>
                   <td>
                     <a href="{% url 'gestion_cofradia:ver_documento' documento.id %}">
-                      <i class="fa-solid fa-file"></i> {{ documento.titulo }}
+                      <i class="fa-solid fa-file me-1"></i> {{ documento.titulo }}
                     </a>
                   </td>
                   <td>
@@ -57,10 +50,10 @@
                   </td>
                   <td>
                     <a href="{% url 'gestion_cofradia:editar_documento' documento.id %}" class="btn btn-sm btn-warning me-1">
-                      <i class="fa-solid fa-pen"></i> Editar
+                      <i class="fa-solid fa-pen me-1"></i> Editar
                     </a>
                     <a href="{% url 'gestion_cofradia:eliminar_documento' documento.id %}" class="btn btn-sm btn-danger">
-                      <i class="fa-solid fa-trash"></i> Eliminar
+                      <i class="fa-solid fa-trash me-1"></i> Eliminar
                     </a>
                   </td>
                 </tr>

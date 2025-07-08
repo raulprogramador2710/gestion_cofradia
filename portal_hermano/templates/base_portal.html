@@ -31,7 +31,6 @@
                         <div class="fw-bold mt-2">{{ user.hermano.nombre }} {{ user.hermano.apellidos }}</div>
                     </div>
                     <ul class="nav flex-column">
-                        {% comment %} Navegación principal {% endcomment %}
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_hermano:dashboard' %}">
                                 <i class="fas fa-home me-2"></i>Inicio
@@ -43,21 +42,20 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'cuotas' %}active{% endif %}" href="{% url 'portal_hermano:cuotas' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'cuotas' %}active{% endif %}" href="{% url 'portal_hermano:ver_cuotas' %}">
                                 <i class="fas fa-euro-sign me-2"></i>Mis Cuotas
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'notificaciones' %}active{% endif %}" href="{% url 'portal_hermano:notificaciones' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'notificaciones' %}active{% endif %}" href="{% url 'portal_hermano:ver_notificaciones' %}">
                                 <i class="fas fa-bell me-2"></i>Notificaciones
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'documentos' %}active{% endif %}" href="{% url 'portal_hermano:documentos' %}">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'documentos' %}active{% endif %}" href="{% url 'portal_hermano:ver_documentos' %}">
                                 <i class="fas fa-file-alt me-2"></i>Documentos
                             </a>
                         </li>
-                        {% comment %} Opciones usuario {% endcomment %}
                         <li class="nav-item mt-3">
                             <a href="{% url 'portal_hermano:cambiar_password' %}" class="nav-link">
                                 <i class="fas fa-key me-2"></i>Cambiar Contraseña

@@ -1,0 +1,29 @@
+{% extends "base_portal.html" %}
+
+{% block title %}Documentos Públicos{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Documentos Públicos</h2>
+
+{% if documentos %}
+  <ul class="list-group">
+    {% for doc in documentos %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ doc.titulo }}</strong><br>
+          <small class="text-muted">Subido el {{ doc.fecha_subida|date:"d/m/Y" }}</small>
+          {% if doc.descripcion %}
+            <p class="mb-0">{{ doc.descripcion|linebreaksbr }}</p>
+          {% endif %}
+        </div>
+        <a href="{{ doc.archivo.url }}" target="_blank" class="btn btn-sm btn-primary">Ver / Descargar</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <div class="alert alert-info" role="alert">
+    No hay documentos públicos disponibles.
+  </div>
+{% endif %}
+
+{% endblock %}

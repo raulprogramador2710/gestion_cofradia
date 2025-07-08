@@ -27,9 +27,9 @@
                     <div class="rounded-circle mb-3 d-flex align-items-center justify-content-center bg-success" style="width: 60px; height: 60px;">
                         <i class="fas fa-calendar-alt text-white fs-4"></i>
                     </div>
-                    <h5 class="card-title mb-2">Eventos (30 días)</h5>
+                    <h5 class="card-title mb-2">Eventos</h5>
                     <p class="display-5 fw-bold mb-3">{{ total_eventos }}</p>
-                    <a href="{% url 'portal_hermano:eventos' %}" class="btn btn-outline-success w-100">Ver eventos</a>
+                    <a href="{% url 'portal_hermano:ver_eventos' %}" class="btn btn-outline-success w-100">Ver eventos</a>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                     </div>
                     <h5 class="card-title mb-2">Notificaciones</h5>
                     <p class="display-5 fw-bold mb-3">{{ total_notificaciones }}</p>
-                    <a href="{% url 'portal_hermano:notificaciones' %}" class="btn btn-outline-warning w-100">Ver notificaciones</a>
+                    <a href="{% url 'portal_hermano:ver_notificaciones' %}" class="btn btn-outline-warning w-100">Ver notificaciones</a>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@
                     </div>
                     <h5 class="card-title mb-2">Cuotas Pendientes</h5>
                     <p class="display-5 fw-bold mb-3">{{ total_cuotas_pendientes }}</p>
-                    <a href="{% url 'portal_hermano:cuotas' %}" class="btn btn-outline-info w-100">Ver cuotas</a>
+                    <a href="{% url 'portal_hermano:ver_cuotas' %}" class="btn btn-outline-info w-100">Ver cuotas</a>
                 </div>
             </div>
         </div>

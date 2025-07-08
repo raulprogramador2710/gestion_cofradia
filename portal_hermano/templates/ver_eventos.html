@@ -1,32 +1,56 @@
 {% extends "base_portal.html" %}
 
 {% block content %}
-<h2>Eventos próximos 30 días</h2>
+<h2 class="mb-4">Eventos próximos 30 días</h2>
 
 {% if eventos %}
-  <ul>
+  <div class="list-group">
     {% for evento in eventos %}
-      <li>
-        <strong>{{ evento.titulo }}</strong> - Fecha: {{ evento.fecha|date:"d/m/Y" }}
-        <br>
-        {{ evento.descripcion|linebreaks }}
-      </li>
+      <div class="list-group-item mb-3 rounded shadow-sm">
+        <h5 class="mb-1">{{ evento.nombre }}</h5>
+        <small class="text-muted">{{ evento.fecha|date:"d/m/Y H:i" }} - {{ evento.get_tipo_display }}</small>
+        <p class="mb-1">{{ evento.descripcion|linebreaksbr }}</p>
+        <small><strong>Lugar:</strong> {{ evento.lugar|default:"-" }}</small>
+      </div>
     {% endfor %}
-  </ul>
-
-  <div class="pagination">
-    {% if eventos.has_previous %}
-      <a href="?page={{ eventos.previous_page_number }}">Anterior</a>
-    {% endif %}
-
-    <span>Página {{ eventos.number }} de {{ eventos.paginator.num_pages }}</span>
-
-    {% if eventos.has_next %}
-      <a href="?page={{ eventos.next_page_number }}">Siguiente</a>
-    {% endif %}
   </div>
+
+  <!-- Paginación igual que antes -->
+  <nav aria-label="Paginación de eventos" class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if eventos.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ eventos.previous_page_number }}" aria-label="Anterior">
+            &laquo; Anterior
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&laquo; Anterior</span>
+        </li>
+      {% endif %}
+
+      <li class="page-item disabled">
+        <span class="page-link">Página {{ eventos.number }} de {{ eventos.paginator.num_pages }}</span>
+      </li>
+
+      {% if eventos.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ eventos.next_page_number }}" aria-label="Siguiente">
+            Siguiente &raquo;
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Siguiente &raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
 {% else %}
-  <p>No hay eventos próximos.</p>
+  <div class="alert alert-info" role="alert">
+    No hay eventos próximos.
+  </div>
 {% endif %}
 
 {% endblock %}

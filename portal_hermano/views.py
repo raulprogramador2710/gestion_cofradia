@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 
-from gestion_cofradia.models import Cofradia, Hermano, Perfil, Tarea, Evento, Notificacion
+from gestion_cofradia.models import Cofradia, Hermano, Perfil, Tarea, Evento, Notificacion, Documento
 from datetime import datetime, timedelta
 
 import logging
@@ -31,7 +32,6 @@ def login_view(request):
                 messages.error(request, 'Cofradía seleccionada no válida.')
                 return render(request, 'login_portal.html', {'cofradias': cofradias, 'username': username})
 
-            # Verificar que el usuario tiene perfil en esa cofradía
             if not Perfil.objects.filter(user=user, cofradia=cofradia).exists():
                 messages.error(request, 'No tienes acceso a la cofradía seleccionada.')
                 return render(request, 'login_portal.html', {'cofradias': cofradias, 'username': username})
@@ -68,7 +68,7 @@ def get_hermano_por_perfil(perfil):
     try:
         hermano = Hermano.objects.get(user=perfil.user, cofradia=perfil.cofradia)
     except Hermano.DoesNotExist:
-        return None
+        hermano = None
     return hermano
 
 @login_required
@@ -80,29 +80,20 @@ def dashboard(request):
 
     hermano = get_hermano_por_perfil(perfil)
 
-    # Datos del hermano (si existe)
     nombre = hermano.nombre if hermano else ''
     apellidos = hermano.apellidos if hermano else ''
     num_hermano = hermano.num_hermano if hermano else ''
 
-    # Tareas asignadas al usuario
     tareas = Tarea.objects.filter(responsable=request.user, estado__in=['pendiente', 'en_progreso'])[:5]
     total_tareas = tareas.count()
 
-    # Eventos próximos 30 días
     hoy = datetime.now().date()
-    eventos = Evento.objects.filter(
-        cofradia=cofradia,
-        fecha__gte=hoy,
-        fecha__lte=hoy + timedelta(days=30)
-    ).order_by('fecha')[:5]
+    eventos = Evento.objects.filter(cofradia=cofradia, fecha__gte=hoy).order_by('fecha')[:5]
     total_eventos = eventos.count()
 
-    # Notificaciones recientes
     notificaciones = Notificacion.objects.filter(destinatario=request.user).order_by('-fecha_envio')[:5]
     total_notificaciones = notificaciones.count()
 
-    # Cuotas pendientes
     cuotas_pendientes = hermano.cuotas_pendientes() if hermano else []
     total_cuotas_pendientes = cuotas_pendientes.count() if hermano else 0
 
@@ -143,13 +134,11 @@ def ver_tareas(request):
         messages.error(request, "No tienes acceso a la cofradía seleccionada.")
         return redirect('portal_hermano:error_no_hermano')
 
-    # Obtener tareas asignadas al usuario logueado y que estén pendientes o en progreso
     tareas_qs = Tarea.objects.filter(
         responsable=request.user,
         estado__in=['pendiente', 'en_progreso']
     ).order_by('fecha_limite')
 
-    # Paginación: 10 tareas por página
     paginator = Paginator(tareas_qs, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -169,8 +158,7 @@ def ver_eventos(request):
     hoy = datetime.now().date()
     eventos_qs = Evento.objects.filter(
         cofradia=cofradia,
-        fecha__gte=hoy,
-        fecha__lte=hoy + timedelta(days=30)
+        fecha__gte=hoy
     ).order_by('fecha')
 
     paginator = Paginator(eventos_qs, 10)
@@ -183,31 +171,37 @@ def ver_eventos(request):
     return render(request, 'ver_eventos.html', context)
 
 @login_required
-def notificaciones(request):
+def ver_notificaciones(request):
     perfil, _ = get_perfil_y_cofradia(request)
     hermano = get_hermano_por_perfil(perfil)
     if hermano is None:
         return redirect('portal_hermano:error_no_hermano')
-    # Lógica para mostrar notificaciones
-    return render(request, 'notificaciones.html')
+
+    notificaciones = Notificacion.objects.filter(destinatario=request.user).order_by('-fecha_envio')
+
+    return render(request, 'ver_notificaciones.html', {'notificaciones': notificaciones})
 
 @login_required
-def cuotas(request):
+def ver_cuotas(request):
     perfil, _ = get_perfil_y_cofradia(request)
     hermano = get_hermano_por_perfil(perfil)
     if hermano is None:
         return redirect('portal_hermano:error_no_hermano')
-    # Lógica para mostrar cuotas
-    return render(request, 'cuotas.html')
+
+    cuotas_pendientes = hermano.cuotas_pendientes()  # Asumiendo que devuelve queryset o lista
+
+    return render(request, 'ver_cuotas.html', {'cuotas_pendientes': cuotas_pendientes})
 
 @login_required
-def documentos(request):
-    perfil, _ = get_perfil_y_cofradia(request)
+def ver_documentos(request):
+    perfil, cofradia = get_perfil_y_cofradia(request)
     hermano = get_hermano_por_perfil(perfil)
-    if hermano is None:
+    if hermano is None or cofradia is None:
         return redirect('portal_hermano:error_no_hermano')
-    # Lógica para mostrar documentos
-    return render(request, 'documentos.html')
+
+    documentos_publicos = Documento.objects.filter(cofradia=cofradia, visibilidad=Documento.PUBLICO)
+
+    return render(request, 'ver_documentos.html', {'documentos': documentos_publicos})
 
 @login_required
 def cambiar_password(request):
@@ -215,5 +209,18 @@ def cambiar_password(request):
     hermano = get_hermano_por_perfil(perfil)
     if hermano is None:
         return redirect('portal_hermano:error_no_hermano')
-    # Lógica para cambiar contraseña
-    return render(request, 'cambiar_password.html')
+
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Actualiza la sesión para que no se cierre sesión automáticamente
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Tu contraseña ha sido cambiada correctamente.')
+            return redirect('portal_hermano:dashboard')
+        else:
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    return render(request, 'password/cambiar_password.html', {'form': form})

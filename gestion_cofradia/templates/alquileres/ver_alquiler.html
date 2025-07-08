@@ -12,7 +12,7 @@
       <p><strong>Fecha de devolución:</strong> {% if alquiler.fecha_devolucion %}{{ alquiler.fecha_devolucion|date:"d/m/Y" }}{% else %}Pendiente{% endif %}</p>
       <p><strong>Estado:</strong> {{ alquiler.get_estado_display }}</p>
       <p><strong>Fianza:</strong> {{ alquiler.fianza|floatformat:2 }} €</p>
-      <a href="{% url 'gestion_cofradia:listar_alquileres' %}" class="btn btn-secondary mt-3">Volver a lista</a>
+      <a href="{% url 'gestion_cofradia:lista_alquileres' %}" class="btn btn-secondary mt-3">Volver a lista</a>
     </div>
   </div>
 </div>
