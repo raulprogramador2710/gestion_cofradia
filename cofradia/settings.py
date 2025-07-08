@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 if not DEBUG:
     # Añade el dominio de Render en producción
-    ALLOWED_HOSTS.append(os.getenv('RENDER_DOMAIN', 'tu-app.onrender.com'))
+    ALLOWED_HOSTS.append(os.getenv('RENDER_DOMAIN', 'gestion-cofradia-6byp.onrender.com'))
 
 # Application definition
 
