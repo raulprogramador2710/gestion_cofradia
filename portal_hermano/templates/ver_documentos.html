@@ -3,27 +3,86 @@
 {% block title %}Documentos Públicos{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Documentos Públicos</h2>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-warning d-flex align-items-center">
+          <i class="fas fa-file-alt fa-2x me-3"></i>
+          <div>
+            <h3 class="mb-0">Documentos Públicos</h3>
+            <small class="text-light">Descarga de documentos disponibles</small>
+          </div>
+        </div>
 
-{% if documentos %}
-  <ul class="list-group">
-    {% for doc in documentos %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>
-          <strong>{{ doc.titulo }}</strong><br>
-          <small class="text-muted">Subido el {{ doc.fecha_subida|date:"d/m/Y" }}</small>
-          {% if doc.descripcion %}
-            <p class="mb-0">{{ doc.descripcion|linebreaksbr }}</p>
+        <div class="card-body bg-light">
+          {% if documentos %}
+            <div class="table-responsive">
+              <table class="table table-striped table-sm align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Título</th>
+                    <th>Fecha subida</th>
+                    <th>Descripción</th>
+                    <th class="text-end">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for doc in documentos %}
+                  <tr>
+                    <td class="fw-semibold">{{ doc.titulo }}</td>
+                    <td>
+                      <i class="fas fa-calendar-alt me-1 text-warning"></i>
+                      {{ doc.fecha_subida|date:"d/m/Y" }}
+                    </td>
+                    <td class="small">{{ doc.descripcion|default:"-"|linebreaksbr }}</td>
+                    <td class="text-end">
+                      <a href="{{ doc.archivo.url }}" target="_blank"
+                         class="btn btn-sm btn-outline-dark border-warning text-warning fw-semibold">
+                        <i class="fas fa-download me-1"></i> Ver / Descargar
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="alert alert-info text-center mb-0" role="alert">
+              <i class="fas fa-info-circle me-2"></i>No hay documentos públicos disponibles.
+            </div>
           {% endif %}
         </div>
-        <a href="{{ doc.archivo.url }}" target="_blank" class="btn btn-sm btn-primary">Ver / Descargar</a>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <div class="alert alert-info" role="alert">
-    No hay documentos públicos disponibles.
-  </div>
-{% endif %}
 
+        {% if documentos and documentos.has_other_pages %}
+        <div class="card-footer bg-white">
+          <nav aria-label="Paginación de documentos">
+            <ul class="pagination justify-content-center mb-0">
+              {% if documentos.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ documentos.previous_page_number }}" aria-label="Anterior">&laquo; Anterior</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+              {% endif %}
+
+              <li class="page-item disabled">
+                <span class="page-link">Página {{ documentos.number }} de {{ documentos.paginator.num_pages }}</span>
+              </li>
+
+              {% if documentos.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ documentos.next_page_number }}" aria-label="Siguiente">Siguiente &raquo;</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente &raquo;</span></li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

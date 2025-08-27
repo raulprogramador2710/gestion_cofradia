@@ -3,31 +3,87 @@
 {% block title %}Notificaciones{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Notificaciones</h2>
-
-{% if notificaciones %}
-  <ul class="list-group">
-    {% for notificacion in notificaciones %}
-      <li class="list-group-item">
-        <div class="d-flex justify-content-between">
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-warning d-flex align-items-center">
+          <i class="fas fa-bell fa-2x me-3"></i>
           <div>
-            <strong>{{ notificacion.titulo }}</strong><br>
-            <small class="text-muted">{{ notificacion.fecha_envio|date:"d/m/Y H:i" }}</small>
+            <h3 class="mb-0">Notificaciones</h3>
+            <small class="text-light">Mensajes y avisos del portal</small>
           </div>
-          {% if notificacion.leida %}
-            <span class="badge bg-success align-self-center">Leída</span>
+        </div>
+
+        <div class="card-body bg-light">
+          {% if notificaciones %}
+            <div class="table-responsive">
+              <table class="table table-striped table-sm align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Título</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Mensaje</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for n in notificaciones %}
+                  <tr>
+                    <td class="fw-semibold">{{ n.titulo }}</td>
+                    <td>
+                      <i class="fas fa-clock me-1 text-warning"></i>
+                      {{ n.fecha_envio|date:"d/m/Y H:i" }}
+                    </td>
+                    <td>
+                      {% if n.leida %}
+                        <span class="badge bg-success">Leída</span>
+                      {% else %}
+                        <span class="badge bg-warning text-dark">No leída</span>
+                      {% endif %}
+                    </td>
+                    <td class="small">{{ n.mensaje|linebreaksbr }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           {% else %}
-            <span class="badge bg-warning text-dark align-self-center">No leída</span>
+            <div class="alert alert-info text-center mb-0" role="alert">
+              <i class="fas fa-info-circle me-2"></i>No tienes notificaciones.
+            </div>
           {% endif %}
         </div>
-        <p class="mt-2 mb-0">{{ notificacion.mensaje|linebreaksbr }}</p>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <div class="alert alert-info" role="alert">
-    No tienes notificaciones.
-  </div>
-{% endif %}
 
+        {% if notificaciones and notificaciones.has_other_pages %}
+        <div class="card-footer bg-white">
+          <nav aria-label="Paginación de notificaciones">
+            <ul class="pagination justify-content-center mb-0">
+              {% if notificaciones.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ notificaciones.previous_page_number }}" aria-label="Anterior">&laquo; Anterior</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+              {% endif %}
+
+              <li class="page-item disabled">
+                <span class="page-link">Página {{ notificaciones.number }} de {{ notificaciones.paginator.num_pages }}</span>
+              </li>
+
+              {% if notificaciones.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ notificaciones.next_page_number }}" aria-label="Siguiente">Siguiente &raquo;</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente &raquo;</span></li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

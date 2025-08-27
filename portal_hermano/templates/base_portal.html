@@ -5,90 +5,222 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}Portal Hermano{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="{% static 'css/styles_portal.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/styles_portal.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg portal-navbar shadow-sm bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center text-white" href="{% url 'portal_hermano:dashboard' %}">
-                <i class="fas fa-church fa-lg me-2"></i>
-                <span class="fs-5">{% if user.hermano %}{{ user.hermano.cofradia.nombre }}{% else %}Portal Hermano{% endif %}</span>
-            </a>
-            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-    </nav>
 
-    <div class="container-fluid portal-container">
-        <div class="row">
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <div class="sidebar-avatar mb-4 text-center">
-                        <span class="avatar-circle-lg">{{ user.hermano.nombre|first|default:"U" }}</span>
-                        <div class="fw-bold mt-2">{{ user.hermano.nombre }} {{ user.hermano.apellidos }}</div>
-                    </div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal_hermano:dashboard' %}">
-                                <i class="fas fa-home me-2"></i>Inicio
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'datos_personales' %}active{% endif %}" href="{% url 'portal_hermano:datos_personales' %}">
-                                <i class="fas fa-user me-2"></i>Mis Datos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'cuotas' %}active{% endif %}" href="{% url 'portal_hermano:ver_cuotas' %}">
-                                <i class="fas fa-euro-sign me-2"></i>Mis Cuotas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'notificaciones' %}active{% endif %}" href="{% url 'portal_hermano:ver_notificaciones' %}">
-                                <i class="fas fa-bell me-2"></i>Notificaciones
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'documentos' %}active{% endif %}" href="{% url 'portal_hermano:ver_documentos' %}">
-                                <i class="fas fa-file-alt me-2"></i>Documentos
-                            </a>
-                        </li>
-                        <li class="nav-item mt-3">
-                            <a href="{% url 'portal_hermano:cambiar_password' %}" class="nav-link">
-                                <i class="fas fa-key me-2"></i>Cambiar Contraseña
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'portal_hermano:logout' %}" class="nav-link">
-                                <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+    {% url 'portal_hermano:dashboard' as url_dashboard %}
+    {% url 'portal_hermano:datos_personales' as url_datos_personales %}
+    {% url 'portal_hermano:ver_cuotas' as url_cuotas %}
+    {% url 'portal_hermano:ver_notificaciones' as url_notificaciones %}
+    {% url 'portal_hermano:ver_tareas' as url_tareas %}
+    {% url 'portal_hermano:ver_eventos' as url_eventos %}
+    {% url 'portal_hermano:ver_documentos' as url_documentos %}
+    {% url 'portal_hermano:cambiar_password' as url_cambiar_password %}
+    {% url 'portal_hermano:logout' as url_logout %}
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 portal-main">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-                {% block content %}{% endblock %}
-            </main>
-        </div>
+    <!-- HEADER PC -->
+<header class="header-pc" role="banner">
+  <div class="nav-container-pc">
+    <div class="nav-brand-pc">
+      <i class="fas fa-church" aria-hidden="true"></i>
+      <span class="fs-5">{% if user.hermano %}{{ user.hermano.cofradia.nombre }}{% else %}Portal Hermano{% endif %}</span>
     </div>
+    <nav class="nav-menu-pc" role="navigation" aria-label="Menú principal">
+      <ul class="nav-list-pc">
+        <!-- Inicio -->
+        <li class="nav-item-pc">
+          <a href="{{ url_dashboard }}" class="nav-link-pc {% if request.path == url_dashboard %}active{% endif %}">
+            <i class="fas fa-home"></i><span>Inicio</span>
+          </a>
+        </li>
+        <!-- Tareas -->
+        <li class="nav-item-pc">
+          <a href="{{ url_tareas }}" class="nav-link-pc {% if request.path == url_tareas %}active{% endif %}">
+            <i class="fas fa-tasks"></i><span>Tareas</span>
+          </a>
+        </li>
+        <!-- Eventos -->
+        <li class="nav-item-pc">
+          <a href="{{ url_eventos }}" class="nav-link-pc {% if request.path == url_eventos %}active{% endif %}">
+            <i class="fas fa-calendar-alt"></i><span>Eventos</span>
+          </a>
+        </li>
+        <!-- Cuotas -->
+        <li class="nav-item-pc">
+          <a href="{{ url_cuotas }}" class="nav-link-pc {% if request.path == url_cuotas %}active{% endif %}">
+            <i class="fas fa-euro-sign"></i><span>Cuotas</span>
+          </a>
+        </li>
+        <!-- Notificaciones -->
+        <li class="nav-item-pc">
+          <a href="{{ url_notificaciones }}" class="nav-link-pc {% if request.path == url_notificaciones %}active{% endif %}">
+            <i class="fas fa-bell"></i><span>Notificaciones</span>
+          </a>
+        </li>
+        <!-- Documentos -->
+        <li class="nav-item-pc">
+          <a href="{{ url_documentos }}" class="nav-link-pc {% if request.path == url_documentos %}active{% endif %}">
+            <i class="fas fa-file-alt"></i><span>Documentos</span>
+          </a>
+        </li>
+        <!-- Dropdown de usuario -->
+        <li class="nav-item-pc user-dropdown">
+            <a href="#" class="nav-link-pc user-toggle">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                {{ user.first_name }} {{ user.last_name }}
+                <i class="fas fa-chevron-down"></i>
+            </a>
+            <ul class="user-menu">
+                <li><a href="{{ url_datos_personales }}"><i class="fas fa-user"></i> Mis Datos</a></li>
+                <li><a href="{{ url_cambiar_password }}"><i class="fas fa-key"></i> Cambiar contraseña</a></li>
+                <li><a href="{{ url_logout }}"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></li>
+            </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-    <footer class="portal-footer mt-4 bg-light py-3 text-center text-muted">
-        &copy; 2024 Portal Hermano. Todos los derechos reservados.
+<!-- HEADER MÓVIL -->
+<header class="header-mobile" role="banner">
+  <div class="nav-container-mobile">
+    <div class="nav-brand-mobile">
+      <i class="fas fa-church"></i>
+      <span class="fs-5">{% if user.hermano %}{{ user.hermano.cofradia.nombre }}{% else %}Portal Hermano{% endif %}</span>
+    </div>
+    <button class="nav-toggle-mobile" id="nav-toggle-mobile" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-menu-mobile" type="button">
+      <span class="hamburger"></span><span class="hamburger"></span><span class="hamburger"></span>
+    </button>
+
+    <nav class="nav-menu-mobile" id="nav-menu-mobile" aria-label="Menú principal">
+      <ul class="nav-list-mobile">
+        <li class="nav-item-mobile"><a href="{{ url_dashboard }}" class="nav-link-mobile {% if request.path == url_dashboard %}active{% endif %}"><i class="fas fa-home"></i> Inicio</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_datos_personales }}" class="nav-link-mobile {% if request.path == url_datos_personales %}active{% endif %}"><i class="fas fa-user"></i> Mis Datos</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_tareas }}" class="nav-link-mobile {% if request.path == url_tareas %}active{% endif %}"><i class="fas fa-tasks"></i> Tareas</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_eventos }}" class="nav-link-mobile {% if request.path == url_eventos %}active{% endif %}"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_cuotas }}" class="nav-link-mobile {% if request.path == url_cuotas %}active{% endif %}"><i class="fas fa-euro-sign"></i> Cuotas</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_notificaciones }}" class="nav-link-mobile {% if request.path == url_notificaciones %}active{% endif %}"><i class="fas fa-bell"></i> Notificaciones</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_documentos }}" class="nav-link-mobile {% if request.path == url_documentos %}active{% endif %}"><i class="fas fa-file-alt"></i> Documentos</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_cambiar_password }}" class="nav-link-mobile {% if request.path == url_cambiar_password %}active{% endif %}"><i class="fas fa-key"></i> Cambiar contraseña</a></li>
+        <li class="nav-item-mobile"><a href="{{ url_logout }}" class="nav-link-mobile"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content" role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+        <p>&copy; 2024 Gestión cofradia. Todos los derechos reservados.</p>
+        </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JAVASCRIPT PARA EL MENÚ MÓVIL -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const navToggleMobile = document.getElementById('nav-toggle-mobile');
+        const navMenuMobile = document.getElementById('nav-menu-mobile');
+
+        navToggleMobile.addEventListener('click', function() {
+            const expanded = this.getAttribute('aria-expanded') === 'true' || false;
+            this.setAttribute('aria-expanded', !expanded);
+            navMenuMobile.classList.toggle('active');
+            navToggleMobile.classList.toggle('active');
+        });
+
+        // Cerrar menú al hacer clic en un enlace (móvil)
+        document.querySelectorAll('.nav-link-mobile').forEach(link => {
+            link.addEventListener('click', () => {
+            navMenuMobile.classList.remove('active');
+            navToggleMobile.classList.remove('active');
+            navToggleMobile.setAttribute('aria-expanded', false);
+            });
+        });
+
+        // Cerrar menú al hacer clic fuera (móvil)
+        document.addEventListener('click', function(e) {
+            if (!navToggleMobile.contains(e.target) && !navMenuMobile.contains(e.target)) {
+            navMenuMobile.classList.remove('active');
+            navToggleMobile.classList.remove('active');
+            navToggleMobile.setAttribute('aria-expanded', false);
+            }
+        });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const userToggle = document.querySelector(".user-toggle");
+            const userDropdown = document.querySelector(".user-dropdown");
+
+            if(userToggle && userDropdown){
+                userToggle.addEventListener("click", (e) => {
+                e.preventDefault();
+                userDropdown.classList.toggle("open");
+                });
+
+                // Cerrar si clic fuera
+                document.addEventListener("click", (e) => {
+                if (!userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove("open");
+                }
+                });
+            }
+        });
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
