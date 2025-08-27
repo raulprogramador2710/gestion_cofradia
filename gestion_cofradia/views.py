@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
@@ -536,6 +537,9 @@ def upload_hermanos_csv(request):
             return render(request, 'hermanos/upload_csv.html')
 
         cofradia = perfil.cofradia
+        
+        # Generar el hash de la contraseña temporal UNA SOLA VEZ
+        hashed_default_password = make_password("Temporal01")
 
         for row in reader:
             try:
@@ -587,11 +591,12 @@ def upload_hermanos_csv(request):
                 user = None
                 if dni:
                     user, created = User.objects.get_or_create(
-                        username=dni,
+                        username=dni,  # Username sigue siendo el DNI
                         defaults={'email': email, 'first_name': nombre, 'last_name': apellidos}
                     )
                     if created:
-                        user.set_password(dni)
+                        # Asignar la contraseña temporal ya hasheada
+                        user.password = hashed_default_password
                         user.save()
                         
                         # Crear perfil asociado al usuario
