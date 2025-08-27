@@ -14,7 +14,7 @@
       {% if tarea.fecha_completada %}
         <p><strong>Fecha completada:</strong> {{ tarea.fecha_completada|date:"d/m/Y H:i" }}</p>
       {% endif %}
-      <a href="{% url 'gestion_cofradia:lista_tareas' %}" class="btn btn-secondary mt-3">Volver a tareas</a>
+      <a href="{% url 'gestion_cofradia:lista_tareas' %}" class="btn btn-primary mt-3">Volver a tareas</a>
     </div>
   </div>
 </div>

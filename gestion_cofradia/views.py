@@ -1002,7 +1002,18 @@ def eliminar_documento(request, documento_id):
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
 def lista_informes(request):
-    return render(request, 'documentos/informes/lista_informes.html')
+    perfil = request.user.perfil_set.first()
+    if not perfil:
+        return redirect('gestion_cofradia:login')
+
+    cofradia = perfil.cofradia
+
+    # Traemos todos los estados disponibles (no hardcodeados)
+    estados = EstadoHermano.objects.all().order_by("nombre")
+
+    return render(request, 'documentos/informes/lista_informes.html', {
+        "estados": estados
+    })
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -1016,10 +1027,13 @@ def descargar_informe(request, tipo):
 
     if tipo == 'hermanos_activos_mayores':
         return generar_pdf_hermanos_activos_mayores(cofradia)
-
+    elif tipo == 'hermanos_por_estado':
+        estado_nombre = request.GET.get("estado")  # recogemos el estado elegido en el select
+        return generar_pdf_hermanos_por_estado(cofradia, estado_nombre)
     elif tipo == 'hermanos_carta_postal':
         return generar_pdf_hermanos_carta_postal(cofradia)
-
+    elif tipo == 'hermanos_completo':
+        return generar_pdf_hermanos_completo(cofradia)
     else:
         return HttpResponse("Informe no encontrado", status=404)
 
@@ -1148,6 +1162,147 @@ def generar_pdf_hermanos_carta_postal(cofradia):
     buffer.seek(0)
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="hermanos_carta_postal.pdf"'
+    return response
+
+def generar_pdf_hermanos_completo(cofradia):
+    hoy = now().date()
+    hermanos = cofradia.hermanos.all().order_by('apellidos', 'nombre')
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
+                            rightMargin=40, leftMargin=40,
+                            topMargin=60, bottomMargin=40)
+
+    styles = getSampleStyleSheet()
+    style_title = ParagraphStyle(
+        name='Title',
+        fontSize=18,
+        leading=22,
+        alignment=TA_CENTER,
+        spaceAfter=20,
+        fontName='Helvetica-Bold'
+    )
+    style_normal = styles['Normal']
+
+    title = Paragraph(f"Listado completo de hermanos - Cofradía {cofradia.nombre}", style_title)
+    fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
+
+    # Columnas principales (ajusta según tu modelo Hermano)
+    data = [[
+        '#', 'Apellidos', 'Nombre', 'DNI', 'Fecha Nac.', 'Teléfono',
+        'Email', 'Dirección', 'Localidad', 'Estado', 'Rol',
+        'Forma de pago', 'Forma de comunicación'
+    ]]
+
+    for i, h in enumerate(hermanos, start=1):
+        data.append([
+            str(i),
+            h.apellidos or '',
+            h.nombre or '',
+            h.dni or '—',
+            h.fecha_nacimiento.strftime("%d/%m/%Y") if h.fecha_nacimiento else '—',
+            h.telefono or '—',
+            h.email or '—',
+            h.direccion or '—',
+            h.localidad or '—',
+            h.estado.nombre if h.estado else '—',
+            h.get_rol_display() if hasattr(h, 'get_rol_display') else '—',
+            h.forma_pago.nombre if h.forma_pago else '—',
+            h.forma_comunicacion.nombre if h.forma_comunicacion else '—',
+        ])
+
+    # Definir anchos de columna
+    col_widths = [
+        0.4*inch, 2.2*inch, 1.8*inch, 1.4*inch, 1.2*inch,
+        1.4*inch, 2.2*inch, 2.5*inch, 1.8*inch,
+        1.4*inch, 1.5*inch, 1.5*inch, 1.7*inch
+    ]
+
+    table = Table(data, colWidths=col_widths)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.darkblue),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('ALIGN', (0,0), (-1,0), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 10),
+        ('BOTTOMPADDING', (0,0), (-1,0), 8),
+
+        ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+        ('ALIGN', (0,1), (0,-1), 'CENTER'),  # número
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ]))
+
+    elements = [title, fecha, Spacer(1, 12), table]
+    doc.build(elements)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="hermanos_completo.pdf"'
+    return response
+
+def generar_pdf_hermanos_por_estado(cofradia, estado_nombre):
+    hoy = now().date()
+
+    try:
+        estado = EstadoHermano.objects.get(nombre__iexact=estado_nombre)
+    except EstadoHermano.DoesNotExist:
+        return HttpResponse(f"El estado '{estado_nombre}' no existe", status=404)
+
+    # Hermanos filtrados por cofradía y estado
+    hermanos = cofradia.hermanos.filter(estado=estado).order_by('apellidos', 'nombre')
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
+                            rightMargin=40, leftMargin=40,
+                            topMargin=60, bottomMargin=40)
+
+    styles = getSampleStyleSheet()
+    style_title = ParagraphStyle(
+        name='Title',
+        fontSize=18,
+        leading=22,
+        alignment=TA_CENTER,
+        spaceAfter=20,
+        fontName='Helvetica-Bold'
+    )
+    style_normal = styles['Normal']
+
+    # Encabezado
+    title = Paragraph(f"Hermanos con estado '{estado.nombre}' - Cofradía {cofradia.nombre}", style_title)
+    fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
+
+    # Datos básicos — ajusta columnas según lo que quieras mostrar
+    data = [['#', 'Apellidos', 'Nombre', 'DNI', 'Teléfono', 'Email']]
+    for i, h in enumerate(hermanos, start=1):
+        data.append([
+            str(i),
+            h.apellidos or '',
+            h.nombre or '',
+            h.dni or '—',
+            h.telefono or '—',
+            h.email or '—'
+        ])
+
+    # Tabla
+    table = Table(data, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.3*inch, 1.5*inch, 2.5*inch])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.black),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('ALIGN', (0,0), (-1,0), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 11),
+        ('BOTTOMPADDING', (0,0), (-1,0), 8),
+        ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+    ]))
+
+    elements = [title, fecha, Spacer(1, 12), table]
+    doc.build(elements)
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="hermanos_estado_{estado.nombre}.pdf"'
     return response
 
 

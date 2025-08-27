@@ -10,11 +10,13 @@
   <div class="row mb-4">
     <!-- Tareas próximas a vencer -->
     <div class="col-md-4 d-flex">
-      <div class="card-summary bg-primary text-white d-flex flex-column shadow-sm w-100">
+      <div class="card-chart shadow-sm w-100 d-flex flex-column">
+        <div class="card-header">
+          <i class="fa-solid fa-list-check me-2"></i> Próximas tareas a vencer
+        </div>
         <div class="card-body d-flex flex-column">
-          <h3 class="card-title mb-3"><i class="fa-solid fa-list-check me-2"></i> Próximas tareas a vencer</h3>
-          <ul class="list-group list-group-flush flex-grow-1 overflow-auto" style="max-height: 220px;">
-            {% if tareas_proximas %}
+          {% if tareas_proximas %}
+            <ul class="list-group list-group-flush flex-grow-1 overflow-auto" style="max-height: 220px;">
               {% for tarea in tareas_proximas %}
                 <li class="list-group-item d-flex justify-content-between align-items-center py-2">
                   <div>
@@ -23,36 +25,44 @@
                       <small class="text-muted">Vence: {{ tarea.fecha_limite|date:"d/m/Y" }}</small>
                     {% endif %}
                   </div>
-                  <a href="{% url 'gestion_cofradia:ver_tarea' tarea.id %}" class="btn btn-sm btn-outline-light" title="Ver tarea">
+                  <a href="{% url 'gestion_cofradia:ver_tarea' tarea.id %}" class="btn btn-sm btn-primary" title="Ver tarea">
                     <i class="fas fa-eye"></i>
                   </a>
                 </li>
               {% endfor %}
-            {% else %}
-              <li class="list-group-item text-muted text-center py-3">No hay tareas próximas a vencer.</li>
-            {% endif %}
-          </ul>
-          <a href="{% url 'gestion_cofradia:lista_tareas' %}" class="btn btn-outline-light mt-3 align-self-center">Ver todas</a>
+            </ul>
+          {% else %}
+            <div class="empty-state">No hay tareas próximas a vencer.</div>
+          {% endif %}
+          <a href="{% url 'gestion_cofradia:lista_tareas' %}" class="btn btn-primary mt-3 align-self-center">Ver todas</a>
         </div>
       </div>
     </div>
-  
+
     <!-- Notificaciones -->
     <div class="col-md-4 d-flex">
-      <div class="card-summary bg-success text-white d-flex flex-column justify-content-center align-items-center shadow-sm p-4 w-100">
-        <h3 class="card-title mb-3"><i class="fa-solid fa-bell me-2"></i> Notificaciones</h3>
-        <p class="card-text mb-3">{{ total_notificaciones }}</p>
-        {% if perfil and perfil.rol == 'hermano_mayor' or perfil and perfil.rol == 'secretario' %}
-          <a href="{% url 'gestion_cofradia:crear_notificacion' %}" class="btn btn-outline-light">Nueva notificación</a>
-        {% endif %}
+      <div class="card-chart shadow-sm w-100 d-flex flex-column text-center">
+        <div class="card-header">
+          <i class="fa-solid fa-bell me-2"></i> Notificaciones
+        </div>
+        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+          <p class="display-4">{{ total_notificaciones }}</p>
+          {% if perfil and perfil.rol == 'hermano_mayor' or perfil and perfil.rol == 'secretario' %}
+            <a href="{% url 'gestion_cofradia:crear_notificacion' %}" class="btn btn-primary">Nueva notificación</a>
+          {% endif %}
+        </div>
       </div>
     </div>
-  
+
     <!-- Hermanos -->
     <div class="col-md-4 d-flex">
-      <div class="card-summary bg-info text-white d-flex flex-column justify-content-center align-items-center shadow-sm p-4 w-100">
-        <h3 class="card-title mb-3"><i class="fa-solid fa-users me-2"></i> Hermanos</h3>
-        <p class="card-text mb-0">{{ total_hermanos }}</p>
+      <div class="card-chart shadow-sm w-100 d-flex flex-column text-center">
+        <div class="card-header">
+          <i class="fa-solid fa-users me-2"></i> Hermanos
+        </div>
+        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+          <p class="display-4">{{ total_hermanos }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -97,7 +107,7 @@
   <div class="row g-4 mb-4">
     <!-- Enseres pendientes -->
     <div class="col-md-6 d-flex">
-      <div class="card-item shadow-sm w-100 d-flex flex-column">
+      <div class="card-chart shadow-sm w-100 d-flex flex-column">
         <div class="card-header">
           <i class="fa-solid fa-box-open me-2"></i> Enseres pendientes de devolución
         </div>
@@ -110,7 +120,7 @@
                   <small class="text-muted">Entregado a: {{ alquiler.hermano.nombre }} {{ alquiler.hermano.apellidos }}</small><br>
                   <small class="text-muted">Fecha entrega: {{ alquiler.fecha_entrega|date:"d/m/Y" }}</small>
                 </div>
-                <a href="{% url 'gestion_cofradia:ver_alquiler' alquiler.id %}" class="btn btn-sm btn-outline-primary" title="Ver alquiler">
+                <a href="{% url 'gestion_cofradia:ver_alquiler' alquiler.id %}" class="btn btn-sm btn-primary" title="Ver alquiler">
                   <i class="fas fa-eye"></i>
                 </a>
               </li>
@@ -124,7 +134,7 @@
   
     <!-- Próximos eventos -->
     <div class="col-md-6 d-flex">
-      <div class="card-event shadow-sm w-100 d-flex flex-column">
+      <div class="card-chart shadow-sm w-100 d-flex flex-column">
         <div class="card-header">
           <i class="fa-solid fa-calendar-days me-2"></i> Eventos pendientes
         </div>
@@ -137,7 +147,7 @@
                   {{ evento.fecha|date:"d/m/Y H:i" }}{% if evento.lugar %} | {{ evento.lugar }}{% endif %}
                 </small>
                 <div class="mt-1">
-                  <a href="{% url 'gestion_cofradia:ver_evento' evento.id %}" class="btn btn-sm btn-outline-primary">
+                  <a href="{% url 'gestion_cofradia:ver_evento' evento.id %}" class="btn btn-sm btn-primary">
                     <i class="fas fa-eye"></i> Ver
                   </a>
                 </div>

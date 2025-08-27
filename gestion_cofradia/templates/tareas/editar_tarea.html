@@ -9,7 +9,7 @@
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card shadow-lg border-0">
-        <div class="card-header {% if tarea %}bg-info text-white{% else %}bg-primary text-white{% endif %} d-flex align-items-center">
+        <div class="card-header {% if tarea %}bg-primary text-white{% else %}bg-primary text-white{% endif %} d-flex align-items-center">
           <i class="fa-solid fa-list-check fa-2x me-3"></i>
           <div>
             <h3 class="mb-0">{% if tarea %}Editar Tarea{% else %}Nueva Tarea{% endif %}</h3>
@@ -22,7 +22,7 @@
 
             <div class="mb-3">
               <label for="{{ form.titulo.id_for_label }}" class="form-label">
-                <i class="fa-solid fa-heading me-2 text-primary"></i>{{ form.titulo.label }}
+                <i class="fa-solid fa-heading me-2 iconos"></i>{{ form.titulo.label }}
               </label>
               {{ form.titulo|attr:"class:form-control" }}
               {% if form.titulo.errors %}
@@ -32,7 +32,7 @@
 
             <div class="mb-3">
               <label for="{{ form.descripcion.id_for_label }}" class="form-label">
-                <i class="fa-solid fa-file-alt me-2 text-primary"></i>{{ form.descripcion.label }}
+                <i class="fa-solid fa-file-alt me-2 iconos"></i>{{ form.descripcion.label }}
               </label>
               {{ form.descripcion|attr:"class:form-control" }}
               {% if form.descripcion.errors %}
@@ -43,7 +43,7 @@
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="{{ form.fecha_limite.id_for_label }}" class="form-label">
-                  <i class="fa-solid fa-calendar-alt me-2 text-primary"></i>{{ form.fecha_limite.label }}
+                  <i class="fa-solid fa-calendar-alt me-2 iconos"></i>{{ form.fecha_limite.label }}
                 </label>
                 {{ form.fecha_limite|attr:"class:form-control" }}
                 {% if form.fecha_limite.errors %}
@@ -53,7 +53,7 @@
 
               <div class="col-md-6 mb-3">
                 <label for="{{ form.responsable.id_for_label }}" class="form-label">
-                  <i class="fa-solid fa-user me-2 text-primary"></i>{{ form.responsable.label }}
+                  <i class="fa-solid fa-user me-2 iconos"></i>{{ form.responsable.label }}
                 </label>
                 {{ form.responsable|attr:"class:form-select" }}
                 {% if form.responsable.errors %}
@@ -64,7 +64,7 @@
 
             <div class="mb-3">
               <label for="{{ form.estado.id_for_label }}" class="form-label">
-                <i class="fa-solid fa-tasks me-2 text-primary"></i>{{ form.estado.label }}
+                <i class="fa-solid fa-tasks me-2 iconos"></i>{{ form.estado.label }}
               </label>
               {{ form.estado|attr:"class:form-select" }}
               {% if form.estado.errors %}
@@ -75,10 +75,10 @@
           </form>
         </div>
         <div class="card-footer bg-white d-flex justify-content-end gap-2">
-          <a href="{% url 'gestion_cofradia:lista_tareas' %}" class="btn btn-outline-secondary">
+          <a href="{% url 'gestion_cofradia:lista_tareas' %}" class="btn btn-primary">
             <i class="fa-solid fa-arrow-left me-1"></i> Volver
           </a>
-          <button type="submit" form="tarea-form" class="btn btn-success">
+          <button type="submit" form="tarea-form" class="btn btn-primary">
             <i class="fa-solid fa-save me-1"></i> {% if tarea %}Guardar cambios{% else %}Crear tarea{% endif %}
           </button>
         </div>

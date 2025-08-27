@@ -8,7 +8,7 @@
   <div class="row justify-content-center">
     <div class="col-lg-6">
       <div class="card shadow-lg border-0">
-        <div class="card-header bg-danger text-white d-flex align-items-center">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
           <i class="fa-solid fa-trash fa-2x me-3"></i>
           <div>
             <h3 class="mb-0">Eliminar Notificación</h3>
@@ -25,22 +25,22 @@
           </div>
 
           <div class="mb-3">
-            <i class="fa-solid fa-heading me-2 text-danger"></i>
+            <i class="fa-solid fa-heading me-2 iconos"></i>
             <strong>Título:</strong> {{ notificacion.titulo }}
           </div>
           
           <div class="mb-3">
-            <i class="fa-solid fa-user me-2 text-danger"></i>
+            <i class="fa-solid fa-user me-2 iconos"></i>
             <strong>Destinatario:</strong> {{ notificacion.destinatario.first_name }} {{ notificacion.destinatario.last_name }}
           </div>
           
           <div class="mb-3">
-            <i class="fa-solid fa-calendar me-2 text-danger"></i>
+            <i class="fa-solid fa-calendar me-2 iconos"></i>
             <strong>Fecha:</strong> {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
           </div>
 
           <div class="mb-3">
-            <i class="fa-solid fa-envelope me-2 text-danger"></i>
+            <i class="fa-solid fa-envelope me-2 iconos"></i>
             <strong>Contenido:</strong><br>
             <div class="bg-white p-3 rounded border">
               {{ notificacion.cuerpo|truncatechars:200 }}
@@ -50,10 +50,10 @@
           <form method="post">
             {% csrf_token %}
             <div class="d-flex justify-content-end gap-2">
-              <a href="{% url 'gestion_cofradia:lista_notificaciones' %}" class="btn btn-secondary">
+              <a href="{% url 'gestion_cofradia:lista_notificaciones' %}" class="btn btn-primary">
                 <i class="fa-solid fa-times me-1"></i> Cancelar
               </a>
-              <button type="submit" class="btn btn-danger">
+              <button type="submit" class="btn btn-primary">
                 <i class="fa-solid fa-trash me-1"></i> Confirmar Eliminación
               </button>
             </div>

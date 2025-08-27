@@ -7,7 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow-lg border-0">
-                <div class="card-header bg-info text-white d-flex align-items-center">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
                     <i class="fa-solid fa-bell fa-2x me-3"></i>
                     <div>
                         <h3 class="mb-0">Crear Notificación</h3>
@@ -20,7 +20,7 @@
 
                         <div class="mb-3">
                             <label for="{{ form.destinatario.id_for_label }}" class="form-label">
-                                <i class="fa-solid fa-user me-2 text-info"></i>{{ form.destinatario.label }}
+                                <i class="fa-solid fa-user me-2 iconos"></i>{{ form.destinatario.label }}
                             </label>
                             {{ form.destinatario|attr:"class:form-select" }}
                             {% if form.destinatario.errors %}
@@ -30,7 +30,7 @@
 
                         <div class="mb-3">
                             <label for="{{ form.grupo_destinatarios.id_for_label }}" class="form-label">
-                                <i class="fa-solid fa-users me-2 text-info"></i>{{ form.grupo_destinatarios.label }}
+                                <i class="fa-solid fa-users me-2 iconos"></i>{{ form.grupo_destinatarios.label }}
                             </label>
                             {{ form.grupo_destinatarios|attr:"class:form-control" }}
                             {% if form.grupo_destinatarios.errors %}
@@ -40,7 +40,7 @@
 
                         <div class="mb-3">
                             <label for="{{ form.titulo.id_for_label }}" class="form-label">
-                                <i class="fa-solid fa-heading me-2 text-info"></i>{{ form.titulo.label }}
+                                <i class="fa-solid fa-heading me-2 iconos"></i>{{ form.titulo.label }}
                             </label>
                             {{ form.titulo|attr:"class:form-control" }}
                             {% if form.titulo.errors %}
@@ -50,7 +50,7 @@
 
                         <div class="mb-3">
                             <label for="{{ form.cuerpo.id_for_label }}" class="form-label">
-                                <i class="fa-solid fa-envelope me-2 text-info"></i>{{ form.cuerpo.label }}
+                                <i class="fa-solid fa-envelope me-2 iconos"></i>{{ form.cuerpo.label }}
                             </label>
                             {{ form.cuerpo|attr:"class:form-control"|attr:"rows:4" }}
                             {% if form.cuerpo.errors %}
@@ -60,7 +60,7 @@
 
                         <div class="mb-3">
                             <label for="{{ form.tipo.id_for_label }}" class="form-label">
-                                <i class="fa-solid fa-tag me-2 text-info"></i>{{ form.tipo.label }}
+                                <i class="fa-solid fa-tag me-2 iconos"></i>{{ form.tipo.label }}
                             </label>
                             {{ form.tipo|attr:"class:form-select" }}
                             {% if form.tipo.errors %}
@@ -72,7 +72,7 @@
                     </form>
                 </div>
                 <div class="card-footer bg-white text-end">
-                    <a href="{% url 'gestion_cofradia:lista_notificaciones' %}" class="btn btn-secondary">Volver</a>
+                    <a href="{% url 'gestion_cofradia:lista_notificaciones' %}" class="btn btn-primary">Volver</a>
                 </div>
             </div>
         </div>
