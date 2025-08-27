@@ -1023,21 +1023,14 @@ def generar_pdf_hermanos_activos_mayores(cofradia):
     edad_mayor = 18
     fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
 
-    hermanos = cofradia.hermanos.filter(
+    # Hermanos activos mayores de edad con DNI
+    hermanos_activos_con_dni = cofradia.hermanos.filter(
+        estado__nombre__iexact='activo',
+        dni__isnull=False,
+        dni__gt='',
         fecha_nacimiento__isnull=False,
         fecha_nacimiento__lte=fecha_limite
     ).order_by('apellidos', 'nombre')
-
-    # Hermanos activos con DNI
-    hermanos_activos_con_dni = hermanos.filter(
-        estado__nombre__iexact='activo',
-        dni__isnull=False
-    ).exclude(dni='')
-
-    # Hermanos que no están activos o sin DNI
-    hermanos_no_activos_o_sin_dni = hermanos.exclude(
-        id__in=hermanos_activos_con_dni.values_list('id', flat=True)
-    )
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
@@ -1058,19 +1051,19 @@ def generar_pdf_hermanos_activos_mayores(cofradia):
     title = Paragraph(f"Hermanos mayores de {edad_mayor} años - Cofradía {cofradia.nombre}", style_title)
     fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
 
-    # Tabla 1: Hermanos activos con DNI
-    data1 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad']]
+    # Tabla: Hermanos activos con DNI
+    data = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad']]
     for i, h in enumerate(hermanos_activos_con_dni, start=1):
         edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
-        data1.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad)])
+        data.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad)])
 
-    total1 = len(hermanos_activos_con_dni)
-    porcentaje1 = ceil(total1 * 0.2)
-    data1.append(['', '', '', 'Total:', str(total1)])
-    data1.append(['', '', '', '20% redondeado:', str(porcentaje1)])
+    total = len(hermanos_activos_con_dni)
+    porcentaje = ceil(total * 0.2)
+    data.append(['', '', '', 'Total:', str(total)])
+    data.append(['', '', '', '20% redondeado:', str(porcentaje)])
 
-    table1 = Table(data1, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
-    table1.setStyle(TableStyle([
+    table = Table(data, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch])
+    table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
@@ -1082,44 +1075,12 @@ def generar_pdf_hermanos_activos_mayores(cofradia):
         ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
     ]))
 
-    # Tabla 2: Hermanos sin DNI o con cuota pendiente con columna condición
-    data2 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad', 'Condición']]
-    for i, h in enumerate(hermanos_no_activos_o_sin_dni, start=1):
-        edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
-        condicion = []
-        if not h.dni:
-            condicion.append("Falta DNI")
-        if h.estado.nombre.lower() != 'activo':
-            condicion.append("Cuota pendiente")
-        data2.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad), ", ".join(condicion)])
-
-    total2 = len(hermanos_no_activos_o_sin_dni)
-    porcentaje2 = ceil(total2 * 0.2)
-    data2.append(['', '', '', 'Total:', str(total2), ''])
-    data2.append(['', '', '', '20% redondeado:', str(porcentaje2), ''])
-
-    table2 = Table(data2, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch, 2*inch])
-    table2.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.lightcoral),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,0), 12),
-        ('BOTTOMPADDING', (0,0), (-1,0), 8),
-        ('BACKGROUND', (0,1), (-1,-3), colors.lavenderblush),
-        ('BACKGROUND', (0,-2), (-1,-1), colors.lightgrey),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
-    ]))
-
     elements = [
         title,
         fecha,
         Spacer(1, 12),
-        Paragraph("Hermanos activos con DNI", style_normal),
-        table1,
-        Spacer(1, 24),
-        Paragraph("Hermanos sin DNI o con cuota pendiente", style_normal),
-        table2
+        Paragraph("Hermanos activos con DNI y mayores de edad", style_normal),
+        table,
     ]
 
     doc.build(elements)
@@ -1216,21 +1177,14 @@ def crear_evento(request):
                 edad_mayor = 18
                 fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
 
-                hermanos = cofradia.hermanos.filter(
+                # Hermanos activos, con DNI, con fecha nacimiento y mayores de edad
+                hermanos_primera_tabla = cofradia.hermanos.filter(
+                    estado__nombre__iexact='activo',
+                    dni__isnull=False,
+                    dni__gt='',
                     fecha_nacimiento__isnull=False,
                     fecha_nacimiento__lte=fecha_limite
                 ).order_by('apellidos', 'nombre')
-
-                # Hermanos activos con DNI
-                hermanos_activos_con_dni = hermanos.filter(
-                    estado__nombre__iexact='activo',
-                    dni__isnull=False
-                ).exclude(dni='')
-
-                # Hermanos sin DNI o con cuota pendiente
-                hermanos_no_activos_o_sin_dni = hermanos.exclude(
-                    id__in=hermanos_activos_con_dni.values_list('id', flat=True)
-                )
 
                 buffer = BytesIO()
                 doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
@@ -1251,13 +1205,13 @@ def crear_evento(request):
                 title = Paragraph(f"Hermanos mayores de {edad_mayor} años para la reunión: {evento.nombre}", style_title)
                 fecha = Paragraph(f"Fecha del evento: {evento.fecha.strftime('%d/%m/%Y %H:%M')}", style_normal)
 
-                # Tabla 1: Hermanos activos con DNI
+                # Tabla: hermanos que cumplen condiciones
                 data1 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad']]
-                for i, h in enumerate(hermanos_activos_con_dni, start=1):
+                for i, h in enumerate(hermanos_primera_tabla, start=1):
                     edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
                     data1.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad)])
 
-                total1 = len(hermanos_activos_con_dni)
+                total1 = len(hermanos_primera_tabla)
                 porcentaje1 = ceil(total1 * 0.2)
                 data1.append(['', '', '', 'Total:', str(total1)])
                 data1.append(['', '', '', '20% redondeado:', str(porcentaje1)])
@@ -1270,37 +1224,7 @@ def crear_evento(request):
                     ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
                     ('FONTSIZE', (0,0), (-1,0), 12),
                     ('BOTTOMPADDING', (0,0), (-1,0), 8),
-                    ('BACKGROUND', (0,1), (-1,-3), colors.whitesmoke),
-                    ('BACKGROUND', (0,-2), (-1,-1), colors.lightgrey),
-                    ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
-                ]))
-
-                # Tabla 2: Hermanos sin DNI o con cuota pendiente con columna condición
-                data2 = [['#', 'Apellidos', 'Nombre', 'DNI', 'Edad', 'Condición']]
-                for i, h in enumerate(hermanos_no_activos_o_sin_dni, start=1):
-                    edad = hoy.year - h.fecha_nacimiento.year - ((hoy.month, hoy.day) < (h.fecha_nacimiento.month, h.fecha_nacimiento.day))
-                    condicion = []
-                    if not h.dni:
-                        condicion.append("Falta DNI")
-                    if h.estado.nombre.lower() != 'activo':
-                        condicion.append("Cuota pendiente")
-                    data2.append([str(i), h.apellidos or '', h.nombre or '', h.dni or '', str(edad), ", ".join(condicion)])
-
-                total2 = len(hermanos_no_activos_o_sin_dni)
-                porcentaje2 = ceil(total2 * 0.2)
-                data2.append(['', '', '', 'Total:', str(total2), ''])
-                data2.append(['', '', '', '20% redondeado:', str(porcentaje2), ''])
-
-                table2 = Table(data2, colWidths=[0.5*inch, 2.5*inch, 2*inch, 1.5*inch, 0.7*inch, 2*inch])
-                table2.setStyle(TableStyle([
-                    ('BACKGROUND', (0,0), (-1,0), colors.lightcoral),
-                    ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-                    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-                    ('FONTSIZE', (0,0), (-1,0), 12),
-                    ('BOTTOMPADDING', (0,0), (-1,0), 8),
-                    ('BACKGROUND', (0,1), (-1,-3), colors.lavenderblush),
-                    ('BACKGROUND', (0,-2), (-1,-1), colors.lightgrey),
+                    ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
                     ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
                 ]))
 
@@ -1308,11 +1232,8 @@ def crear_evento(request):
                     title,
                     fecha,
                     Spacer(1, 12),
-                    Paragraph("Hermanos activos con DNI", style_normal),
+                    Paragraph("Hermanos activos, con DNI y mayores de edad", style_normal),
                     table1,
-                    Spacer(1, 24),
-                    Paragraph("Hermanos sin DNI o con cuota pendiente", style_normal),
-                    table2
                 ]
 
                 doc.build(elements)

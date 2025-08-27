@@ -29,9 +29,13 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+render_domain = os.getenv('RENDER_DOMAIN')
+if render_domain:
+    ALLOWED_HOSTS.append(render_domain)
+"""
 if not DEBUG:
     # Añade el dominio de Render en producción
-    ALLOWED_HOSTS.append(os.getenv('RENDER_DOMAIN', 'gestion-cofradia-6byp.onrender.com'))
+    ALLOWED_HOSTS.append(os.getenv('RENDER_DOMAIN', 'gestion-cofradia-6byp.onrender.com'))"""
 
 # Application definition
 
@@ -86,7 +90,7 @@ DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL', 'postgresql://admin:admin@localhost:5432/cofradia'),
         conn_max_age=600,
-        ssl_require=True  # Puedes poner False en local si no usas SSL
+        ssl_require=not DEBUG  # SSL solo en producción
     )
 }
 
@@ -117,6 +121,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login URLs
+LOGIN_URL = '/gestion_cofradia/login/'  # Para que admin funcione por defecto
 LOGIN_REDIRECT_URL = 'inicio'
 LOGOUT_REDIRECT_URL = 'login'
 

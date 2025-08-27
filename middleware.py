@@ -7,25 +7,32 @@ class LoginRequiredMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Rutas que no requieren login
-        exempt_urls = [
-            reverse('gestion_cofradia:login'),  # Login de gestion_cofradia
-            reverse('portal_hermano:login'),    # Login de portal_hermano
-            '/logout/',                         # Logout genérico
-            '/admin/',                          # Admin de Django
+        path = request.path_info
+
+        exempt_paths = [
+            reverse('gestion_cofradia:login'),
+            reverse('portal_hermano:login'),
+            '/logout/',
+            '/admin/login/',  # ← Añadir esto también
         ]
 
-        # Añade las rutas estáticas y de media
-        exempt_urls += [settings.STATIC_URL, settings.MEDIA_URL]
+        # 1. Exentos exactos
+        if path in exempt_paths:
+            return self.get_response(request)
 
-        # Comprueba si la ruta actual requiere login
-        path = request.path_info.lstrip('/')
-        if not any(url.lstrip('/') == path for url in exempt_urls) and not request.user.is_authenticated:
-            # Redirige al login correspondiente
-            if path.startswith('portal/'):
-                return redirect(reverse('portal_hermano:login') + '?next=' + request.path)
+        # 2. Exentos de estáticos/media
+        if settings.STATIC_URL and path.startswith(settings.STATIC_URL):
+            return self.get_response(request)
+        if settings.MEDIA_URL and path.startswith(settings.MEDIA_URL):
+            return self.get_response(request)
+
+        # 3. Redirecciones si no está logueado
+        if not request.user.is_authenticated:
+            if path.startswith('/portalhermano/'):
+                return redirect(reverse('portal_hermano:login') + f'?next={request.path}')
+            elif path.startswith('/admin/'):
+                return redirect('/admin/login/?next=' + request.path)
             else:
-                return redirect(reverse('gestion_cofradia:login') + '?next=' + request.path)
+                return redirect(reverse('gestion_cofradia:login') + f'?next={request.path}')
 
-        response = self.get_response(request)
-        return response
+        return self.get_response(request)
