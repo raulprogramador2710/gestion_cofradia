@@ -4,148 +4,181 @@
 {% block title %}Nuevo Hermano{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white d-flex align-items-center">
-                    <i class="fa-solid fa-user-plus fa-2x me-3"></i>
-                    <div>
-                        <h3 class="mb-0">Nuevo Hermano</h3>
-                        <small class="text-light">Introduce los datos del nuevo hermano</small>
-                    </div>
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fa-solid fa-user-plus me-2"></i>Crear Hermano
+                    </h3>
                 </div>
-                <div class="card-body bg-light">
+                <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
+
                         <div class="row">
+                            <!-- DNI -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">DNI</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-id-card me-1 "></i>DNI
+                                </label>
                                 {{ form.dni }}
                                 {% if form.dni.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.dni.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.dni.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Nombre -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Nombre</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-user me-1 "></i>Nombre
+                                </label>
                                 {{ form.nombre }}
                                 {% if form.nombre.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.nombre.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.nombre.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Apellidos -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Apellidos</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-user-pen me-1 "></i>Apellidos
+                                </label>
                                 {{ form.apellidos }}
                                 {% if form.apellidos.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.apellidos.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.apellidos.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Teléfono -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Teléfono</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-phone me-1 "></i>Teléfono
+                                </label>
                                 {{ form.telefono }}
                                 {% if form.telefono.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.telefono.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.telefono.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Email -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-envelope me-1 "></i>Email
+                                </label>
                                 {{ form.email }}
                                 {% if form.email.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.email.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.email.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Fecha de nacimiento -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Fecha de Nacimiento</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-cake-candles me-1 "></i>Fecha de Nacimiento
+                                </label>
                                 {{ form.fecha_nacimiento }}
                                 {% if form.fecha_nacimiento.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.fecha_nacimiento.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.fecha_nacimiento.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Dirección -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Dirección</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-home me-1 "></i>Dirección
+                                </label>
                                 {{ form.direccion }}
                             </div>
+
+                            <!-- Localidad -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Localidad</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-city me-1 "></i>Localidad
+                                </label>
                                 {{ form.localidad }}
                             </div>
+
+                            <!-- IBAN -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">IBAN</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-credit-card me-1 "></i>IBAN
+                                </label>
                                 {{ form.iban }}
                                 {% if form.iban.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.iban.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.iban.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Año inicio -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Año Inicio Cofradía</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-calendar-plus me-1 "></i>Año Inicio Cofradía
+                                </label>
                                 {{ form.fecha_inicio_cofradia }}
                             </div>
+
+                            <!-- Año último pago -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Año Último Pago</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-calendar-check me-1 "></i>Año Último Pago
+                                </label>
                                 {{ form.fecha_ultimo_pago }}
                             </div>
+
+                            <!-- Estado -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Estado</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-toggle-on me-1 "></i>Estado
+                                </label>
                                 {{ form.estado }}
                                 {% if form.estado.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.estado.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="text-danger mt-1">{{ form.estado.errors }}</div>
                                 {% endif %}
                             </div>
+
+                            <!-- Rol -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Rol</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-user-shield me-1 "></i>Rol
+                                </label>
                                 {{ form.rol }}
                             </div>
+
+                            <!-- Forma de pago -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Forma de Pago</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-wallet me-1 "></i>Forma de Pago
+                                </label>
                                 {{ form.forma_pago }}
                             </div>
+
+                            <!-- Forma de comunicación -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Forma de Comunicación</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-paper-plane me-1 "></i>Forma de Comunicación
+                                </label>
                                 {{ form.forma_comunicacion }}
                             </div>
+
+                            <!-- LOPD -->
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">Documento LOPD</label>
+                                <label class="form-label">
+                                    <i class="fa-solid fa-file-contract me-1 "></i>Documento LOPD
+                                </label>
                                 {{ form.lopd }}
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-save me-1"></i> Crear Hermano
-                        </button>
-                        <a href="{% url 'gestion_cofradia:lista_hermanos' %}" class="btn btn-primary">
-                            <i class="fa-solid fa-arrow-left me-1"></i> Cancelar
-                        </a>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-save me-1 "></i> Guardar
+                            </button>
+                            <a href="{% url 'gestion_cofradia:lista_hermanos' %}" class="btn btn-cancelar">
+                                <i class="fa-solid fa-arrow-left me-1 "></i> Cancelar
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>

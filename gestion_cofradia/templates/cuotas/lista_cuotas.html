@@ -2,23 +2,29 @@
 {% block content %}
 <div class="container">
   <div class="card card-info mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h2 class="mb-0"><i class="fa-solid fa-euro-sign"></i> Cuotas</h2>
-      <a href="{% url 'gestion_cofradia:crear_cuota' %}" class="btn btn-light">
-        <i class="fa-solid fa-plus"></i> Nueva cuota
-      </a>
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
+      <h2 class="mb-0">
+        <i class="fa-solid fa-euro-sign me-2"></i> Listado de Cuotas
+      </h2>
+      <div class="mt-2 mt-md-0">
+        <a href="{% url 'gestion_cofradia:crear_cuota' %}" class="btn btn-light" data-bs-toggle="tooltip" title="Crear nueva cuota">
+          <i class="fa-solid fa-plus"></i>
+          <span class="d-none d-md-inline ms-1">Nueva Cuota</span>
+        </a>
+      </div>
     </div>
-    <div class="card-body">
+
+    <div class="card-body bg-light">
       <div class="table-responsive">
         <table class="table table-hover align-middle">
-          <thead class="thead-light">
+          <thead>
             <tr>
               <th>Tipo</th>
               <th>Año</th>
               <th>Importe</th>
               <th>Vencimiento</th>
               <th>Activa</th>
-              <th>Acciones</th>
+              <th class="text-center">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -35,13 +41,17 @@
                   <span class="badge bg-secondary">No</span>
                 {% endif %}
               </td>
-              <td>
-                <a href="{% url 'gestion_cofradia:editar_cuota' pk=cuota.pk %}" class="btn btn-sm btn-warning me-1">
-                  <i class="fa-solid fa-pen"></i> Editar
-                </a>
-                <a href="{% url 'gestion_cofradia:eliminar_cuota' pk=cuota.pk %}" class="btn btn-sm btn-danger">
-                  <i class="fa-solid fa-trash"></i> Eliminar
-                </a>
+              <td class="text-center">
+                <div class="acciones gap-2">
+                  <a href="{% url 'gestion_cofradia:editar_cuota' pk=cuota.pk %}" 
+                     class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Editar cuota">
+                    <i class="fas fa-pen text-warning"></i>
+                  </a>
+                  <a href="{% url 'gestion_cofradia:eliminar_cuota' pk=cuota.pk %}" 
+                     class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Eliminar cuota">
+                    <i class="fas fa-trash text-danger"></i>
+                  </a>
+                </div>
               </td>
             </tr>
             {% empty %}
@@ -55,4 +65,14 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Activa tooltips de Bootstrap
+  document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+  });
+</script>
 {% endblock %}

@@ -1,71 +1,98 @@
 {% extends "base.html" %}
-
 {% block content %}
-  <div class="container">
-    <div class="d-flex justify-content-end mb-3">
-      <a href="{% url 'gestion_cofradia:lista_informes' %}" class="btn btn-primary">
-        <i class="fa-solid fa-file-pdf me-1"></i> Ver informes
-      </a>
-    </div>
+<div class="container">
+  <!-- Botón superior para informes -->
+  <div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'gestion_cofradia:lista_informes' %}" class="btn btn-light" data-bs-toggle="tooltip" title="Ver informes de la cofradía">
+      <i class="fa-solid fa-file-pdf me-1"></i>
+      <span class="d-none d-md-inline">Ver informes</span>
+    </a>
+  </div>
 
-    <div class="card card-info mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h2 class="mb-0"><i class="fa-solid fa-file-alt"></i> Documentos de la Cofradía</h2>
-        <a href="{% url 'gestion_cofradia:crear_documento' %}" class="btn btn-light">
-          <i class="fa-solid fa-upload me-1"></i> Subir documento
+  <div class="card card-info mb-4">
+    <!-- CABECERA -->
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
+      <h2 class="mb-0">
+        <i class="fa-solid fa-file-alt me-2"></i> Documentos de la Cofradía
+      </h2>
+      <div class="mt-2 mt-md-0">
+        <a href="{% url 'gestion_cofradia:crear_documento' %}" class="btn btn-light" data-bs-toggle="tooltip" title="Subir documento">
+          <i class="fa-solid fa-upload"></i>
+          <span class="d-none d-md-inline ms-1">Subir documento</span>
         </a>
       </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle">
-            <thead class="thead-light">
-              <tr>
-                <th>Título</th>
-                <th>Fecha de Subida</th>
-                <th>Visibilidad</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for documento in documentos %}
-                <tr>
-                  <td>
-                    <a href="{% url 'gestion_cofradia:ver_documento' documento.id %}">
-                      <i class="fa-solid fa-file me-1"></i> {{ documento.titulo }}
-                    </a>
-                  </td>
-                  <td>
-                    <span class="badge bg-info">
-                      {{ documento.fecha_subida|date:"d/m/Y H:i" }}
-                    </span>
-                  </td>
-                  <td>
-                    {% if documento.visibilidad == 'privado' %}
-                      <span class="badge bg-danger">Privado</span>
-                    {% elif documento.visibilidad == 'hermanos' %}
-                      <span class="badge bg-warning text-dark">Solo hermanos</span>
-                    {% else %}
-                      <span class="badge bg-success">Público</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    <a href="{% url 'gestion_cofradia:editar_documento' documento.id %}" class="btn btn-sm btn-warning me-1">
-                      <i class="fa-solid fa-pen me-1"></i> Editar
-                    </a>
-                    <a href="{% url 'gestion_cofradia:eliminar_documento' documento.id %}" class="btn btn-sm btn-danger">
-                      <i class="fa-solid fa-trash me-1"></i> Eliminar
-                    </a>
-                  </td>
-                </tr>
-              {% empty %}
-                <tr>
-                  <td colspan="4" class="text-center text-muted">No hay documentos subidos.</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+    </div>
+
+    <!-- CUERPO -->
+    <div class="card-body bg-light">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Fecha de Subida</th>
+              <th>Visibilidad</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for documento in documentos %}
+            <tr>
+              <td>
+                <a href="{% url 'gestion_cofradia:ver_documento' documento.id %}" class="text-decoration-none">
+                  <i class="fa-solid fa-file me-1"></i> {{ documento.titulo }}
+                </a>
+              </td>
+              <td>
+                <span class="badge bg-info">
+                  <i class="fa-solid fa-calendar-alt me-1"></i>{{ documento.fecha_subida|date:"d/m/Y H:i" }}
+                </span>
+              </td>
+              <td>
+                {% if documento.visibilidad == 'privado' %}
+                  <span class="badge bg-danger"><i class="fas fa-lock me-1"></i>Privado</span>
+                {% elif documento.visibilidad == 'hermanos' %}
+                  <span class="badge bg-warning text-dark"><i class="fas fa-users me-1"></i>Solo hermanos</span>
+                {% else %}
+                  <span class="badge bg-success"><i class="fas fa-globe me-1"></i>Público</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="acciones gap-2">
+                  <a href="{% url 'gestion_cofradia:editar_documento' documento.id %}" 
+                     class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Editar documento">
+                    <i class="fas fa-pen text-warning"></i>
+                  </a>
+                  <a href="{% url 'gestion_cofradia:eliminar_documento' documento.id %}" 
+                     class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Eliminar documento"
+                     onclick="return confirm('¿Seguro que deseas eliminar este documento?')">
+                    <i class="fas fa-trash text-danger"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">
+                <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
+                <h5>No hay documentos subidos</h5>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
+
+<script>
+  // Activa tooltips Bootstrap
+  document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+  });
+</script>
 {% endblock %}

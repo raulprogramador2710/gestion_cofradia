@@ -486,6 +486,17 @@ def editar_hermano(request, pk):
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def dar_de_baja_hermano(request, pk):
+    hermano = get_object_or_404(Hermano, pk=pk)
+    # Busca el estado "Baja" (ajusta según tu modelo)
+    estado_baja = EstadoHermano.objects.get(nombre__iexact="Baja")
+    hermano.estado = estado_baja
+    hermano.save()
+    messages.warning(request, f"El hermano {hermano.nombre} {hermano.apellidos} ha sido dado de baja.")
+    return redirect("gestion_cofradia:lista_hermanos")
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
 def notificar_hermano(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
@@ -928,6 +939,19 @@ def completar_tarea(request, tarea_id):
     tarea.fecha_completada = timezone.now()
     tarea.save()
     return redirect('gestion_cofradia:lista_tareas')
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def eliminar_tarea(request, pk):
+    tarea = get_object_or_404(Tarea, pk=pk)
+
+    if request.method == "POST":
+        tarea.delete()
+        messages.success(request, "La tarea se eliminó correctamente.")
+        return redirect("gestion_cofradia:lista_tareas")
+
+    # Si viene por GET, mostramos página de confirmación
+    return render(request, "tareas/eliminar_tarea.html", {"tarea": tarea})
 
 
 #DOCUMENTACION

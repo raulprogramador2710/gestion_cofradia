@@ -220,7 +220,7 @@ a:hover { color: #d4af37; }
 .nav-link-mobile.active { background: #d4af37; color: #000; font-weight: 600; }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 991.98px) {
+@media (max-width: 991.99px) {
     .header-pc { display: none !important; }
     .header-mobile { display: flex !important; }
 }

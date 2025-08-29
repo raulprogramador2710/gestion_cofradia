@@ -22,8 +22,8 @@
       {{ form.observaciones.label_tag }}
       {{ form.observaciones }}
     </div>
-    <button type="submit" class="btn btn-success">Registrar Pago</button>
-    <a href="{% url 'gestion_cofradia:ver_hermano' pk=hermano.pk %}" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-secondary">Registrar Pago</button>
+    <a href="{% url 'gestion_cofradia:ver_hermano' pk=hermano.pk %}" class="btn btn-cancelar">Cancelar</a>
   </form>
 </div>
 {% endblock %}

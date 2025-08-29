@@ -1,41 +1,106 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nuevo Alquiler{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-  <h2>Crear Alquiler</h2>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <div class="mb-3">
-      {{ form.hermano.label_tag }} {{ form.hermano }}
-      {{ form.hermano.errors }}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fa-solid fa-handshake me-2"></i>Crear Alquiler
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <!-- Hermano -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-user me-1 "></i>Hermano
+                                </label>
+                                {{ form.hermano }}
+                                {% if form.hermano.errors %}
+                                    <div class="text-danger mt-1">{{ form.hermano.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Enser -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-box-open me-1 "></i>Enser
+                                </label>
+                                {{ form.enser }}
+                                {% if form.enser.errors %}
+                                    <div class="text-danger mt-1">{{ form.enser.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Evento -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-calendar me-1 "></i>Evento
+                                </label>
+                                {{ form.evento }}
+                                {% if form.evento.errors %}
+                                    <div class="text-danger mt-1">{{ form.evento.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Estado -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-toggle-on me-1 "></i>Estado
+                                </label>
+                                {{ form.estado }}
+                                {% if form.estado.errors %}
+                                    <div class="text-danger mt-1">{{ form.estado.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Fecha de Entrega -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-truck-ramp-box me-1 "></i>Fecha de Entrega
+                                </label>
+                                {{ form.fecha_entrega }}
+                                {% if form.fecha_entrega.errors %}
+                                    <div class="text-danger mt-1">{{ form.fecha_entrega.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Fecha de Devolución -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-rotate-left me-1 "></i>Fecha de Devolución
+                                </label>
+                                {{ form.fecha_devolucion }}
+                                {% if form.fecha_devolucion.errors %}
+                                    <div class="text-danger mt-1">{{ form.fecha_devolucion.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Fianza -->
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-euro-sign me-1 "></i>Fianza
+                                </label>
+                                {{ form.fianza }}
+                                {% if form.fianza.errors %}
+                                    <div class="text-danger mt-1">{{ form.fianza.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-save me-1 "></i> Guardar
+                            </button>
+                            <a href="{% url 'gestion_cofradia:lista_alquileres' %}" class="btn btn-cancelar">
+                                <i class="fa-solid fa-arrow-left me-1 "></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-      {{ form.enser.label_tag }} {{ form.enser }}
-      {{ form.enser.errors }}
-    </div>
-    <div class="mb-3">
-      {{ form.evento.label_tag }} {{ form.evento }}
-      {{ form.evento.errors }}
-    </div>
-    <div class="mb-3">
-      {{ form.fecha_entrega.label_tag }} {{ form.fecha_entrega }}
-      {{ form.fecha_entrega.errors }}
-    </div>
-    <div class="mb-3">
-      {{ form.fecha_devolucion.label_tag }} {{ form.fecha_devolucion }}
-      {{ form.fecha_devolucion.errors }}
-    </div>
-    <div class="mb-3">
-      {{ form.fianza.label_tag }} {{ form.fianza }}
-      {{ form.fianza.errors }}
-    </div>
-    <div class="mb-3">
-      {{ form.estado.label_tag }} {{ form.estado }}
-      {{ form.estado.errors }}
-    </div>
-    <button type="submit" class="btn btn-primary">Crear</button>
-    <a href="{% url 'gestion_cofradia:lista_alquileres' %}" class="btn btn-primary">Cancelar</a>
-  </form>
 </div>
 {% endblock %}

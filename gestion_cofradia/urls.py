@@ -18,6 +18,7 @@ urlpatterns = [
     path('hermanos/crear/', views.crear_hermano, name='crear_hermano'),
     path('hermanos/<int:pk>/', views.ver_hermano, name='ver_hermano'),
     path('hermanos/<int:pk>/editar/', views.editar_hermano, name='editar_hermano'),
+    path("hermanos/<int:pk>/baja/", views.dar_de_baja_hermano, name="dar_baja_hermano"),
 
     path('hermanos/<int:pk>/notificar/', views.notificar_hermano, name='notificar_hermano'),
     path('hermanos/upload-csv/', views.upload_hermanos_csv, name='upload_hermanos_csv'),
@@ -45,6 +46,7 @@ urlpatterns = [
     path('tareas/<int:pk>/', views.ver_tarea, name='ver_tarea'),
     path('tareas/<int:tarea_id>/editar/', views.editar_tarea, name='editar_tarea'),
     path('tareas/<int:tarea_id>/completar/', views.completar_tarea, name='completar_tarea'),
+    path("tareas/<int:pk>/eliminar/", views.eliminar_tarea, name="eliminar_tarea"),
 
     #Doumentacion
     path('documentos/', views.lista_documentos, name='lista_documentos'),

@@ -21,26 +21,26 @@
             {% csrf_token %}
             <div class="mb-3">
               <label for="{{ form.destinatario.id_for_label }}" class="form-label">
-                <i class="fa-solid fa-user me-2 iconos"></i>Destinatario
+                <i class="fa-solid fa-user me-2 "></i>Destinatario
               </label>
               {{ form.destinatario|attr:"class:form-select" }}
             </div>
             <div class="mb-3">
               <label for="{{ form.titulo.id_for_label }}" class="form-label">
-                <i class="fa-solid fa-heading me-2 iconos"></i>Título
+                <i class="fa-solid fa-heading me-2 "></i>Título
               </label>
               {{ form.titulo|attr:"class:form-control" }}
             </div>
             <div class="mb-3">
               <label for="{{ form.cuerpo.id_for_label }}" class="form-label">
-                <i class="fa-solid fa-envelope me-2 iconos"></i>Cuerpo
+                <i class="fa-solid fa-envelope me-2 "></i>Cuerpo
               </label>
               {{ form.cuerpo|attr:"class:form-control"|attr:"rows:4" }}
             </div>
             <div class="mb-3 form-check">
               {{ form.leida|attr:"class:form-check-input" }}
               <label class="form-check-label" for="{{ form.leida.id_for_label }}">
-                <i class="fa-solid fa-eye me-2 iconos"></i>Marcar como leída
+                <i class="fa-solid fa-eye me-2 "></i>Marcar como leída
               </label>
             </div>
             <button type="submit" class="btn btn-primary">

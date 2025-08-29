@@ -11,11 +11,11 @@
         <i class="fa-solid fa-users me-2"></i> Listado de Hermanos
       </h2>
       <div class="d-flex gap-2 mt-2 mt-md-0">
-        <a href="{% url 'gestion_cofradia:upload_hermanos_csv' %}" class="btn btn-light" data-bs-toggle="tooltip" title="Importar desde CSV">
+        <a href="{% url 'gestion_cofradia:upload_hermanos_csv' %}" class="btn btn-cancelar" data-bs-toggle="tooltip" title="Importar desde CSV">
           <i class="fas fa-file-upload"></i>
           <span class="d-none d-md-inline ms-1">Importar CSV</span>
         </a>
-        <a href="{% url 'gestion_cofradia:crear_hermano' %}" class="btn btn-light" data-bs-toggle="tooltip" title="Crear nuevo hermano">
+        <a href="{% url 'gestion_cofradia:crear_hermano' %}" class="btn btn-cancelar" data-bs-toggle="tooltip" title="Crear nuevo hermano">
           <i class="fa-solid fa-user-plus"></i>
           <span class="d-none d-md-inline ms-1">Nuevo Hermano</span>
         </a>
@@ -72,7 +72,7 @@
         { data: 5, render: function(data){ return data; } }, // Estado
         { data: 6, render: function(data){ return data; } }, // Forma de pago
         { data: 7, render: function(data){ return data; } }, // Forma de comunicación
-        { data: 8, orderable: false, searchable: false, render: function(data){ return data; } } // Acciones
+        { data: 8, orderable: false, searchable: false, render: function(data, type, row){ return '<div class="acciones">' + data + '</div>'; } } // Acciones
       ]
     });
     // Inicializar tooltips de Bootstrap (cuando se dibuje la tabla)

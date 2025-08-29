@@ -29,7 +29,6 @@
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1.6;
-    background-color: red;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -253,30 +252,139 @@ body {
     padding: 0 1rem;
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 1024px) {
-    .nav-item-pc {
-        margin-left: 0.5rem;
-    }
-    .nav-link-pc span {
-        font-size: 0.9rem;
-        white-space: nowrap;
-    }
-}
+/* ======================= */
+/* RESPONSIVE DESIGN       */
+/* ======================= */
 
-@media (max-width: 768px) {
-    .header-pc {
-        display: none;
-    }
+/* ===== MOBILE / TABLET (hasta 991.99px) ===== */
+@media (max-width: 991.99px) {
+    .header-pc { display: none !important; }
+    .header-mobile { display: flex !important; }
 
+    /* MENÚ MÓVIL */
     .header-mobile {
-        display: flex;
+        background: #000000; /* negro elegante */
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
 
+    .nav-container-mobile {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+    }
+
+    /* Logo */
+    .nav-brand-mobile {
+        display: flex;
+        align-items: center;
+        font-size: 1.2rem; /* ajustado */
+        font-weight: 700;
+        color: #ffffff; /* blanco */
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .nav-brand-mobile:hover {
+        color: #d4af37; /* dorado al hover */
+    }
+
+    .nav-brand-mobile i {
+        margin-right: 0.5rem;
+        font-size: 1.4rem; /* ajustado */
+        color: #d4af37; /* icono dorado fijo */
+    }
+
+    /* Botón hamburguesa */
     .nav-toggle-mobile {
-        display: flex;
+        display: flex; /* cambiado de none a flex */
+        flex-direction: column;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
     }
 
+    .hamburger {
+        width: 25px;
+        height: 3px;
+        background: #d4af37; /* dorado */
+        margin: 3px 0;
+        transition: var(--transition);
+        border-radius: 2px;
+    }
+
+    .nav-toggle-mobile.active .hamburger:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    .nav-toggle-mobile.active .hamburger:nth-child(2) {
+        opacity: 0;
+    }
+    .nav-toggle-mobile.active .hamburger:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+
+    /* Menú desplegado */
+    .nav-menu-mobile {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: #000000; /* negro */
+        transition: var(--transition);
+        box-shadow: var(--shadow);
+        overflow-y: auto;
+        z-index: 999;
+    }
+
+    .nav-menu-mobile.active {
+        left: 0;
+    }
+
+    .nav-list-mobile {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        margin: 0;
+        padding: 2rem 0;
+    }
+
+    .nav-item-mobile {
+        margin: 0;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    /* Links */
+    .nav-link-mobile {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #ffffff; /* blanco */
+        font-weight: 500;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        transition: var(--transition);
+    }
+
+    .nav-link-mobile:hover {
+        background-color: rgba(212, 175, 55, 0.15);
+        color: #d4af37;
+    }
+
+    .nav-link-mobile.active {
+        background-color: #d4af37;
+        color: #000000;
+        font-weight: 600;
+    }
+
+    /* Ajustes de columnas */
     .col-md-4,
     .col-md-6,
     .col-md-12 {
@@ -285,45 +393,112 @@ body {
         margin-bottom: 1rem;
     }
 
-    /* Opcional: ocultar texto y mostrar solo iconos para ahorrar espacio */
-    /*
-    .nav-link-pc span {
-        display: none;
-    }
-    .nav-item-pc {
-        margin-left: 0.75rem;
-    }
-    */
+    /* Ajustes tipográficos */
+    .card-header h3 { font-size: 1.1rem; }
+    .card-header small { font-size: 0.8rem; }
+    .card-summary .card-text { font-size: 2rem; }
+    .card-info .card-text { font-size: 1.75rem; }
+    h1 { font-size: 1.75rem; }
 }
 
-@media (max-width: 480px) {
-    .nav-brand-mobile {
-        font-size: 1.2rem;
-    }
-    
-    .nav-brand-mobile i {
-        font-size: 1.4rem;
-    }
-    
-    .card-header h3 {
-        font-size: 1.1rem;
-    }
-    
-    .card-header small {
-        font-size: 0.8rem;
+.nav-menu-pc i {
+    color: #ffffff !important;
+}
+
+.nav-menu-mobile i {
+    color: #ffffff !important;
+}
+
+/* ===== DESKTOP (desde 992px) ===== */
+@media (min-width: 992px) {
+    .header-pc { display: flex !important; }
+    .header-mobile { display: none !important; }
+
+    /* MENÚ PC */
+    .header-pc {
+        background: #000000;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
 
-    .card-summary .card-text {
-        font-size: 2rem;
+    .nav-container-pc {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-left: 0.5rem; 
+        padding-right: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+        width: 100%;
     }
 
-    .card-info .card-text {
-        font-size: 1.75rem;
+    /* Logo */
+    .nav-brand-pc {
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-decoration: none;
+        transition: color 0.3s ease;
     }
 
-    h1 {
-        font-size: 1.75rem;
+    .nav-brand-pc:hover {
+        color: #d4af37; 
     }
+
+    .nav-brand-pc i {
+        margin-right: 0.5rem;
+        font-size: 1.8rem;
+        color: #d4af37;
+    }
+
+    /* Menú principal */
+    .nav-menu-pc ul {
+        display: flex;
+        flex-wrap: wrap;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-item-pc {
+        margin-left: 0.3rem;
+        white-space: nowrap;
+    }
+
+    /* Links */
+    .nav-link-pc {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #ffffff;
+        font-weight: 500;
+        padding: 0.3rem 0.6rem;
+        border-radius: var(--border-radius);
+        transition: all 0.3s ease;
+    }
+
+    .nav-link-pc:hover {
+        background-color: rgba(212, 175, 55, 0.2);
+        color: #d4af37;
+    }
+
+    .nav-link-pc.active {
+        background-color: #d4af37;
+        color: #000000;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .nav-link-pc i {
+        margin-right: 0.3rem;
+        font-size: 1rem;
+    }
+    
 }
 
 /* ANIMACIONES */
@@ -385,20 +560,8 @@ body {
     }
 }
 
-/* EFECTOS ADICIONALES */
-.card-summary:hover .card-title i {
-    transform: scale(1.1);
-    transition: var(--transition);
-}
-
 .btn:active {
     transform: translateY(0);
-}
-
-.nav-link-pc:hover i,
-.nav-link-mobile:hover i {
-    transform: translateX(3px);
-    transition: var(--transition);
 }
 
 /* Igualar altura de las tarjetas de resumen en la fila */
@@ -468,7 +631,7 @@ canvas {
   color: #cbd5e1; /* un gris claro */
 }
 
-.card-summary.bg-primary .list-group-item .btn-outline-light {
+.card-summary.bg-primary .list-group-item {
   border-color: rgba(255, 255, 255, 0.6);
   color: #fff;
   padding: 0.25rem 0.5rem;
@@ -476,13 +639,13 @@ canvas {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.card-summary.bg-primary .list-group-item .btn-outline-light:hover {
+.card-summary.bg-primary .list-group-item:hover {
   background-color: rgba(255, 255, 255, 0.2);
   color: #fff;
   border-color: #fff;
 }
 
-.card-summary.bg-primary .btn-outline-light.mt-3 {
+.card-summary.bg-primary {
   border-color: #fff;
   color: #fff;
   padding: 0.5rem 1rem;
@@ -490,7 +653,7 @@ canvas {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.card-summary.bg-primary .btn-outline-light.mt-3:hover {
+.card-summary.bg-primary:hover {
   background-color: rgba(255, 255, 255, 0.3);
   color: #fff;
   border-color: #fff;
@@ -538,7 +701,11 @@ canvas {
 
 
 
-
+input, select, textarea {
+    border-radius: 0.5rem !important; /* Bordes redondeados */
+    border: 1px solid #ced4da;       /* Borde estilo Bootstrap */
+    padding: 0.5rem;
+}
 
 
 /* TÍTULOS PRINCIPALES */
@@ -562,222 +729,11 @@ h3 {
     color: #ffffff;
     margin-bottom: 1rem;
 }
-/* MENÚ PC */
-.header-pc {
-    background: #000000;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-}
 
-.nav-container-pc {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-left: 0.5rem; /* Antes 1rem */
-    padding-right: 0.5rem; /* Antes 1rem */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 70px;
-    width: 100%;
-    flex-wrap: wrap; /* Permite que los items bajen de línea si no caben */
-}
 
-/* Logo */
-.nav-brand-pc {
-    display: flex;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
 
-.nav-brand-pc:hover {
-    color: #d4af37; /* dorado en hover */
-}
 
-.nav-brand-pc i {
-    margin-right: 0.5rem;
-    font-size: 1.8rem;
-    color: #d4af37; /* icono dorado fijo */
-}
 
-.nav-menu-pc ul {
-    display: flex;
-    flex-wrap: wrap; /* Permite que los items bajen de línea */
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.nav-item-pc {
-    margin-left: 0.3rem;
-    white-space: nowrap; /* Evita que el texto se divida */
-}
-
-/* Ítems */
-.nav-link-pc {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #ffffff;
-    font-weight: 500;
-    padding: 0.3rem 0.6rem;
-    border-radius: var(--border-radius);
-    transition: all 0.3s ease;
-}
-
-.nav-link-pc:hover {
-    background-color: rgba(212, 175, 55, 0.2); /* fondo dorado suave */
-    color:#d4af37; /* texto dorado */
-}
-
-.nav-link-pc.active {
-    background-color: #d4af37;
-    color: #000000;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.nav-link-pc i {
-    margin-right: 0.3rem;
-    font-size: 1rem;
-}
-
-/* MENÚ MÓVIL */
-.header-mobile {
-    background: #000000; /* negro elegante */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4); 
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: none;
-}
-
-.nav-container-mobile {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 70px;
-}
-
-/* Logo */
-.nav-brand-mobile {
-    display: flex;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff; /* blanco */
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.nav-brand-mobile:hover {
-    color: #d4af37; /* dorado al hover */
-}
-
-.nav-brand-mobile i {
-    margin-right: 0.5rem;
-    font-size: 1.8rem;
-    color: #d4af37; /* icono dorado fijo */
-}
-
-/* Botón hamburguesa */
-.nav-toggle-mobile {
-    display: none;
-    flex-direction: column;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-}
-
-.hamburger {
-    width: 25px;
-    height: 3px;
-    background: #d4af37; /* dorado */
-    margin: 3px 0;
-    transition: var(--transition);
-    border-radius: 2px;
-}
-
-.nav-toggle-mobile.active .hamburger:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-.nav-toggle-mobile.active .hamburger:nth-child(2) {
-    opacity: 0;
-}
-.nav-toggle-mobile.active .hamburger:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* Menú desplegado */
-.nav-menu-mobile {
-    position: fixed;
-    top: 70px;
-    left: -100%;
-    width: 100%;
-    height: calc(100vh - 70px);
-    background: #000000; /* negro */
-    transition: var(--transition);
-    box-shadow: var(--shadow);
-    overflow-y: auto;
-    z-index: 999;
-}
-
-.nav-menu-mobile.active {
-    left: 0;
-}
-
-.nav-list-mobile {
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    margin: 0;
-    padding: 2rem 0;
-}
-
-.nav-item-mobile {
-    margin: 0;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.3); /* línea dorada sutil */
-}
-
-/* Links */
-.nav-link-mobile {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #ffffff; /* blanco */
-    font-weight: 500;
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    transition: var(--transition);
-}
-
-.nav-link-mobile:hover {
-    background-color: rgba(212, 175, 55, 0.15); /* dorado translúcido */
-    color: #d4af37; /* dorado al hover */
-}
-
-.nav-link-mobile.active {
-    background-color: #d4af37; /* dorado sólido */
-    color: #000000; /* texto negro */
-    font-weight: 600;
-}
-
-/* Iconos */
-.nav-link-mobile i {
-    margin-right: 1rem;
-    font-size: 1.2rem;
-    color: #d4af37; /* dorado */
-}
 
 
 /* TARJETAS BASE */
@@ -803,12 +759,6 @@ h3 {
     align-items: center;
     font-weight: 600;
     border-bottom: 2px solid #d4af37; /* añadido: línea dorada elegante */
-}
-
-.card-header i {
-    margin-right: 0.75rem;
-    font-size: 1.3rem;
-    color: #d4af37; /* cambiado: iconos dorados */
 }
 
 .card-header h3 {
@@ -853,11 +803,6 @@ h3 {
     align-items: center;
 }
 
-.card-chart .card-header i {
-    color: #d4af37; /* añadido para coherencia */
-    margin-right: 0.5rem;
-}
-
 .card-chart .card-body,
 .list-group,
 .card-chart .list-group-item{
@@ -884,7 +829,7 @@ h3 {
     margin-bottom: 0.5rem;
 }
 
-/* Iconos destacados en círculo (para métricas) */
+/*  destacados en círculo (para métricas) */
 .icon-circle {
     width: 55px;
     height: 55px;
@@ -899,8 +844,102 @@ h3 {
     margin-bottom: 1rem;
 }
 
-/* ================================================== */
-/* BOTONES - base */
+
+
+
+
+
+
+/* Tamaño pequeño */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.page-link {
+    color: #000000 !important;
+}
+
+.page-item.active .page-link {
+    background-color: #000000 !important;
+    border-color: #d4af37 !important;
+    color: #ffffff !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ========================================
+   ICONOS
+======================================== */
+i {
+    color: #d4af37 !important; 
+}
+
+.btn i {
+    margin-right: 0.5rem;
+    color: inherit !important; 
+    transition: inherit;
+}
+
+.card-header i {
+    margin-right: 0.75rem;
+    font-size: 1.3rem;
+}
+
+.card-chart .card-header i {
+    margin-right: 0.5rem;
+}
+
+/*iconos en botones acciones*/
+.acciones .btn i {
+  color: #d4af37 !important;
+}
+
+
+/* ========================================
+   BOTONES - ESTILOS BASE
+======================================== */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -924,98 +963,110 @@ h3 {
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.btn i {
-    margin-right: 0.5rem;
-}
-
-/* Botones dentro de tarjetas -> integrados (sin sombra propia) */
+/* Botones dentro de tarjetas inicio */
 .card-chart .btn {
     box-shadow: none;
     border-radius: 20px;
 }
 
+
+/* ========================================
+   BOTONES - VARIANTES
+======================================== */
 /* Botón principal: NEGRO */
 .btn-primary {
     background-color: #000000 !important;
     border: 2px solid #d4af37 !important;
     color: #ffffff !important;
 }
-
 .btn-primary:hover {
     background-color: #d4af37 !important;
-    color: #000000 !important;
-    border-color: #d4af37 !important;
-}
-
-/* Botón dorado */
-.btn-success {
-    background: #d4af37 !important;
-    color: #000000 !important;
-    border: 2px solid #000000 !important;
-}
-
-.btn-success:hover {
-    background: #000000 !important;
+    border-color: #000000 !important;
     color: #ffffff !important;
-    border-color: #d4af37 !important;
 }
 
-/* Botón secundario: BLANCO */
+/* Botón secundario: DORADO */
 .btn-secondary {
+    background: #d4af37 !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+}
+.btn-secondary:hover {
+    background: #ffffff !important;
+    border-color: #d4af37 !important;
+    color: #d4af37 !important;
+}
+
+/* Botón cancelar: BLANCO */
+.btn-cancelar {
     background-color: #ffffff !important;
     border: 2px solid #000000 !important;
-    color: #000000 !important;
+    color: #d4af37 !important;
 }
-
-.btn-secondary:hover {
+.btn-cancelar:hover {
     background-color: #000000 !important;
-    border: 2px solid #d4af37 !important;
+    border-color: 2px solid #d4af37 !important;
     color: #ffffff !important;
 }
 
-/* Botón outline claro (para sobre negro) */
-.btn-outline-light {
-    background: transparent !important;
-    color: #ffffff !important;
-    border: 2px solid #d4af37 !important;
-}
-
-.btn-outline-light:hover {
-    background: #d4af37 !important;
-    color: #000000 !important;
-    border-color: #d4af37 !important;
-}
-
-/* Tamaño pequeño */
-.btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-}
-
-.iconos {
-  color: #d4af37 !important; /* DORADO */
-}
-
-.page-link {
-    color: #000000 !important;
-}
-
-.page-item.active .page-link {
-    background-color: #000000 !important;
-    border-color: #d4af37 !important;
-    color: #ffffff !important;
+/*botones acciones*/
+.acciones .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 
+/* ========================================
+   MENÚ NAVEGACIÓN
+======================================== */
+/* Menu PC */
+@media (min-width: 992px) {
+    .nav-menu-pc i,
+    .nav-link-pc i {
+        color: #ffffff !important;
+    }
+    .nav-brand-pc i { margin-right: .5rem; font-size: 1.8rem; }
+    .nav-link-pc i { margin-right: .3rem; font-size: 1rem; }
+}
+
+/* Menu móvil */
+@media (max-width: 991.99px) {
+    .nav-menu-mobile i,
+    .nav-link-mobile i {
+        color: #ffffff !important;
+    }
+    .nav-brand-mobile i { margin-right: .5rem; font-size: 1.4rem; }
+    .nav-link-mobile i { margin-right: 1rem; font-size: 1.2rem; }
+}
 
 
+/* ========================================
+   EFECTOS ADICIONALES
+======================================== */
+.card-summary:hover .card-title i {
+    transform: scale(1.1);
+    transition: var(--transition);
+}
+
+.nav-link-pc:hover i,
+.nav-link-mobile:hover i {
+    transform: translateX(3px);
+    transition: var(--transition);
+}
+
+/*celca botones acciones*/
+.acciones {
+  display: flex;
+  justify-content: center; /* centra los botones en la celda */
+  align-items: center;
+  gap: 0.5rem; /* espacio uniforme entre botones */
+}
 
 
-
-
-
-
-/* Tarjeta para informes */
+/* ========================================
+   INFORMES
+======================================== */
 .informe-card {
   transition: all 0.3s ease;
   border-radius: 12px;
@@ -1026,7 +1077,6 @@ h3 {
   box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
-/* Header de cada card */
 .informe-card .card-header {
   background: linear-gradient(135deg, #000000, #1a1a1a);
   border-bottom: 2px solid #d4af37;
@@ -1038,7 +1088,6 @@ h3 {
   padding: 1rem;
 }
 
-/* Título del informe */
 .informe-card .card-title {
   font-weight: 700;
   font-size: 1.2rem;
@@ -1046,7 +1095,7 @@ h3 {
   color: #000;
 }
 
-/* Botón ancho */
+/* Botones dentro de informes */
 .informe-card .btn {
   margin-top: 1rem;
   border-radius: 8px;

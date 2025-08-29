@@ -7,7 +7,7 @@
     <form method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger">Eliminar</button>
-      <a href="{% url 'gestion_cofradia:lista_documentos' %}" class="btn btn-secondary">Cancelar</a>
+      <a href="{% url 'gestion_cofradia:lista_documentos' %}" class="btn btn-cancelar">Cancelar</a>
     </form>
   </div>
 {% endblock %}

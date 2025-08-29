@@ -1,108 +1,103 @@
 {% extends "base.html" %}
-{% load static %}
-
-{% block title %}Lista de Notificaciones{% endblock %}
-
 {% block content %}
 <div class="container">
   <div class="card card-info mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center">
-        <i class="fa-solid fa-bell fa-2x me-3"></i>
-        <div>
-          <h2 class="mb-0">Notificaciones</h2>
-          <small>Gestión de notificaciones de la cofradía</small>
-        </div>
+    <!-- CABECERA -->
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between">
+      <h2 class="mb-0">
+        <i class="fa-solid fa-bell me-2"></i> Notificaciones
+      </h2>
+      <div class="mt-2 mt-md-0">
+        <a href="{% url 'gestion_cofradia:crear_notificacion' %}" class="btn btn-light" data-bs-toggle="tooltip" title="Crear nueva notificación">
+          <i class="fa-solid fa-plus"></i>
+          <span class="d-none d-md-inline ms-1">Nueva Notificación</span>
+        </a>
       </div>
-      <a href="{% url 'gestion_cofradia:crear_notificacion' %}" class="btn btn-light">
-        <i class="fa-solid fa-plus me-1"></i> Nueva Notificación
-      </a>
     </div>
-    <div class="card-body p-0 bg-light">
+
+    <!-- CUERPO -->
+    <div class="card-body bg-light p-0">
       {% if notificaciones %}
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead>
-              <tr>
-                <th><i class="fa-solid fa-user me-1"></i>Destinatario</th>
-                <th><i class="fa-solid fa-heading me-1"></i>Título</th>
-                <th><i class="fa-solid fa-calendar me-1"></i>Fecha</th>
-                <th><i class="fa-solid fa-eye me-1"></i>Estado</th>
-                <th class="text-center"><i class="fa-solid fa-cogs me-1"></i>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for notificacion in notificaciones %}
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <i class="fa-solid fa-user-circle me-2 text-info"></i>
-                    <div>
-                      <strong>{{ notificacion.destinatario.first_name }} {{ notificacion.destinatario.last_name }}</strong>
-                      <br><small class="text-muted">{{ notificacion.destinatario.username }}</small>
-                    </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Destinatario</th>
+              <th>Título</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for notificacion in notificaciones %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <i class="fa-solid fa-user-circle me-2 text-info"></i>
+                  <div>
+                    <strong>{{ notificacion.destinatario.first_name }} {{ notificacion.destinatario.last_name }}</strong>
+                    <br><small class="text-muted">{{ notificacion.destinatario.username }}</small>
                   </div>
-                </td>
-                <td>
-                  <strong>{{ notificacion.titulo }}</strong>
-                  <br><small class="text-muted">{{ notificacion.cuerpo|truncatechars:50 }}</small>
-                </td>
-                <td>
-                  <span class="badge bg-info">
-                    <i class="fa-solid fa-calendar-alt me-1"></i>
-                    {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
-                  </span>
-                </td>
-                <td>
-                  {% if notificacion.leida %}
-                    <span class="badge bg-success">
-                      <i class="fa-solid fa-check me-1"></i>Leída
-                    </span>
-                  {% else %}
-                    <span class="badge bg-warning text-dark">
-                      <i class="fa-solid fa-clock me-1"></i>Pendiente
-                    </span>
-                  {% endif %}
-                </td>
-                <td class="text-center">
-                  <div class="btn-group" role="group">
-                    <a href="{% url 'gestion_cofradia:ver_notificacion' notificacion.id %}" 
-                       class="btn btn-outline-primary btn-sm" title="Ver detalles">
-                      <i class="fa-solid fa-eye"></i>
-                    </a>
-                    <a href="{% url 'gestion_cofradia:editar_notificacion' notificacion.id %}" 
-                       class="btn btn-outline-warning btn-sm" title="Editar">
-                      <i class="fa-solid fa-pen-to-square"></i>
-                    </a>
-                    <a href="{% url 'gestion_cofradia:eliminar_notificacion' notificacion.id %}" 
-                       class="btn btn-outline-danger btn-sm" title="Eliminar"
-                       onclick="return confirm('¿Estás seguro de que quieres eliminar esta notificación?')">
-                      <i class="fa-solid fa-trash"></i>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+                </div>
+              </td>
+              <td>
+                <strong>{{ notificacion.titulo }}</strong>
+                <br><small class="text-muted">{{ notificacion.cuerpo|truncatechars:50 }}</small>
+              </td>
+              <td>
+                <span class="badge bg-info">
+                  <i class="fa-solid fa-calendar-alt me-1"></i>
+                  {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
+                </span>
+              </td>
+              <td>
+                {% if notificacion.leida %}
+                  <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>Leída</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i>Pendiente</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="d-inline-flex gap-2">
+                  <a href="{% url 'gestion_cofradia:ver_notificacion' notificacion.id %}" 
+                     class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Ver detalles">
+                    <i class="fas fa-eye text-info"></i>
+                  </a>
+                  <a href="{% url 'gestion_cofradia:editar_notificacion' notificacion.id %}" 
+                     class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Editar notificación">
+                    <i class="fas fa-pen text-warning"></i>
+                  </a>
+                  <a href="{% url 'gestion_cofradia:eliminar_notificacion' notificacion.id %}" 
+                     class="btn btn-sm btn-light" data-bs-toggle="tooltip" title="Eliminar notificación"
+                     onclick="return confirm('¿Estás seguro de que quieres eliminar esta notificación?')">
+                    <i class="fas fa-trash text-danger"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
       {% else %}
-        <div class="text-center py-5">
-          <i class="fa-solid fa-bell-slash fa-4x text-muted mb-3"></i>
-          <h4 class="text-muted">No hay notificaciones</h4>
-          <p class="text-muted">Aún no se han creado notificaciones para esta cofradía.</p>
-        </div>
+      <div class="text-center py-5 text-muted">
+        <i class="fa-solid fa-bell-slash fa-4x mb-3"></i>
+        <h4>No hay notificaciones</h4>
+        <p>Aún no se han creado notificaciones para esta cofradía.</p>
+      </div>
       {% endif %}
-    </div>
-    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-      <small class="text-muted">
-        <i class="fa-solid fa-info-circle me-1"></i>
-        Total: {{ notificaciones.count }} notificación{{ notificaciones.count|pluralize:"es" }}
-      </small>
-      <a href="{% url 'gestion_cofradia:inicio' %}" class="btn btn-outline-secondary">
-        <i class="fa-solid fa-arrow-left me-1"></i> Volver al Inicio
-      </a>
     </div>
   </div>
 </div>
+
+<script>
+  // Activa tooltips Bootstrap
+  document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+  });
+</script>
 {% endblock %}

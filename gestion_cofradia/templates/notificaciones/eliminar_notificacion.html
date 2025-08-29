@@ -25,22 +25,22 @@
           </div>
 
           <div class="mb-3">
-            <i class="fa-solid fa-heading me-2 iconos"></i>
+            <i class="fa-solid fa-heading me-2 "></i>
             <strong>Título:</strong> {{ notificacion.titulo }}
           </div>
           
           <div class="mb-3">
-            <i class="fa-solid fa-user me-2 iconos"></i>
+            <i class="fa-solid fa-user me-2 "></i>
             <strong>Destinatario:</strong> {{ notificacion.destinatario.first_name }} {{ notificacion.destinatario.last_name }}
           </div>
           
           <div class="mb-3">
-            <i class="fa-solid fa-calendar me-2 iconos"></i>
+            <i class="fa-solid fa-calendar me-2 "></i>
             <strong>Fecha:</strong> {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
           </div>
 
           <div class="mb-3">
-            <i class="fa-solid fa-envelope me-2 iconos"></i>
+            <i class="fa-solid fa-envelope me-2 "></i>
             <strong>Contenido:</strong><br>
             <div class="bg-white p-3 rounded border">
               {{ notificacion.cuerpo|truncatechars:200 }}

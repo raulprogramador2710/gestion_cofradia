@@ -7,7 +7,7 @@
     <p><strong>Subido por:</strong> {{ documento.subido_por }}</p>
     <p><strong>Fecha de Subida:</strong> {{ documento.fecha_subida }}</p>
     <p><strong>Visibilidad:</strong> {{ documento.get_visibilidad_display }}</p>
-    <a href="{{ documento.archivo.url }}" target="_blank" class="btn btn-success">Ver Documento</a>
-    <a href="{% url 'gestion_cofradia:lista_documentos' %}" class="btn btn-secondary">Volver a la lista</a>
+    <a href="{{ documento.archivo.url }}" target="_blank" class="btn btn-secondary">Ver Documento</a>
+    <a href="{% url 'gestion_cofradia:lista_documentos' %}" class="btn btn-cancelar">Volver a la lista</a>
   </div>
 {% endblock %}

@@ -8,7 +8,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow">
-                <div class="card-header bg-info text-white d-flex align-items-center justify-content-between">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
                     <div>
                         <i class="fas fa-calendar-day fa-lg me-2"></i>
                         <h3 class="mb-0 d-inline">{{ evento.nombre }}</h3>
@@ -21,13 +21,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <dl class="row">
-                                <dt class="col-sm-5"><i class="fas fa-clock me-1"></i>Fecha y hora:</dt>
+                                <dt class="col-sm-5"><i class="fas fa-clock me-1 "></i>Fecha y hora:</dt>
                                 <dd class="col-sm-7">{{ evento.fecha|date:"d/m/Y H:i" }}</dd>
 
-                                <dt class="col-sm-5"><i class="fas fa-map-marker-alt me-1"></i>Lugar:</dt>
+                                <dt class="col-sm-5"><i class="fas fa-map-marker-alt me-1 "></i>Lugar:</dt>
                                 <dd class="col-sm-7">{{ evento.lugar|default:"Sin especificar" }}</dd>
 
-                                <dt class="col-sm-5"><i class="fas fa-euro-sign me-1"></i>Cuota extra:</dt>
+                                <dt class="col-sm-5"><i class="fas fa-euro-sign me-1 "></i>Cuota extra:</dt>
                                 <dd class="col-sm-7">
                                     {% if evento.cuota_extra %}
                                         <span class="badge bg-warning text-dark">{{ evento.cuota_extra }}</span>
@@ -39,7 +39,7 @@
                         </div>
                         <div class="col-md-6">
                             <dl class="row">
-                                <dt class="col-sm-6"><i class="fas fa-lock me-1"></i>Evento interno:</dt>
+                                <dt class="col-sm-6"><i class="fas fa-lock me-1 "></i>Evento interno:</dt>
                                 <dd class="col-sm-6">
                                     {% if evento.es_interno %}
                                         <span class="badge bg-info">Sí</span>
@@ -48,7 +48,7 @@
                                     {% endif %}
                                 </dd>
 
-                                <dt class="col-sm-6"><i class="fas fa-bell me-1"></i>Notificar:</dt>
+                                <dt class="col-sm-6"><i class="fas fa-bell me-1 "></i>Notificar:</dt>
                                 <dd class="col-sm-6">
                                     {% if evento.notificar %}
                                         <span class="badge bg-success">Sí</span>
@@ -62,7 +62,7 @@
 
                     {% if evento.descripcion %}
                     <hr>
-                    <h5><i class="fas fa-align-left me-1"></i>Descripción</h5>
+                    <h5><i class="fas fa-align-left me-1 "></i>Descripción</h5>
                     <p class="text-muted">{{ evento.descripcion }}</p>
                     {% endif %}
 
@@ -73,15 +73,15 @@
                     {% endif %}
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    <a href="{% url 'gestion_cofradia:lista_eventos' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i>Volver a la lista
+                    <a href="{% url 'gestion_cofradia:lista_eventos' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-1 "></i>Volver a la lista
                     </a>
                     <div>
-                        <a href="{% url 'gestion_cofradia:editar_evento' evento.id %}" class="btn btn-warning me-2">
-                            <i class="fas fa-edit"></i> Editar
+                        <a href="{% url 'gestion_cofradia:editar_evento' evento.id %}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit "></i> Editar
                         </a>
-                        <a href="{% url 'gestion_cofradia:eliminar_evento' evento.id %}" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Eliminar
+                        <a href="{% url 'gestion_cofradia:eliminar_evento' evento.id %}" class="btn btn-primary">
+                            <i class="fas fa-trash "></i> Eliminar
                         </a>
                     </div>
                 </div>

@@ -1,47 +1,98 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nueva Cuota{% endblock %}
+
 {% block content %}
-<div class="container">
-  <div class="card card-info mb-4 mx-auto" style="max-width: 500px;">
-    <div class="card-header">
-      <h2 class="mb-0"><i class="fa-solid fa-euro-sign"></i> Crear Cuota</h2>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fa-solid fa-euro-sign me-2"></i>Nueva Cuota
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <!-- Tipo -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-list me-1 "></i>Tipo
+                                </label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                    <div class="text-danger mt-1">{{ form.tipo.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Año -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-calendar me-1 "></i>Año
+                                </label>
+                                {{ form.anio }}
+                                {% if form.anio.errors %}
+                                    <div class="text-danger mt-1">{{ form.anio.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Importe -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-coins me-1 "></i>Importe
+                                </label>
+                                {{ form.importe }}
+                                {% if form.importe.errors %}
+                                    <div class="text-danger mt-1">{{ form.importe.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Fecha de Vencimiento -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-clock me-1 "></i>Fecha de Vencimiento
+                                </label>
+                                {{ form.fecha_vencimiento }}
+                                {% if form.fecha_vencimiento.errors %}
+                                    <div class="text-danger mt-1">{{ form.fecha_vencimiento.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Descripción -->
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-align-left me-1 "></i>Descripción
+                                </label>
+                                {{ form.descripcion }}
+                                {% if form.descripcion.errors %}
+                                    <div class="text-danger mt-1">{{ form.descripcion.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <!-- Activa (Checkbox) -->
+                            <div class="col-md-12 mb-3">
+                                <div class="form-check">
+                                    {{ form.activa }}
+                                    <label class="form-check-label" for="{{ form.activa.id_for_label }}">
+                                        <i class="fa-solid fa-toggle-on me-1 "></i>Activa
+                                    </label>
+                                </div>
+                                {% if form.activa.errors %}
+                                    <div class="text-danger mt-1">{{ form.activa.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-save me-1 "></i> Guardar
+                            </button>
+                            <a href="{% url 'gestion_cofradia:lista_cuotas' %}" class="btn btn-cancelar">
+                                <i class="fa-solid fa-arrow-left me-1 "></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-      <form method="post" autocomplete="off">
-        {% csrf_token %}
-        <div class="mb-3">
-          {{ form.tipo.label_tag }}
-          {{ form.tipo }}
-        </div>
-        <div class="mb-3">
-          {{ form.anio.label_tag }}
-          {{ form.anio }}
-        </div>
-        <div class="mb-3">
-          {{ form.importe.label_tag }}
-          {{ form.importe }}
-        </div>
-        <div class="mb-3">
-          {{ form.fecha_vencimiento.label_tag }}
-          {{ form.fecha_vencimiento }}
-        </div>
-        <div class="mb-3">
-          {{ form.descripcion.label_tag }}
-          {{ form.descripcion }}
-        </div>
-        <div class="form-check mb-4">
-          {{ form.activa }}
-          {{ form.activa.label_tag }}
-        </div>
-        <div class="d-flex gap-2 justify-content-end">
-          <button type="submit" class="btn btn-primary">
-            <i class="fa-solid fa-check"></i> Crear
-          </button>
-          <a href="{% url 'gestion_cofradia:lista_cuotas' %}" class="btn btn-primary">
-            <i class="fa-solid fa-arrow-left"></i> Cancelar
-          </a>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
 {% endblock %}
