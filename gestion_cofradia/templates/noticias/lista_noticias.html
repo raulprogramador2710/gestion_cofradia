@@ -11,6 +11,7 @@
       <table class="table table-striped mb-0">
         <thead>
           <tr>
+            <th>Imagen</th>
             <th>Título</th>
             <th>Fecha</th>
             <th>Público</th>
@@ -20,17 +21,37 @@
         <tbody>
           {% for noticia in noticias %}
           <tr>
+            <td>
+              {% if noticia.imagen %}
+                <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}" 
+                     class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
+              {% else %}
+                <span class="text-muted"><i class="fas fa-image"></i> Sin imagen</span>
+              {% endif %}
+            </td>
             <td>{{ noticia.titulo }}</td>
             <td>{{ noticia.fecha_publicacion|date:"d/m/Y" }}</td>
-            <td>{% if noticia.publico %}Sí{% else %}No{% endif %}</td>
-            <td class="acciones">
-              <a href="{% url 'gestion_cofradia:ver_noticia' noticia.id %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
-              <a href="{% url 'gestion_cofradia:editar_noticia' noticia.id %}" class="btn btn-sm btn-secondary"><i class="fas fa-edit"></i></a>
-              <a href="{% url 'gestion_cofradia:eliminar_noticia' noticia.id %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+            <td>
+              {% if noticia.publico %}
+                <span class="badge bg-success">Sí</span>
+              {% else %}
+                <span class="badge bg-secondary">No</span>
+              {% endif %}
+            </td>
+            <td class="acciones text-center">
+              <a href="{% url 'gestion_cofradia:ver_noticia' noticia.id %}" class="btn btn-sm btn-info" title="Ver">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'gestion_cofradia:editar_noticia' noticia.id %}" class="btn btn-sm btn-secondary" title="Editar">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a href="{% url 'gestion_cofradia:eliminar_noticia' noticia.id %}" class="btn btn-sm btn-danger" title="Eliminar">
+                <i class="fas fa-trash"></i>
+              </a>
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="4" class="text-center text-muted">No hay noticias registradas</td></tr>
+          <tr><td colspan="5" class="text-center text-muted">No hay noticias registradas</td></tr>
           {% endfor %}
         </tbody>
       </table>

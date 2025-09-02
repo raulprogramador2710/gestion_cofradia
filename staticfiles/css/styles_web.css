@@ -1,0 +1,343 @@
+/* =======================================================
+   VARIABLES GLOBALES
+   ======================================================= */
+:root {
+  --cofrade-black: #000;
+  --cofrade-gold: #d4af37;
+  --text-light: #f8f9fa;
+  --text-muted: #ccc;
+  --font-main: 'Segoe UI', Arial, sans-serif;
+}
+
+/* =======================================================
+   RESET BASE
+   ======================================================= */
+body {
+  font-family: var(--font-main);
+  color: #333;
+}
+
+/* =======================================================
+   HEADER Y NAVBAR
+   ======================================================= */
+header {
+  border-bottom: 2px solid var(--cofrade-gold);
+}
+
+.navbar {
+  background-color: var(--cofrade-black) !important;
+}
+
+.navbar-brand {
+  color: #fff !important;
+}
+
+.brand-text .brand-small {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+.brand-text .brand-strong {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--cofrade-gold);
+}
+
+/* Links */
+.navbar-nav .nav-link {
+  color: #fff !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+  color: var(--cofrade-gold) !important;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  background-color: #111;
+  border: 1px solid var(--cofrade-gold);
+}
+.dropdown-menu .dropdown-item {
+  color: #fff;
+}
+.dropdown-menu .dropdown-item:hover {
+  background-color: var(--cofrade-gold);
+  color: #000;
+  font-weight: 600;
+}
+
+/* Botón hamburguesa (toggle móvil) */
+.navbar-toggler {
+  border: 1px solid var(--cofrade-gold);
+}
+.navbar-light .navbar-toggler-icon,
+.navbar-dark .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(212, 175, 55, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* =======================================================
+   BOTONES GENÉRICOS
+   ======================================================= */
+.btn-main {
+  background-color: var(--cofrade-gold);
+  color: #000;
+  border: 2px solid var(--cofrade-gold);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-main:hover {
+  background-color: var(--cofrade-black);
+  color: #fff;
+  border-color: var(--cofrade-gold);
+}
+
+.btn-publica-outline {
+  background: transparent;
+  color: var(--cofrade-gold);
+  border: 2px solid var(--cofrade-gold);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-publica-outline:hover {
+  background-color: var(--cofrade-gold);
+  color: #000;
+}
+
+/* =======================================================
+   HERO / SECCIÓN INICIAL
+   ======================================================= */
+.hero-section {
+  background-color: var(--cofrade-black);
+  color: #fff;
+  text-align: center;
+  padding: 2rem 0;
+}
+.hero-section h1 {
+  font-weight: 700;
+  color: var(--cofrade-gold);
+}
+.hero-section p {
+  font-size: 1.1rem;
+}
+
+/* =======================================================
+   SECCIONES DESTACADAS (GENÉRICAS)
+   ======================================================= */
+.section-publica {
+  padding: 3rem 0;
+}
+.section-publica h3 {
+  font-weight: 600;
+  margin-top: 1rem;
+}
+.text-cofrade-gold {
+  color: var(--cofrade-gold);
+}
+.section-publica i {
+  color: var(--cofrade-gold);
+}
+
+/* =======================================================
+   SECCIÓN VIDEO + BOTONES
+   ======================================================= */
+.video-wrapper {
+  border: 0px solid var(--cofrade-gold);
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 16/9;   /* define altura base */
+  flex: 1;
+}
+.video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.overlay-btn {
+  position: relative;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.overlay-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.overlay-btn:hover img {
+  transform: scale(1.05);
+}
+.overlay-btn .overlay-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+  color: var(--cofrade-gold);
+  background: rgba(0,0,0,0.4);
+  transition: background 0.3s ease;
+}
+.overlay-btn:hover .overlay-text {
+  background: rgba(0,0,0,0.6);
+}
+
+/* =======================================================
+   NOTICIAS Y AGENDA
+   ======================================================= */
+.agenda-wrapper {
+  border: 0px solid var(--cofrade-gold);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 1; /* extiende altura */
+  display: flex;
+}
+
+.noticia-grid-card {
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.noticia-grid-card img {
+  object-fit: cover;
+  height: 160px;
+  width: 100%;
+}
+
+/* Calendario */
+.agenda-calendar {
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: var(--font-main);
+  flex: 1;
+}
+.agenda-calendar th[colspan="7"] {
+  background: var(--cofrade-gold);
+  color: #000;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+.agenda-calendar th {
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  background: #222;
+  color: #fff;
+  border: none;
+}
+.agenda-calendar td {
+  border: 1px solid #eee;
+  width: 14.2%;
+  height: 110px;
+  vertical-align: top;
+  padding: 6px;
+  transition: background 0.2s, transform 0.15s;
+  position: relative;
+}
+.agenda-calendar td:hover {
+  background: #faf8f0;
+  transform: scale(1.02);
+  z-index: 2;
+}
+.agenda-calendar .day-number {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.agenda-calendar .today .day-number {
+  background: var(--cofrade-gold);
+  color: #000;
+  box-shadow: 0 0 5px rgba(0,0,0,0.25);
+}
+.agenda-calendar .other-month {
+  background: #f9f9f9;
+  color: #bbb;
+}
+.agenda-calendar .event-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+}
+.agenda-calendar .event-list li {
+  font-size: 0.75rem;
+  margin-bottom: 3px;
+  padding: 2px 4px;
+  border-left: 3px solid var(--cofrade-gold);
+  background: #fff9e8;
+  border-radius: 3px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.agenda-calendar .event-list li:hover {
+  background: var(--cofrade-gold);
+  color: #000;
+}
+@media (max-width: 768px) {
+  .agenda-calendar td {
+    height: 80px;
+    font-size: 0.7rem;
+  }
+  .agenda-calendar .day-number {
+    font-size: 0.75rem;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+  }
+}
+
+/* =======================================================
+   FOOTER
+   ======================================================= */
+.footer-expiracion {
+  background-color: var(--cofrade-black);
+  border-top: 3px solid var(--cofrade-gold);
+  padding: 2rem 0;
+}
+.footer-expiracion h5 {
+  color: #fff;
+  font-weight: 600;
+}
+.footer-expiracion p {
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+.footer-expiracion a {
+  color: #fff;
+  transition: color 0.2s ease;
+}
+.footer-expiracion a:hover {
+  color: var(--cofrade-gold);
+}
+.footer-expiracion .social-icon {
+  font-size: 1.8rem;
+  margin: 0 0.6rem;
+  color: #fff;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.footer-expiracion .social-icon:hover {
+  color: var(--cofrade-gold);
+  transform: translateY(-2px);
+}

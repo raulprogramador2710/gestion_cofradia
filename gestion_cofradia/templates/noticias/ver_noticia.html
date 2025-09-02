@@ -1,18 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Ver Noticia{% endblock %}
+{% block title %}{{ noticia.titulo }}{% endblock %}
+
 {% block content %}
-<div class="container">
-  <h1>{{ noticia.titulo }}</h1>
-  <p><strong>Fecha:</strong> {{ noticia.fecha_publicacion|date:"d/m/Y" }}</p>
-  <p><strong>Público:</strong> {% if noticia.publico %}Sí{% else %}No{% endif %}</p>
+<div class="container mt-4">
+
+  <!-- Título -->
+  <h1 class="mb-3">{{ noticia.titulo }}</h1>
+
+  <!-- Meta info -->
+  <p class="text-muted">
+    <i class="fas fa-calendar-alt"></i> {{ noticia.fecha_publicacion|date:"d/m/Y" }}
+    &nbsp; | &nbsp;
+    {% if noticia.publico %}
+      <span class="badge bg-success"><i class="fas fa-globe"></i> Público</span>
+    {% else %}
+      <span class="badge bg-secondary"><i class="fas fa-lock"></i> Privado</span>
+    {% endif %}
+  </p>
+
+  <!-- Imagen destacada -->
   {% if noticia.imagen %}
-    <img src="{{ noticia.imagen.url }}" class="img-fluid mb-3 rounded">
+    <div class="mb-4 text-center">
+      <img src="{{ noticia.imagen.url }}" 
+           alt="{{ noticia.titulo }}" 
+           class="img-fluid rounded shadow">
+    </div>
   {% endif %}
-  <div class="card">
+
+  <!-- Contenido -->
+  <div class="card shadow-sm mb-4">
     <div class="card-body">
       {{ noticia.cuerpo|linebreaks }}
     </div>
   </div>
-  <a href="{% url 'gestion_cofradia:lista_noticias' %}" class="btn btn-cancelar mt-3">Volver</a>
+
+  <!-- Botón volver -->
+  <a href="{% url 'gestion_cofradia:lista_noticias' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+  </a>
+
 </div>
 {% endblock %}

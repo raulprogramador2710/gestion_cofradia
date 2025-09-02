@@ -1,17 +1,41 @@
 {% extends "base.html" %}
 {% block title %}Eliminar Noticia{% endblock %}
+
 {% block content %}
-<div class="container">
-  <h1>Eliminar Noticia</h1>
-  <div class="card">
+<div class="container mt-4">
+
+  <h1 class="text-danger"><i class="fas fa-trash"></i> Eliminar Noticia</h1>
+
+  <div class="card shadow-sm mt-3">
     <div class="card-body text-center">
-      <p>¿Seguro que deseas eliminar la noticia <strong>{{ noticia.titulo }}</strong>?</p>
-      <form method="post">
+
+      <!-- Texto de confirmación -->
+      <p class="mb-4">
+        ¿Seguro que deseas eliminar la noticia 
+        <strong>"{{ noticia.titulo }}"</strong>?
+      </p>
+
+      <!-- Si hay imagen, mostrar miniatura -->
+      {% if noticia.imagen %}
+        <div class="mb-4">
+          <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}" 
+               class="img-thumbnail shadow-sm" style="max-height: 120px;">
+          <p class="text-muted mt-2">(Esta imagen también será eliminada)</p>
+        </div>
+      {% endif %}
+
+      <!-- Botones -->
+      <form method="post" class="d-inline">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Sí, eliminar</button>
-        <a href="{% url 'gestion_cofradia:lista_noticias' %}" class="btn btn-cancelar">Cancelar</a>
+        <button type="submit" class="btn btn-danger me-2">
+          <i class="fas fa-trash"></i> Sí, eliminar
+        </button>
       </form>
+      <a href="{% url 'gestion_cofradia:lista_noticias' %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Cancelar
+      </a>
     </div>
   </div>
+
 </div>
 {% endblock %}

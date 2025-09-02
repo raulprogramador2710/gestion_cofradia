@@ -1,15 +1,43 @@
 {% extends "base.html" %}
 {% block title %}Nueva Noticia{% endblock %}
+
 {% block content %}
-<div class="container">
-  <h1>Nueva Noticia</h1>
-  <div class="card">
+<div class="container mt-4">
+  <h1><i class="fas fa-plus"></i> Nueva Noticia</h1>
+
+  <div class="card shadow-sm mt-3">
     <div class="card-body">
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Crear</button>
-        <a href="{% url 'gestion_cofradia:lista_noticias' %}" class="btn btn-cancelar">Cancelar</a>
+        
+        <div class="mb-3">
+          <label for="id_titulo" class="form-label">Título</label>
+          {{ form.titulo }}
+        </div>
+        
+        <div class="mb-3">
+          <label for="id_cuerpo" class="form-label">Cuerpo</label>
+          {{ form.cuerpo }}
+        </div>
+        
+        <div class="mb-3">
+          <label for="id_imagen" class="form-label">Imagen</label>
+          {{ form.imagen }}
+        </div>
+        
+        <div class="form-check mb-3">
+          {{ form.publico }}
+          <label for="id_publico" class="form-check-label">Visible en web pública</label>
+        </div>
+        
+        <div class="mt-4">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Crear Noticia
+          </button>
+          <a href="{% url 'gestion_cofradia:lista_noticias' %}" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Cancelar
+          </a>
+        </div>
       </form>
     </div>
   </div>
