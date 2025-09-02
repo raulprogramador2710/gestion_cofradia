@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}Cofradía de la Expiración - Adra{% endblock %}</title>
+
+  <!-- Bootstrap + Icons -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="{% static 'css/styles_web.css' %}">
+</head>
+<body>
+
+  {% url 'web_publica:inicio' as url_inicio %}
+  {% url 'web_publica:noticias' as url_noticias %}
+  {% url 'web_publica:historia_cofradia' as url_historia_cofradia %}
+  {% url 'web_publica:titular_cristo' as url_titular_cristo %}
+  {% url 'web_publica:titular_virgen' as url_titular_virgen %}
+  {% url 'portal_hermano:login' as url_inicio_portal %}
+
+  <!-- HEADER -->
+  <header class="shadow-sm sticky-top bg-white">
+    <nav class="navbar navbar-expand-lg navbar-light container-fluid">
+      <!-- Logo + Nombre -->
+      <a class="navbar-brand d-flex align-items-center" href="{{ url_inicio }}">
+        <img src="{% static 'img/public/logo_cofradia.png' %}" alt="Logo" class="brand-logo mr-2" style="height:50px; width:50px;">
+        <div class="brand-text">
+          <div class="brand-line brand-small">Cofradía de la</div>
+          <div class="brand-line brand-strong">Expiración</div>
+          <div class="brand-line brand-small">Adra</div>
+        </div>
+      </a>
+
+      <!-- Botón móvil -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
+              aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Menú -->
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ml-auto align-items-lg-center">
+
+          <li class="nav-item"><a href="{{ url_inicio }}" class="nav-link">Inicio</a></li>
+
+          <li class="nav-item"><a href="{{ url_noticias }}" class="nav-link">Noticias</a></li>
+
+          <!-- Hermandad con submenú -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="hermandadDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Hermandad
+            </a>
+            <div class="dropdown-menu" aria-labelledby="hermandadDropdown">
+              <a class="dropdown-item" href="{{ url_historia_cofradia }}">Historia de la Cofradía</a>
+              <a class="dropdown-item" href="#">Reglas de la Hermandad</a>
+            </div>
+          </li>
+
+          <!-- Titulares con submenú -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="titularesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Titulares
+            </a>
+            <div class="dropdown-menu" aria-labelledby="titularesDropdown">
+              <a class="dropdown-item" href="{{ url_titular_cristo }}">Cristo de la Expiración, Señor de las Penas</a>
+              <a class="dropdown-item" href="{{ url_titular_virgen }}">María Santísima de los Dolores</a>
+            </div>
+          </li>
+
+          <li class="nav-item"><a href="#" class="nav-link">Contacto</a></li>
+
+          <!-- Botón Acceso Hermanos -->
+          <li class="nav-item ml-lg-3">
+            <a href="{{url_inicio_portal}}" class="btn btn-main">
+              <i class="fas fa-user-lock mr-1"></i> Acceso Hermanos
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- CONTENIDO -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-expiracion text-white">
+    <div class="container py-5">
+
+      <!-- Conecta con redes -->
+      <div class="text-center mb-4">
+        <h3 class="mb-3 text-cofrade-gold">¡Conéctate a nuestras redes sociales!</h3>
+        <div class="d-flex justify-content-center gap-4">
+          <a href="{{ cofradia.facebook|default:'https://www.facebook.com/ExpiracionyDoloresAdra/?locale=es_ES' }}" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>
+          <a href="{{ cofradia.instagram|default:'https://www.instagram.com/cofradiaexpiracionadra/' }}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+
+      <!-- Bloques de info -->
+      <div class="row text-center mb-4">
+        <div class="col-md-4 mb-3">
+          <i class="fas fa-church fa-2x text-cofrade-gold mb-2"></i>
+          <h5 class="mb-1">Parroquia</h5>
+          <p class="mb-0">Parroquia Inmaculada Concepción<br>Adra (Almería)</p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <i class="fas fa-home fa-2x text-cofrade-gold mb-2"></i>
+          <h5 class="mb-1">Casa Hermandad</h5>
+          <p class="mb-0">Calle San Sebastián 14 <br>Adra (Almería)</p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <i class="fas fa-phone fa-2x text-cofrade-gold mb-2"></i>
+          <h5 class="mb-1">Secretaría</h5>
+          <p class="mb-0">722521995</p>
+        </div>
+      </div>
+
+      <!-- Legal -->
+      <div class="row text-center">
+        <div class="col-12">
+          <p class="mb-1">&copy; {% now "Y" %} Cofradía de la Expiración - Adra</p>
+          <p class="small">
+            <a href="{% url 'web_publica:inicio' %}" class="text-white">Aviso legal</a> | 
+            <a href="#" class="text-white">Política de Cookies</a> | 
+            <a href="#" class="text-white">Política de Privacidad</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

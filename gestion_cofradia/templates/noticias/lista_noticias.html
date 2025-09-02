@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Noticias{% endblock %}
+{% block content %}
+<div class="container">
+  <h1><i class="fas fa-newspaper"></i> Noticias</h1>
+  <a href="{% url 'gestion_cofradia:crear_noticia' %}" class="btn btn-primary mb-3">
+    <i class="fas fa-plus"></i> Nueva Noticia
+  </a>
+  <div class="card">
+    <div class="card-body p-0">
+      <table class="table table-striped mb-0">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Fecha</th>
+            <th>Público</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for noticia in noticias %}
+          <tr>
+            <td>{{ noticia.titulo }}</td>
+            <td>{{ noticia.fecha_publicacion|date:"d/m/Y" }}</td>
+            <td>{% if noticia.publico %}Sí{% else %}No{% endif %}</td>
+            <td class="acciones">
+              <a href="{% url 'gestion_cofradia:ver_noticia' noticia.id %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'gestion_cofradia:editar_noticia' noticia.id %}" class="btn btn-sm btn-secondary"><i class="fas fa-edit"></i></a>
+              <a href="{% url 'gestion_cofradia:eliminar_noticia' noticia.id %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-center text-muted">No hay noticias registradas</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

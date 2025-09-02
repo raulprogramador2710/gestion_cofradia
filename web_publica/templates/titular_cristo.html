@@ -1,0 +1,73 @@
+{% extends "base_web.html" %}
+{% load static %}
+
+{% block content %}
+<main id="content" class="site-main page-titular">
+
+  <!-- Cabecera -->
+  <div class="page-header text-center py-4">
+    <h1 class="entry-title">Santísimo Cristo de la Expiración</h1>
+  </div>
+
+  <!-- Imagen destacada -->
+  <section class="titular-hero mb-4">
+    <div class="container text-center">
+      <img src="{% static 'img/cristo-expiracion.jpg' %}" 
+           alt="Santísimo Cristo de la Expiración de Adra"
+           class="img-fluid rounded shadow">
+    </div>
+  </section>
+
+  <!-- Origen y autor -->
+  <section class="titular-section py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-7">
+          <h2 class="mb-3">Obra de Alonso de Mena (1623)</h2>
+          <p>
+            El <strong>Santísimo Cristo de la Expiración</strong> fue tallado en <strong>1623</strong> 
+            por el escultor granadino <strong>Alonso de Mena</strong>, uno de los grandes del barroco andaluz. 
+            La talla representa a Cristo expirando en la cruz, con realismo, serenidad y profunda espiritualidad.
+          </p>
+          <p>
+            Su antigüedad y su valor artístico lo convierten en una de las <strong>imágenes sacras más antiguas</strong> 
+            de la provincia de Almería, y en un auténtico tesoro del patrimonio abderitano.
+          </p>
+        </div>
+        <div class="col-md-5 text-center">
+          <img src="{% static 'img/alonsodemena.jpg' %}" 
+               alt="Escultor Alonso de Mena"
+               class="img-fluid rounded shadow-sm">
+          <small class="d-block text-muted mt-2">Alonso de Mena (Granada, 1587-1646)</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Procesión -->
+  <section class="titular-section bg-light py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 order-md-2 text-center">
+          <img src="{% static 'img/procesion-cristo.jpg' %}" 
+               alt="Procesión del Santísimo Cristo de la Expiración" 
+               class="img-fluid rounded shadow-sm">
+        </div>
+        <div class="col-md-6 order-md-1">
+          <h2 class="mb-3">Procesión en solitario</h2>
+          <p>
+            Cada <strong>Viernes Santo</strong>, el Cristo procesiona en solitario,
+            acompañado por un cortejo de nazarenos de túnica y capirote,
+            en un recorrido marcado por el silencio, la solemnidad y la devoción.
+          </p>
+          <p>
+            Su paso sobrio, iluminado por la luz de los cirios y acompañado por música de capilla,
+            constituye uno de los momentos más intensos y esperados de la Semana Santa de Adra.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+{% endblock %}

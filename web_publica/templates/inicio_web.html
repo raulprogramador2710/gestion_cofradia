@@ -1,0 +1,151 @@
+{% extends "base_web.html" %}
+{% load static %}
+
+{% block title %}Inicio - {% firstof cofradia.nombre "Hermandad de la Expiración" %}{% endblock %}
+
+{% block content %}
+<main>
+
+  <!-- SECCIÓN INICIAL: VÍDEO + BOTONES -->
+  <section class="py-5 bg-black text-white">
+    <div class="container">
+      <div class="row align-items-stretch">
+        
+        <!-- VIDEO -->
+        <div class="col-lg-8 mb-4 mb-lg-0 d-flex">
+          <div class="video-wrapper shadow rounded flex-fill">
+            <video autoplay muted loop playsinline class="w-100 h-100 object-fit-cover rounded">
+              <source src="{% static 'videos/video-inicio.mp4' %}" type="video/mp4">
+              Tu navegador no soporta video.
+            </video>
+          </div>
+        </div>
+        
+        <!-- BOTONES (se adaptan a la altura del vídeo) -->
+        <div class="col-lg-4 d-flex flex-column gap-3">
+          
+          <!-- EVANGELIO -->
+          <a href="https://www.dominicos.org/predicacion/evangelio-del-dia/hoy/lecturas/"
+            target="_blank" class="overlay-btn shadow rounded flex-fill">
+            <img src="{% static 'img/public/evangelio.jpg' %}" 
+                alt="Evangelio del día" 
+                class="w-100 h-100 object-fit-cover rounded">
+            <div class="overlay-text">EVANGELIO DEL DÍA</div>
+          </a>
+
+          <!-- HAZTE HERMANO -->
+          <a href="{% url 'web_publica:hazte_hermano' %}"
+            class="overlay-btn shadow rounded flex-fill">
+            <img src="{% static 'img/public/hazte_hermano.jpg' %}" 
+                alt="Hazte Hermano" 
+                class="w-100 h-100 object-fit-cover rounded">
+            <div class="overlay-text">HAZTE HERMANO</div>
+          </a>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN NOTICIAS + AGENDA -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="row align-items-stretch">
+        
+        <!-- NOTICIAS -->
+        <div class="col-lg-6 mb-4 mb-lg-0 d-flex flex-column">
+          <h3 class="text-cofrade-gold mb-4">
+            <i class="fas fa-newspaper mr-2"></i>Últimas Noticias
+          </h3>
+
+          <div class="row flex-fill">
+            {% for noticia in noticias %}
+            <div class="col-md-4 mb-4 d-flex">
+              <article class="noticia-grid-card shadow-sm flex-fill d-flex flex-column">
+                
+                <!-- Imagen -->
+                <a href="{{ noticia.get_absolute_url }}" class="noticia-thumb">
+                  {% if noticia.imagen %}
+                    <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}" class="w-100 h-100 object-fit-cover rounded-top">
+                  {% else %}
+                    <img src="{% static 'img/public/placeholder.jpg' %}" alt="Sin imagen" class="w-100 h-100 object-fit-cover rounded-top">
+                  {% endif %}
+                </a>
+
+                <!-- Texto -->
+                <div class="noticia-body p-3 flex-grow-1 d-flex flex-column">
+                  <span class="badge badge-warning text-dark mb-2">Noticias</span>
+                  <h5 class="noticia-title mb-2">
+                    <a href="{{ noticia.get_absolute_url }}">{{ noticia.titulo }}</a>
+                  </h5>
+                  <div class="noticia-excerpt mb-2">
+                    <p>{{ noticia.cuerpo|truncatewords:15 }}</p>
+                  </div>
+                  <div class="mt-auto">
+                    <a href="{{ noticia.get_absolute_url }}" class="noticia-readmore">Leer más »</a>
+                  </div>
+                </div>
+
+                <!-- Fecha -->
+                <div class="noticia-meta p-2 border-top text-muted small">
+                  {{ noticia.fecha_publicacion|date:"d \d\e F \d\e Y" }}
+                </div>
+              </article>
+            </div>
+            {% empty %}
+              <div class="col-12"><p>No hay noticias disponibles.</p></div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- AGENDA / CALENDARIO -->
+        <div class="col-lg-6 d-flex flex-column">
+          <h3 class="text-cofrade-gold mb-3">
+            <i class="fas fa-calendar-alt mr-2"></i>Agenda
+          </h3>
+
+          <div class="agenda-wrapper shadow rounded flex-fill">
+            <table class="agenda-calendar w-100 h-100">
+              <thead>
+                <tr>
+                  <th colspan="7" class="text-center py-2 text-cofrade-gold">
+                    {% load l10n %}
+                    {{ month|date:"F" }} {{ year }}
+                  </th>
+                </tr>
+                <tr class="bg-dark text-light">
+                  <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for week in weeks %}
+                <tr>
+                  {% for day_data in week %}
+                  <td class="day-cell {% if not day_data.is_current_month %}other-month{% endif %} {% if day_data.is_today %}today{% endif %}">
+                    <span class="day-number">{{ day_data.day_number }}</span>
+                    
+                    {% if day_data.eventos %}
+                    <ul class="event-list">
+                      {% for ev in day_data.eventos %}
+                      <li title="{{ ev.nombre }} - {{ ev.fecha|date:'H:i' }}{% if ev.lugar %} en {{ ev.lugar }}{% endif %}">
+                        <span class="event-dot">•</span> {{ ev.nombre|truncatechars:15 }}
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    {% endif %}
+                  </td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+{% endblock %}

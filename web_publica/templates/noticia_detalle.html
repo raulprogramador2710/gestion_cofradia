@@ -1,0 +1,46 @@
+{% extends "base_web.html" %}
+{% load static %}
+
+{% block title %}{{ noticia.titulo }} - Noticias{% endblock %}
+
+{% block content %}
+<main class="site-main py-5">
+
+  <!-- IMAGEN DESTACADA -->
+  {% if noticia.imagen %}
+  <section class="mb-4 text-center">
+    <img src="{{ noticia.imagen.url }}"
+         alt="{{ noticia.titulo }}"
+         class="img-fluid shadow rounded">
+  </section>
+  {% endif %}
+
+  <!-- TÍTULO + FECHA -->
+  <section class="mb-5 text-center">
+    <div class="container">
+      <h1 class="mb-3 text-cofrade-gold">{{ noticia.titulo }}</h1>
+      <p class="text-muted">
+        <i class="far fa-calendar-alt"></i>
+        Publicado el {{ noticia.fecha_publicacion|date:"d \d\e F \d\e Y" }}
+      </p>
+    </div>
+  </section>
+
+  <!-- CUERPO DE LA NOTICIA -->
+  <section>
+    <div class="container">
+      <div class="contenido-noticia">
+        {{ noticia.cuerpo|linebreaks }}
+      </div>
+
+      <!-- BOTÓN VOLVER -->
+      <div class="mt-4">
+        <a href="{% url 'web_publica:noticias' %}" class="btn btn-publica-outline">
+          ← Volver a noticias
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+{% endblock %}

@@ -4,6 +4,8 @@ class MultiLoginMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self.public_paths = [
+            # web pública
+            '/web/',
             # gestión cofradía
             '/gestioncofradia/login/',
             '/gestioncofradia/password_reset/',
@@ -23,6 +25,11 @@ class MultiLoginMiddleware:
     def __call__(self, request):
         if not request.user.is_authenticated:
             path = request.path_info
+            
+            # Permitir toda la web pública
+            if path.startswith('/web'):
+                return self.get_response(request)
+                
             if path not in self.public_paths:
                 if path.startswith('/admin'):
                     return redirect('admin:login')

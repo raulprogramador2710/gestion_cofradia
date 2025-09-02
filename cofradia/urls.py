@@ -24,4 +24,5 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),  # Incluye las URLs de autenticación de Django
     path('gestioncofradia/', include('gestion_cofradia.urls')),  # Incluye las URLs de tu app
     path('portalhermano/', include('portal_hermano.urls')),
+    path('web/', include('web_publica.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

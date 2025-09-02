@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Nueva Noticia{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Nueva Noticia</h1>
+  <div class="card">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Crear</button>
+        <a href="{% url 'gestion_cofradia:lista_noticias' %}" class="btn btn-cancelar">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

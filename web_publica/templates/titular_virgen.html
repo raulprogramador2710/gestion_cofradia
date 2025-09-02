@@ -1,0 +1,76 @@
+{% extends "base_web.html" %}
+{% load static %}
+
+{% block content %}
+<main id="content" class="site-main page-titular">
+
+  <!-- Cabecera -->
+  <div class="page-header text-center py-4">
+    <h1 class="entry-title">María Santísima de los Dolores</h1>
+  </div>
+
+  <!-- Imagen destacada -->
+  <section class="titular-hero mb-4">
+    <div class="container text-center">
+      <img src="{% static 'img/virgen-dolores.jpg' %}" 
+           alt="María Santísima de los Dolores de Adra"
+           class="img-fluid rounded shadow">
+    </div>
+  </section>
+
+  <!-- Origen y autor -->
+  <section class="titular-section py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-7">
+          <h2 class="mb-3">La Dolorosa granadina (1772)</h2>
+          <p>
+            La imagen de <strong>María Santísima de los Dolores</strong> fue realizada en <strong>1772</strong>
+            en un taller granadino, de autor anónimo. 
+            Su belleza serena y su expresión de dolor materno la han convertido en una de las 
+            devociones más queridas de Adra.
+          </p>
+          <p>
+            Esta Dolorosa transmite compasión y ternura, recogiendo en su rostro el sufrimiento
+            de la Madre al pie de la Cruz. Su rostro dulce y a la vez sobrecogedor ha guiado
+            la oración de los abderitanos durante más de dos siglos.
+          </p>
+        </div>
+        <div class="col-md-5 text-center">
+          <img src="{% static 'img/dolorosa-detalle.jpg' %}" 
+               alt="Detalle de María Santísima de los Dolores"
+               class="img-fluid rounded shadow-sm">
+          <small class="d-block text-muted mt-2">Detalle de la dolorosa granadina</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Procesión -->
+  <section class="titular-section bg-light py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center">
+          <img src="{% static 'img/procesion-virgen.jpg' %}" 
+               alt="Procesión de María Santísima de los Dolores"
+               class="img-fluid rounded shadow-sm">
+        </div>
+        <div class="col-md-6">
+          <h2 class="mb-3">Procesión bajo palio</h2>
+          <p>
+            Cada <strong>Viernes Santo</strong>, la Virgen de los Dolores procesiona bajo palio,
+            vestida de luto, rodeada por un mar de cirios encendidos y flores blancas.
+          </p>
+          <p>
+            La acompañan un cortejo de nazarenos de hábito blanco y capirote negro,
+            junto a mujeres vestidas de mantilla. 
+            Su paso, cargado de solemnidad y belleza, es uno de los momentos más esperados 
+            de la Semana Santa abderitana.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+{% endblock %}

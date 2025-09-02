@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 
-from gestion_cofradia.models import Cofradia, Hermano, Perfil, Tarea, Evento, Notificacion, Documento
-from datetime import datetime, timedelta
+from gestion_cofradia.models import Hermano, Perfil, Tarea, Evento, Notificacion, Documento
+from datetime import datetime
 
 import logging
 
@@ -16,69 +16,52 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('portal_hermano:dashboard')
 
-    cofradias = Cofradia.objects.all()
     username = ''
 
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        cofradia_id = request.POST.get('cofradia')
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            try:
-                cofradia = Cofradia.objects.get(pk=cofradia_id)
-            except Cofradia.DoesNotExist:
-                messages.error(request, 'Cofradía seleccionada no válida.')
-                return render(request, 'login_portal.html', {'cofradias': cofradias, 'username': username})
-
-            if not Perfil.objects.filter(user=user, cofradia=cofradia).exists():
-                messages.error(request, 'No tienes acceso a la cofradía seleccionada.')
-                return render(request, 'login_portal.html', {'cofradias': cofradias, 'username': username})
+            # Solo comprobamos que tenga perfil
+            if not Perfil.objects.filter(user=user).exists():
+                messages.error(request, 'No tienes acceso al portal.')
+                return render(request, 'login_portal.html', {'username': username})
 
             login(request, user)
-            request.session['cofradia_id'] = cofradia.id
             return redirect('portal_hermano:dashboard')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
 
-    return render(request, 'login_portal.html', {'cofradias': cofradias, 'username': username})
+    return render(request, 'login_portal.html', {'username': username})
 
 @login_required
 def logout_view(request):
     logger.info(f"Usuario {request.user} (ID: {request.user.id}) cerrando sesión.")
     logout(request)
-    request.session.pop('cofradia_id', None)
     return redirect('portal_hermano:login')
 
-def get_perfil_y_cofradia(request):
-    cofradia_id = request.session.get('cofradia_id')
-    if not cofradia_id:
-        return None, None
-    cofradia = get_object_or_404(Cofradia, pk=cofradia_id)
+def get_perfil(request):
     try:
-        perfil = Perfil.objects.get(user=request.user, cofradia=cofradia)
+        return Perfil.objects.get(user=request.user)
     except Perfil.DoesNotExist:
-        return None, cofradia
-    return perfil, cofradia
-
-def get_hermano_por_perfil(perfil):
-    if not perfil:
         return None
+
+def get_hermano(request):
     try:
-        hermano = Hermano.objects.get(user=perfil.user, cofradia=perfil.cofradia)
+        return Hermano.objects.get(user=request.user)
     except Hermano.DoesNotExist:
-        hermano = None
-    return hermano
+        return None
 
 @login_required
 def dashboard(request):
-    perfil, cofradia = get_perfil_y_cofradia(request)
+    perfil = get_perfil(request)
     if perfil is None:
-        messages.error(request, "No tienes acceso a la cofradía seleccionada o no estás vinculado a ningún perfil.")
+        messages.error(request, "No tienes acceso al portal.")
         return redirect('portal_hermano:error_no_hermano')
 
-    hermano = get_hermano_por_perfil(perfil)
+    hermano = get_hermano(request)
 
     nombre = hermano.nombre if hermano else ''
     apellidos = hermano.apellidos if hermano else ''
@@ -88,7 +71,7 @@ def dashboard(request):
     total_tareas = tareas.count()
 
     hoy = datetime.now().date()
-    eventos = Evento.objects.filter(cofradia=cofradia, fecha__gte=hoy).order_by('fecha')[:5]
+    eventos = Evento.objects.filter(fecha__gte=hoy).order_by('fecha')[:5]
     total_eventos = eventos.count()
 
     notificaciones = Notificacion.objects.filter(destinatario=request.user).order_by('-fecha_envio')[:5]
@@ -101,7 +84,6 @@ def dashboard(request):
         'nombre': nombre,
         'apellidos': apellidos,
         'num_hermano': num_hermano,
-        'cofradia': cofradia,
         'hermano': hermano,
         'perfil': perfil,
         'tareas': tareas,
@@ -121,92 +103,55 @@ def error_no_hermano(request):
 
 @login_required
 def datos_personales(request):
-    perfil, _ = get_perfil_y_cofradia(request)
-    hermano = get_hermano_por_perfil(perfil)
+    hermano = get_hermano(request)
     if hermano is None:
         return redirect('portal_hermano:error_no_hermano')
     return render(request, 'ver_datos_personales.html', {'hermano': hermano})
 
 @login_required
 def ver_tareas(request):
-    perfil, _ = get_perfil_y_cofradia(request)
-    if perfil is None:
-        messages.error(request, "No tienes acceso a la cofradía seleccionada.")
-        return redirect('portal_hermano:error_no_hermano')
-
     tareas_qs = Tarea.objects.filter(
         responsable=request.user,
         estado__in=['pendiente', 'en_progreso']
     ).order_by('fecha_limite')
 
     paginator = Paginator(tareas_qs, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginator.get_page(request.GET.get('page'))
 
-    context = {
-        'tareas': page_obj,
-    }
-    return render(request, 'ver_tareas.html', context)
+    return render(request, 'ver_tareas.html', {'tareas': page_obj})
 
 @login_required
 def ver_eventos(request):
-    perfil, cofradia = get_perfil_y_cofradia(request)
-    if perfil is None or cofradia is None:
-        messages.error(request, "No tienes acceso a la cofradía seleccionada.")
-        return redirect('portal_hermano:error_no_hermano')
-
     hoy = datetime.now().date()
-    eventos_qs = Evento.objects.filter(
-        cofradia=cofradia,
-        fecha__gte=hoy
-    ).order_by('fecha')
+    eventos_qs = Evento.objects.filter(fecha__gte=hoy).order_by('fecha')
 
     paginator = Paginator(eventos_qs, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginator.get_page(request.GET.get('page'))
 
-    context = {
-        'eventos': page_obj,
-    }
-    return render(request, 'ver_eventos.html', context)
+    return render(request, 'ver_eventos.html', {'eventos': page_obj})
 
 @login_required
 def ver_notificaciones(request):
-    perfil, _ = get_perfil_y_cofradia(request)
-    hermano = get_hermano_por_perfil(perfil)
-    if hermano is None:
-        return redirect('portal_hermano:error_no_hermano')
-
     notificaciones = Notificacion.objects.filter(destinatario=request.user).order_by('-fecha_envio')
-
     return render(request, 'ver_notificaciones.html', {'notificaciones': notificaciones})
 
 @login_required
 def ver_cuotas(request):
-    perfil, _ = get_perfil_y_cofradia(request)
-    hermano = get_hermano_por_perfil(perfil)
+    hermano = get_hermano(request)
     if hermano is None:
         return redirect('portal_hermano:error_no_hermano')
 
-    cuotas_pendientes = hermano.cuotas_pendientes()  # Asumiendo que devuelve queryset o lista
-
+    cuotas_pendientes = hermano.cuotas_pendientes()
     return render(request, 'ver_cuotas.html', {'cuotas_pendientes': cuotas_pendientes})
 
 @login_required
 def ver_documentos(request):
-    perfil, cofradia = get_perfil_y_cofradia(request)
-    hermano = get_hermano_por_perfil(perfil)
-    if hermano is None or cofradia is None:
-        return redirect('portal_hermano:error_no_hermano')
-
-    documentos_publicos = Documento.objects.filter(cofradia=cofradia, visibilidad=Documento.PUBLICO)
-
+    documentos_publicos = Documento.objects.filter(visibilidad=Documento.PUBLICO)
     return render(request, 'ver_documentos.html', {'documentos': documentos_publicos})
 
 @login_required
 def cambiar_password(request):
-    perfil, _ = get_perfil_y_cofradia(request)
-    hermano = get_hermano_por_perfil(perfil)
+    hermano = get_hermano(request)
     if hermano is None:
         return redirect('portal_hermano:error_no_hermano')
 
@@ -214,7 +159,6 @@ def cambiar_password(request):
         form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            # Actualiza la sesión para que no se cierre sesión automáticamente
             update_session_auth_hash(request, user)
             messages.success(request, 'Tu contraseña ha sido cambiada correctamente.')
             return redirect('portal_hermano:dashboard')

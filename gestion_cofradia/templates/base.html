@@ -22,6 +22,7 @@
   {% url 'gestion_cofradia:lista_documentos' as url_documentos %}
   {% url 'gestion_cofradia:lista_enseres' as url_enseres %}
   {% url 'gestion_cofradia:lista_alquileres' as url_alquileres %}
+  {% url 'gestion_cofradia:lista_noticias' as url_noticias %}
   {% url 'gestion_cofradia:logout' as url_logout %}
 
   <!-- HEADER PC -->
@@ -111,6 +112,14 @@
             </a>
           </li>
 
+          <!-- Alquileres -->
+          <li class="nav-item-pc">
+            <a href="{{ url_noticias }}" class="nav-link-pc {% if request.path == url_noticias %}active{% endif %}" aria-current="{% if request.path == url_noticias %}page{% endif %}">
+              <i class="fas fa-newspaper" aria-hidden="true"></i>
+              <span>Noticias</span>
+            </a>
+          </li>
+
           <!-- Logout -->
           <li class="nav-item-pc">
             <a href="{{ url_logout }}" class="nav-link-pc">
@@ -191,6 +200,12 @@
             <a href="{{ url_alquileres }}" class="nav-link-mobile {% if request.path == url_alquileres %}active{% endif %}" aria-current="{% if request.path == url_alquileres %}page{% endif %}">
               <i class="fas fa-key" aria-hidden="true"></i>
               <span>Alquileres</span>
+            </a>
+          </li>
+          <li class="nav-item-mobile">
+            <a href="{{ url_noticias }}" class="nav-link-mobile {% if request.path == url_noticias %}active{% endif %}">
+              <i class="fas fa-newspaper" aria-hidden="true"></i>
+              <span>Noticias</span>
             </a>
           </li>
           <li class="nav-item-mobile">

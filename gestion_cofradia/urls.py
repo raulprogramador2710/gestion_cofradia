@@ -79,4 +79,11 @@ urlpatterns = [
     path('enseres/<int:pk>/editar/', views.editar_enser, name='editar_enser'),
     path('enseres/<int:pk>/borrar/', views.borrar_enser, name='borrar_enser'),
 
+    # Noticias
+    path("noticias/", views.lista_noticias, name="lista_noticias"),
+    path("noticias/nueva/", views.crear_noticia, name="crear_noticia"),
+    path("noticias/<int:pk>/", views.ver_noticia, name="ver_noticia"),
+    path("noticias/<int:pk>/editar/", views.editar_noticia, name="editar_noticia"),
+    path("noticias/<int:pk>/eliminar/", views.eliminar_noticia, name="eliminar_noticia"),
+
 ]

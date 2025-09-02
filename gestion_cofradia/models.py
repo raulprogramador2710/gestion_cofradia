@@ -1,19 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
-class Cofradia(models.Model):
-    nombre = models.CharField(max_length=150, unique=True, db_index=True)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    localidad = models.CharField(max_length=100, blank=True, null=True)
-    telefono = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    descripcion = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.nombre
-
-    class Meta:
-        verbose_name_plural = "Cofradías"
+from django.urls import reverse
 
 class Perfil(models.Model):
     ROLES = [
@@ -23,11 +10,10 @@ class Perfil(models.Model):
         ('hermano_mayor', 'Hermano Mayor'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    cofradia = models.ForeignKey('Cofradia', on_delete=models.CASCADE)
     rol = models.CharField(max_length=20, choices=ROLES, default='hermano')
 
     def __str__(self):
-        return f"{self.user.username} - Cofradía: {self.cofradia.nombre} ({self.rol})"
+        return f"{self.user.username} ({self.rol})"
 
 class FormaPago(models.Model):
     nombre = models.CharField(max_length=100, unique=True, db_index=True)
@@ -66,9 +52,8 @@ class Hermano(models.Model):
         ('hermano', 'Hermano'),
     ]
 
-    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='hermanos')
-    num_hermano = models.PositiveIntegerField(help_text="Número interno único dentro de la cofradía", db_index=True)
-    dni = models.CharField(max_length=10, null=True, blank=True, db_index=True)
+    num_hermano = models.PositiveIntegerField(unique=True, help_text="Número interno único", db_index=True)
+    dni = models.CharField(max_length=10, null=True, blank=True, unique=True, db_index=True)
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, help_text="Usuario asociado para portal hermano")
     nombre = models.CharField(max_length=100, db_index=True)
     apellidos = models.CharField(max_length=150, db_index=True)
@@ -79,48 +64,37 @@ class Hermano(models.Model):
     fecha_inicio_cofradia = models.IntegerField(null=True, blank=True)
     fecha_ultimo_pago = models.IntegerField(null=True, blank=True)
     estado = models.ForeignKey(EstadoHermano, on_delete=models.SET_NULL, null=True, blank=True, related_name='hermanos')
-    # Valores por defecto para forma_pago y forma_comunicacion
-    forma_pago = models.ForeignKey('FormaPago', on_delete=models.CASCADE, default=1)  # Asumiendo que ID 1 es "Efectivo"
-    forma_comunicacion = models.ForeignKey('FormaComunicacion', on_delete=models.CASCADE, default=1)  # Asumiendo que ID 1 es "Carta Postal"
+    forma_pago = models.ForeignKey('FormaPago', on_delete=models.CASCADE, default=1)
+    forma_comunicacion = models.ForeignKey('FormaComunicacion', on_delete=models.CASCADE, default=1)
     email = models.EmailField(null=True, blank=True)
     lopd = models.FileField(upload_to='lopd_files/', null=True, blank=True)
     rol = models.CharField(max_length=20, choices=ROLES, default='hermano')
-    iban = models.CharField(max_length=34, null=True, blank=True)  # Corregido de 'ibam' a 'iban'
+    iban = models.CharField(max_length=34, null=True, blank=True)
 
     class Meta:
-        unique_together = (
-            ('cofradia', 'num_hermano'),
-            ('cofradia', 'dni'),
-        )
-        indexes = [
-            models.Index(fields=['cofradia', 'num_hermano']),
-        ]
         verbose_name_plural = "Hermanos"
 
     def __str__(self):
         return f"{self.nombre} {self.apellidos} (#{self.num_hermano} - {self.dni})"
-    
+
     def tiene_cuotas_pendientes(self):
-        """Devuelve True si el hermano tiene cuotas sin pagar"""
-        cuotas_cofradia = self.cofradia.cuotas.filter(activa=True)
-        for cuota in cuotas_cofradia:
+        cuotas_activas = Cuota.objects.filter(activa=True)
+        for cuota in cuotas_activas:
             if not self.pagos.filter(cuota=cuota).exists():
                 return True
         return False
 
     def cuotas_pendientes(self):
-        """Devuelve las cuotas que el hermano no ha pagado"""
-        cuotas_cofradia = self.cofradia.cuotas.filter(activa=True)
+        cuotas_activas = Cuota.objects.filter(activa=True)
         cuotas_pagadas = self.pagos.values_list('cuota_id', flat=True)
-        return cuotas_cofradia.exclude(id__in=cuotas_pagadas)
-
+        return cuotas_activas.exclude(id__in=cuotas_pagadas)
+    
 class Cuota(models.Model):
     TIPO_CUOTA = [
         ('anual', 'Anual'),
         ('extraordinaria', 'Extraordinaria'),
     ]
 
-    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='cuotas')
     tipo = models.CharField(max_length=20, choices=TIPO_CUOTA, db_index=True)
     anio = models.PositiveIntegerField(db_index=True)
     importe = models.DecimalField(max_digits=8, decimal_places=2)
@@ -130,7 +104,7 @@ class Cuota(models.Model):
     activa = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ('cofradia', 'tipo', 'anio')
+        unique_together = ('tipo', 'anio')
         ordering = ['-anio', 'tipo']
         verbose_name_plural = "Cuotas"
 
@@ -146,7 +120,6 @@ class Pago(models.Model):
         ('bizum', 'Bizum'),
     ]
 
-    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='pagos')
     hermano = models.ForeignKey(Hermano, on_delete=models.CASCADE, related_name='pagos')
     cuota = models.ForeignKey(Cuota, on_delete=models.CASCADE, related_name='pagos')
     fecha_pago = models.DateField(db_index=True)
@@ -171,7 +144,6 @@ class Evento(models.Model):
         ('procesion', 'Procesión'),
     ]
 
-    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='eventos')
     nombre = models.CharField(max_length=150, db_index=True)
     descripcion = models.TextField(blank=True, null=True)
     fecha = models.DateTimeField(db_index=True)
@@ -189,7 +161,7 @@ class Evento(models.Model):
         verbose_name_plural = "Eventos"
 
 class Enser(models.Model):
-    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='ensers')
+    
     nombre = models.CharField(max_length=100, db_index=True)
     descripcion = models.TextField(blank=True, null=True)
     tipo = models.CharField(max_length=50, db_index=True)
@@ -210,7 +182,6 @@ class Alquiler(models.Model):
         ('devuelto', 'Devuelto'),
     ]
 
-    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='alquileres')
     hermano = models.ForeignKey(Hermano, on_delete=models.CASCADE, related_name='alquileres')
     enser = models.ForeignKey(Enser, on_delete=models.CASCADE, related_name='alquileres')
     evento = models.ForeignKey(Evento, null=True, blank=True, on_delete=models.SET_NULL)
@@ -232,7 +203,6 @@ class Notificacion(models.Model):
         ('general', 'General'),
     ]
 
-    cofradia = models.ForeignKey(Cofradia, on_delete=models.CASCADE, related_name='notificaciones')
     destinatario = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name='notificaciones')
     grupo_destinatarios = models.CharField(max_length=255, null=True, blank=True, help_text="Filtro para grupo de hermanos (ej: estado=activo, rol=nazareno)")
     titulo = models.CharField(max_length=100, db_index=True)
@@ -276,10 +246,6 @@ class Tarea(models.Model):
         verbose_name_plural = "Tareas"
 
 class Documento(models.Model):
-    """
-    Modelo para almacenar documentos importantes de la cofradía.
-    """
-    cofradia = models.ForeignKey('Cofradia', on_delete=models.CASCADE)
     titulo = models.CharField(max_length=255, verbose_name="Título", db_index=True)
     descripcion = models.TextField(blank=True, null=True, verbose_name="Descripción")
     archivo = models.FileField(upload_to='documentos/', verbose_name="Archivo")
@@ -307,3 +273,21 @@ class Documento(models.Model):
         verbose_name = "Documento"
         verbose_name_plural = "Documentos"
         ordering = ['-fecha_subida']
+
+class Noticia(models.Model):
+    titulo = models.CharField(max_length=200)
+    cuerpo = models.TextField()
+    imagen = models.ImageField(upload_to="noticias/", blank=True, null=True)
+    fecha_publicacion = models.DateTimeField(auto_now_add=True)
+    publico = models.BooleanField(default=True, help_text="Visible en web pública")
+
+    class Meta:
+        ordering = ["-fecha_publicacion"]
+
+    def __str__(self):
+        return self.titulo
+    
+    def get_absolute_url(self):
+        return reverse("web_publica:noticia_detalle", args=[str(self.id)])
+
+

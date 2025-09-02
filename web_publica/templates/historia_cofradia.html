@@ -1,0 +1,357 @@
+{% extends "base_web.html" %}
+{% load static %}
+
+{% block content %}
+<main id="content" class="site-main page-historia">
+
+  <!-- Cabecera -->
+  <div class="page-header text-center py-4">
+    <h1 class="entry-title">Historia de la Cofradía</h1>
+    <p class="lead text-muted">Cofradía del Santísimo Cristo de la Expiración y María Santísima de los Dolores</p>
+  </div>
+
+  <!-- Imagen destacada -->
+  <section class="historia-hero mb-5">
+    <div class="container">
+      <img src="{% static 'img/public/cofradia-expiracion.jpg' %}" 
+           alt="Cofradía de la Expiración de Adra" 
+           class="img-fluid rounded shadow">
+    </div>
+  </section>
+
+  <!-- Introducción -->
+  <section class="historia-section py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="mb-4">Introducción</h2>
+          <p>
+            La Semana Santa de Adra constituye uno de los pilares religiosos y culturales del Poniente Almeriense. 
+            Entre las hermandades que la integran, la <strong>Cofradía del Santísimo Cristo de la Expiración, 
+            Señor de las Penas y María Santísima de los Dolores</strong>, fundada en <strong>1956</strong>, 
+            ocupa un lugar de honor.
+          </p>
+          <p>
+            A lo largo de casi siete décadas ha custodiado un conjunto de imágenes de altísimo valor artístico 
+            y devocional, convirtiéndose en referente de fe e identidad para la ciudad. Sus titulares abarcan 
+            desde el Cristo de la Expiración —obra barroca de 1623 y el <strong>crucificado procesional más antiguo 
+            de la provincia</strong>— hasta la Virgen de los Dolores, el Santo Sepulcro, el Resucitado y la Inmaculada Concepción.
+          </p>
+          <p>
+            En cuanto a sus procesiones, la cofradía ha conocido <strong>dos etapas</strong>: una inicial, entre 1956 y 2024, 
+            con una presencia muy extensa, y una nueva etapa desde 2025, en la que decide centrar sus estaciones 
+            de penitencia en el Triduo Pascual y la Pascua de Resurrección.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Orígenes históricos -->
+  <section class="historia-section bg-dark text-light py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="mb-4">Orígenes históricos</h2>
+          <p>
+            El origen de la devoción al Cristo de la Expiración se remonta a <strong>diciembre de 1622</strong>, 
+            cuando el sacerdote abderitano <strong>Juan Ginés de Espinosa</strong> encargó al escultor granadino 
+            <strong>Alonso de Mena y Escalante</strong> un crucificado para la parroquia de la Inmaculada Concepción.
+          </p>
+          <p>
+            La obra, concluida en <strong>1623</strong>, costó 70 ducados e incluía también una talla de San Sebastián 
+            y unas andas. El resultado fue un Cristo en el instante último de la agonía, de intenso realismo barroco, 
+            que llegó a conocerse como el <strong>Cristo de las Penas</strong>.
+          </p>
+          <p>
+            Cuatro siglos más tarde se le sigue venerando como el Cristo de la Expiración, joya artística y espiritual, 
+            considerado el <strong>crucificado más antiguo de cuantos procesionan en Almería</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fundación de la Cofradía -->
+  <section class="historia-section py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h2 class="mb-3">Fundación de la Cofradía (1956)</h2>
+          <p>
+            Aunque la veneración se mantuvo de forma ininterrumpida durante siglos, no fue hasta 
+            <strong>1956</strong> cuando se instituyó la cofradía, bajo la advocación del Santísimo Cristo 
+            de la Expiración y María Santísima de los Dolores.
+          </p>
+          <p>
+            La Hermandad creció rápidamente y fue asumiendo nuevos titulares y procesiones, 
+            hasta convertirse en la <strong>más veterana y una de las más activas</strong> de la Semana Santa de Adra.
+          </p>
+        </div>
+        <div class="col-md-4 text-center">
+          <img src="{% static 'img/public/fundacion-1956.jpg' %}" 
+               alt="Fundación de la Cofradía en 1956"
+               class="img-fluid rounded shadow-sm">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Imágenes de la Cofradía -->
+  <section class="historia-section bg-light py-5">
+    <div class="container">
+      <h2 class="mb-4">Imágenes de la Cofradía</h2>
+      
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100">
+            <img src="{% static 'img/public/expiracion.jpg' %}" class="card-img-top" alt="Cristo de la Expiración">
+            <div class="card-body">
+              <h5 class="card-title">Santísimo Cristo de la Expiración</h5>
+              <p class="card-text">
+                <strong>Autor:</strong> Alonso de Mena, 1623<br>
+                Crucificado barroco de enorme valor patrimonial. Procesiona cada Jueves Santo.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100">
+            <img src="{% static 'img/public/dolorosa.jpg' %}" class="card-img-top" alt="Virgen de los Dolores">
+            <div class="card-body">
+              <h5 class="card-title">María Santísima de los Dolores</h5>
+              <p class="card-text">
+                Dolorosa granadina de 1772, de autor anónimo. Titular mariana que acompaña al Cristo el Jueves Santo. 
+                El Viernes Santo se viste de luto como Virgen de la Soledad.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100">
+            <img src="{% static 'img/public/sepulcro.jpg' %}" class="card-img-top" alt="Santo Sepulcro">
+            <div class="card-body">
+              <h5 class="card-title">Santo Sepulcro</h5>
+              <p class="card-text">
+                Cristo Yacente que representa a Jesús muerto tras el descendimiento. 
+                Sale en el cortejo fúnebre del Santo Entierro del Viernes Santo.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100">
+            <img src="{% static 'img/public/resucitado.jpg' %}" class="card-img-top" alt="Cristo Resucitado">
+            <div class="card-body">
+              <h5 class="card-title">Cristo Resucitado</h5>
+              <p class="card-text">
+                Imagen de Cristo glorioso que representa la victoria sobre la muerte, 
+                procesionando el Domingo de Resurrección.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100">
+            <img src="{% static 'img/public/inmaculada.jpg' %}" class="card-img-top" alt="Inmaculada Concepción">
+            <div class="card-body">
+              <h5 class="card-title">Inmaculada Concepción</h5>
+              <p class="card-text">
+                Titular de la parroquia, custodiada por la cofradía. 
+                El Domingo de Pascua participa en el Encuentro Glorioso con el Resucitado.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Procesiones - Etapa I -->
+  <section class="historia-section py-5">
+    <div class="container">
+      <h2 class="mb-4">Procesiones de la Cofradía</h2>
+      
+      <h3 class="mb-3 text-primary">Etapa I: 1956–2024</h3>
+      <p class="mb-4">
+        Durante esta etapa, la Cofradía tenía protagonismo en <strong>cinco jornadas principales</strong>:
+      </p>
+      
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="card border-success">
+            <div class="card-body">
+              <h5 class="card-title text-success">Domingo de Ramos</h5>
+              <p class="card-text">
+                <strong>La Borriquilla</strong> - Procesión infantil y juvenil con fuerte participación 
+                de los niños del municipio.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <div class="card border-info">
+            <div class="card-body">
+              <h5 class="card-title text-info">Miércoles Santo</h5>
+              <p class="card-text">
+                <strong>Nazareno y Dolores</strong> - Salida de Nuestro Padre Jesús Nazareno 
+                (El Señor de Adra) con emotivo Encuentro en Plaza Puerta del Mar.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <div class="card border-warning">
+            <div class="card-body">
+              <h5 class="card-title text-warning">Jueves Santo</h5>
+              <p class="card-text">
+                <strong>Expiración y Dolores</strong> - Día grande de la Cofradía. 
+                Cristo de la Expiración y Virgen de los Dolores bajo palio en procesión solemne.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <div class="card border-dark">
+            <div class="card-body">
+              <h5 class="card-title text-dark">Viernes Santo</h5>
+              <p class="card-text">
+                <strong>Santo Entierro y Soledad</strong> - Procesión del Santo Sepulcro y la Virgen de la Soledad, 
+                una de las noches más sobrecogedoras.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-12 mb-3">
+          <div class="card border-primary">
+            <div class="card-body">
+              <h5 class="card-title text-primary">Domingo de Resurrección</h5>
+              <p class="card-text">
+                <strong>El Encuentro Glorioso</strong> - El Resucitado y la Inmaculada protagonizan el multitudinario 
+                Encuentro en Plaza San Sebastián, donde la Virgen cambia su manto negro por uno celeste.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nueva etapa -->
+  <section class="historia-section bg-light py-5">
+    <div class="container">
+      <h3 class="mb-3 text-danger">Etapa II: desde 2025</h3>
+      <p>
+        En <strong>2025</strong>, la Cofradía decidió reorganizar su calendario y limitar sus estaciones de penitencia. 
+        Por razones pastorales y organizativas, ha dejado de procesionar el Domingo de Ramos y Miércoles Santo.
+      </p>
+      <p class="mb-4">
+        Actualmente, sus cultos comienzan el Jueves Santo y se concentran en el <strong>corazón del Triduo y la Pascua</strong>:
+      </p>
+      
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="card border-warning h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title text-warning">Jueves Santo</h5>
+              <p class="card-text">Cristo de la Expiración y Virgen de los Dolores</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card border-dark h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title text-dark">Viernes Santo</h5>
+              <p class="card-text">Santo Sepulcro y Virgen de la Soledad</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card border-success h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title text-success">Domingo de Resurrección</h5>
+              <p class="card-text">Resucitado e Inmaculada</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <p class="mt-3">
+        De este modo, la cofradía abre su calendario directamente en el <strong>Triduo Pascual</strong>, 
+        reforzando así la centralidad de estos días en la fe cristiana.
+      </p>
+    </div>
+  </section>
+
+  <!-- IV Centenario y Restauración -->
+  <section class="historia-section py-5">
+    <div class="container">
+      <h2 class="mb-4">Restauración del Cristo y IV Centenario</h2>
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <p>
+            El <strong>Cristo de la Expiración</strong> ha sido objeto de diversas restauraciones. 
+            La última, realizada en <strong>2022–2023</strong>, recuperó la talla de Alonso de Mena 
+            y descubrió policromías y detalles originales.
+          </p>
+          <p>
+            Su regreso fue celebrado con solemnidad, coincidiendo con los actos del <strong>IV Centenario (1623–2023)</strong>, 
+            que incluyeron conferencias, muestras en el Museo de Adra, procesiones extraordinarias y la 
+            <strong>imposición de la Medalla de la Ciudad de Adra</strong> al Cristo.
+          </p>
+        </div>
+        <div class="col-md-4 text-center">
+          <img src="{% static 'img/public/cristo_restaurado.jpg' %}" 
+               alt="Restauración del Cristo de la Expiración"
+               class="img-fluid rounded shadow-sm">
+        </div>
+      </div>
+      
+      <div class="row mt-4">
+        <div class="col-md-4 mb-3">
+          <img src="{% static 'img/public/acto-centenario.jpg' %}" class="img-fluid rounded shadow-sm" alt="Actos del IV Centenario">
+        </div>
+        <div class="col-md-4 mb-3">
+          <img src="{% static 'img/public/extraordinaria.jpg' %}" class="img-fluid rounded shadow-sm" alt="Procesión extraordinaria">
+        </div>
+        <div class="col-md-4 mb-3">
+          <img src="{% static 'img/public/medalla_ciudad.jpg' %}" class="img-fluid rounded shadow-sm" alt="Medalla de la Ciudad de Adra">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conclusión -->
+  <section class="historia-section bg-dark text-light py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="mb-3">Conclusión</h2>
+          <p>
+            La <strong>Cofradía del Santísimo Cristo de la Expiración y María Santísima de los Dolores</strong> 
+            es la más veterana de Adra y la guardiana de parte esencial de su identidad cultural y devocional.
+          </p>
+          <ul class="list-unstyled">
+            <li class="mb-2">✓ En su <strong>primera etapa (1956–2024)</strong> fue protagonista de hasta cinco procesiones a lo largo de la Semana Santa.</li>
+            <li class="mb-2">✓ Desde <strong>2025</strong> abre una nueva etapa, limitando sus salidas al Jueves Santo, Viernes Santo y Domingo de Resurrección.</li>
+            <li class="mb-2">✓ Señala con mayor fuerza el núcleo de la fe cristiana: la <strong>Pasión, Muerte y Resurrección del Señor</strong>.</li>
+          </ul>
+          <p>
+            Así, la cofradía ha sabido conjugar la tradición de casi cuatro siglos con la adaptación a los nuevos tiempos, 
+            manteniendo en lo más alto el fervor de un pueblo que sigue rindiéndose ante sus imágenes titulares.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+{% endblock %}

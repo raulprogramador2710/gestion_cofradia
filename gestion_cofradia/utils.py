@@ -20,46 +20,7 @@ class RoleRequiredMixin(UserPassesTestMixin):
             return self.request.user.is_superuser or (rol_usuario in self.roles_permitidos)
         except AttributeError:
             return False
-"""
-def role_required(roles_permitidos):
-    def decorator(view_func):
-        def wrapper_func(request, *args, **kwargs):
-            try:
-                perfil = request.user.perfil_set.first()
 
-                print(f"DEBUG: request.user.perfil_set.first.rol = {request.user.perfil_set.first().rol}")
-                print(f"DEBUG: request.user.perfil_set.first.cofrada = {request.user.perfil_set.first().cofradia}")
-
-                rol_usuario = perfil.rol if perfil else 'Sin perfil'
-
-                print(f"DEBUG: rol_usuario = {rol_usuario}")
-                print(f"DEBUG: request.user.is_superuser = {request.user.is_superuser}")
-                print(f"DEBUG: roles_permitidos = {roles_permitidos}")
-
-                if request.user.is_superuser or rol_usuario in roles_permitidos:
-                    return view_func(request, *args, **kwargs)
-                else:
-                    return render(
-                        request,
-                        'acceso_denegado.html',
-                        {
-                            'rol_usuario': rol_usuario,
-                            'roles_permitidos': roles_permitidos
-                        },
-                        status=403
-                    )
-            except AttributeError:
-                return render(
-                    request,
-                    'acceso_denegado.html',
-                    {
-                        'rol_usuario': 'Sin perfil',
-                        'roles_permitidos': roles_permitidos
-                    },
-                    status=403
-                )
-        return wrapper_func
-    return decorator"""
 
 def role_required(roles_permitidos):
     def decorator(view_func):
@@ -81,7 +42,7 @@ def role_required(roles_permitidos):
 
 
 
-def crear_hermano_con_usuario(nombre, apellidos, dni, rol, cofradia, email=None):
+def crear_hermano_con_usuario(nombre, apellidos, dni, rol, email=None):
     user = User.objects.create_user(username=dni, password='cambiar1234', email=email)
     hermano = Hermano.objects.create(
         user=user,
@@ -89,14 +50,13 @@ def crear_hermano_con_usuario(nombre, apellidos, dni, rol, cofradia, email=None)
         apellidos=apellidos,
         dni=dni,
         rol=rol,
-        cofradia=cofradia,
-        numero_hermano=obtener_numero_hermano(cofradia),
+        numero_hermano=obtener_numero_hermano(),
         email=email,  # Solo si tu modelo Hermano tiene este campo
     )
     return hermano
 
-def obtener_numero_hermano(cofradia):
-    max_num = Hermano.objects.filter(cofradia=cofradia).aggregate(models.Max('numero_hermano'))['numero_hermano__max']
+def obtener_numero_hermano():
+    max_num = Hermano.objects.all().aggregate(models.Max('numero_hermano'))['numero_hermano__max']
     return (max_num or 0) + 1
 
 

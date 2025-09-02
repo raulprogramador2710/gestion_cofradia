@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Hermano, Cuota, Pago, Notificacion, Tarea, Documento, EstadoHermano, FormaComunicacion, Evento, Alquiler, Perfil, Enser
+from .models import Hermano, Cuota, Pago, Notificacion, Tarea, Documento, EstadoHermano, FormaComunicacion, Evento, Alquiler, Perfil, Enser, Noticia
 import csv
 
 from django import forms
@@ -24,7 +24,7 @@ class HermanoForm(forms.ModelForm):
 
     class Meta:
         model = Hermano
-        exclude = ['num_hermano', 'cofradia', 'user']  # Campos que se asignan automáticamente
+        exclude = ['num_hermano', 'user']  # Campos que se asignan automáticamente
         fields = [
             'dni', 'nombre', 'apellidos',
             'telefono', 'direccion', 'localidad', 'fecha_nacimiento',
@@ -99,7 +99,7 @@ class DestinatarioModelChoiceField(forms.ModelChoiceField):
 
 class NotificacionForm(forms.ModelForm):
     destinatario = DestinatarioModelChoiceField(
-        queryset=User.objects.none(),
+        queryset=User.objects.all(),  # Ahora incluye todos los usuarios
         required=False,
         label="Destinatario",
         widget=forms.Select(attrs={'class': 'form-select'})
@@ -115,12 +115,11 @@ class NotificacionForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        cofradia = kwargs.pop('cofradia', None)
+        kwargs.pop('cofradia', None)
         super().__init__(*args, **kwargs)
         
-        if cofradia:
-            usuarios = User.objects.filter(perfil__cofradia=cofradia)
-            self.fields['destinatario'].queryset = usuarios
+        # Todos los usuarios están disponibles
+        self.fields['destinatario'].queryset = User.objects.all()
 
 class ResponsableModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -279,14 +278,11 @@ class EventoForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        cofradia = kwargs.pop('cofradia', None)
+        kwargs.pop('cofradia', None)
         super().__init__(*args, **kwargs)
         
         # Filtrar cuotas por cofradía si se proporciona
-        if cofradia:
-            self.fields['cuota_extra'].queryset = Cuota.objects.filter(cofradia=cofradia)
-        else:
-            self.fields['cuota_extra'].queryset = Cuota.objects.none()
+        self.fields['cuota_extra'].queryset = Cuota.objects.all()
         
         # Hacer que cuota_extra tenga opción vacía
         self.fields['cuota_extra'].empty_label = "Sin cuota extra"
@@ -313,4 +309,14 @@ class EnserForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'rows': 3}),
         }
 
+class NoticiaForm(forms.ModelForm):
+    class Meta:
+        model = Noticia
+        fields = ["titulo", "cuerpo", "imagen", "publico"]
+        widgets = {
+            "titulo": forms.TextInput(attrs={"class": "form-control"}),
+            "cuerpo": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "imagen": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "publico": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
 

@@ -36,11 +36,11 @@ from reportlab.pdfgen import canvas
 from .utils import RoleRequiredMixin, role_required
 from .forms import (
     HermanoForm, CuotaForm, PagoForm, EventoForm, NotificacionForm,
-    TareaForm, DocumentoForm, UploadHermanosForm, AlquilerForm, EnserForm
+    TareaForm, DocumentoForm, UploadHermanosForm, AlquilerForm, EnserForm, NoticiaForm
 )
 from .models import (
     Hermano, Cuota, Pago, Evento, Notificacion, Tarea, FormaPago,
-    FormaComunicacion, Documento, EstadoHermano, Alquiler, Cofradia, Enser
+    FormaComunicacion, Documento, EstadoHermano, Alquiler, Enser, Noticia
 )
 
 logger = logging.getLogger(__name__)
@@ -74,7 +74,6 @@ def inicio(request):
     if not perfil:
         return redirect('gestion_cofradia:login')
 
-    cofradia = perfil.cofradia
     rol = perfil.rol
     user = request.user
 
@@ -90,15 +89,12 @@ def inicio(request):
 
     # Solo hermanos activos o no pagados (excluye fallecidos y bajas, insensible a mayúsculas)
     hermanos = Hermano.objects.filter(
-        cofradia=cofradia
-    ).filter(
         Q(estado__nombre__iexact='activo') | Q(estado__nombre__iexact='no pagado')
     ).distinct()
     total_hermanos = hermanos.count()
 
     # Enseres pendientes de devolución (alquileres en estado "prestado")
     enseres_pendientes = Alquiler.objects.filter(
-        cofradia=cofradia,
         estado='prestado'
     ).select_related('enser', 'hermano').order_by('fecha_entrega')[:5]
 
@@ -114,7 +110,7 @@ def inicio(request):
 
     if rol in ['hermano_mayor', 'secretario']:
         # Gráfica 1: Hermanos por estado (todos los hermanos de la cofradía)
-        hermanos_todos = Hermano.objects.filter(cofradia=cofradia)
+        hermanos_todos = Hermano.objects.all()
         hermanos_estado = []
         for h in hermanos_todos:
             if h.estado and h.estado.nombre:
@@ -145,14 +141,12 @@ def inicio(request):
         ahora = timezone.now()
         en_30_dias = ahora + timedelta(days=30)
         proximos_eventos = Evento.objects.filter(
-            cofradia=cofradia,
             fecha__gte=ahora,
             fecha__lte=en_30_dias
         ).order_by('fecha')[:5]
 
         # Eventos pendientes (todos los eventos futuros)
         eventos_pendientes = Evento.objects.filter(
-            cofradia=cofradia,
             fecha__gte=ahora
         ).order_by('fecha')[:5]
 
@@ -167,18 +161,16 @@ def inicio(request):
     if rol in ['hermano_mayor', 'tesorero']:
         # TESORERO y HERMANO MAYOR: Cuentas, cuotas, pagos
 
-        cuota_activa = Cuota.objects.filter(cofradia=cofradia, activa=True).first()
+        cuota_activa = Cuota.objects.filter(activa=True).first()
         if cuota_activa:
             total_a_recaudar = cuota_activa.importe * total_hermanos
             total_recaudado = Pago.objects.filter(
                 cuota=cuota_activa,
-                cofradia=cofradia,
                 hermano__in=hermanos
             ).aggregate(total=Sum('importe_pagado'))['total'] or 0
 
             hermanos_pagados_ids = Pago.objects.filter(
                 cuota=cuota_activa,
-                cofradia=cofradia,
                 hermano__in=hermanos
             ).values_list('hermano_id', flat=True).distinct()
 
@@ -210,7 +202,6 @@ def lista_hermanos(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia_usuario = perfil.cofradia
 
     # Importación CSV (si la usas)
     if request.method == 'POST' and request.FILES.get('csv_file'):
@@ -222,7 +213,6 @@ def lista_hermanos(request):
             for row in reader:
                 try:
                     hermano, created = Hermano.objects.get_or_create(
-                        cofradia=cofradia_usuario,
                         dni=row['dni'],
                         defaults={
                             'numero': int(row['numero']),
@@ -278,7 +268,7 @@ def hermanos_json(request):
 
     # Filtro por cofradía del usuario
     perfil = request.user.perfil_set.first()
-    hermanos = Hermano.objects.filter(cofradia=perfil.cofradia)
+    hermanos = Hermano.objects.all()
 
     # Búsqueda global
     if search_value:
@@ -361,12 +351,10 @@ def ver_hermano(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia_usuario = perfil.cofradia
-    hermano = get_object_or_404(Hermano, pk=pk, cofradia=cofradia_usuario)
+    hermano = get_object_or_404(Hermano, pk=pk)
     
     # Obtener cuotas activas que no han sido pagadas por este hermano
     cuotas_pendientes = Cuota.objects.filter(
-        cofradia=cofradia_usuario, 
         activa=True
     ).exclude(
         pagos__hermano=hermano
@@ -393,11 +381,8 @@ def crear_hermano(request):
         if form.is_valid():
             hermano = form.save(commit=False)
             
-            # Asignar cofradía del usuario logueado
-            hermano.cofradia = perfil.cofradia
-            
             # Calcular num_hermano automáticamente
-            ultimo_hermano = Hermano.objects.filter(cofradia=hermano.cofradia).order_by('-num_hermano').first()
+            ultimo_hermano = Hermano.objects.all().order_by('-num_hermano').first()
             hermano.num_hermano = (ultimo_hermano.num_hermano + 1) if ultimo_hermano else 1
             
             # Crear o asociar usuario para el hermano SOLO si tiene DNI
@@ -419,7 +404,6 @@ def crear_hermano(request):
                 from .models import Perfil
                 perfil_usuario, perfil_created = Perfil.objects.get_or_create(
                     user=usuario,
-                    cofradia=hermano.cofradia,
                     defaults={'rol': 'hermano'}
                 )
                 
@@ -439,7 +423,7 @@ def editar_hermano(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    hermano = get_object_or_404(Hermano, pk=pk, cofradia=perfil.cofradia)
+    hermano = get_object_or_404(Hermano, pk=pk)
     
     if request.method == 'POST':
         form = HermanoForm(request.POST, request.FILES, instance=hermano)
@@ -463,7 +447,6 @@ def editar_hermano(request, pk):
                 from .models import Perfil
                 perfil_usuario, perfil_created = Perfil.objects.get_or_create(
                     user=usuario,
-                    cofradia=hermano_actualizado.cofradia,
                     defaults={'rol': 'hermano'}
                 )
                 
@@ -473,7 +456,7 @@ def editar_hermano(request, pk):
                 if hermano_actualizado.user:
                     # Opcional: eliminar perfil asociado a esta cofradía y usuario
                     from .models import Perfil
-                    Perfil.objects.filter(user=hermano_actualizado.user, cofradia=hermano_actualizado.cofradia).delete()
+                    Perfil.objects.filter(user=hermano_actualizado.user).delete()
                     hermano_actualizado.user = None
             
             hermano_actualizado.save()
@@ -501,14 +484,12 @@ def notificar_hermano(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia_usuario = perfil.cofradia
-    hermano = get_object_or_404(Hermano, pk=pk, cofradia=cofradia_usuario)
+    hermano = get_object_or_404(Hermano, pk=pk)
 
     if request.method == 'POST':
-        form = NotificacionForm(request.POST, cofradia=cofradia_usuario)
+        form = NotificacionForm(request.POST)
         if form.is_valid():
             notificacion = form.save(commit=False)
-            notificacion.cofradia = cofradia_usuario
             notificacion.destinatario = hermano
             notificacion.fecha_envio = timezone.now()
             notificacion.save()
@@ -519,10 +500,9 @@ def notificar_hermano(request, pk):
         form = NotificacionForm(
             initial={
                 'destinatario': hermano,
-                'titulo': f'Notificación de {hermano.cofradia.nombre}',
+                'titulo': f'Notificación de Cofradia de la Expiración',
                 'cuerpo': f'Estimado/a {hermano.nombre} {hermano.apellidos},\n\n',
             },
-            cofradia=cofradia_usuario
         )
 
     return render(request, 'notificaciones/notificar_hermano.html', {
@@ -546,8 +526,6 @@ def upload_hermanos_csv(request):
         except UnicodeDecodeError:
             messages.error(request, "No se pudo decodificar el archivo CSV. Asegúrate de que está guardado en latin-1.")
             return render(request, 'hermanos/upload_csv.html')
-
-        cofradia = perfil.cofradia
         
         # Generar el hash de la contraseña temporal UNA SOLA VEZ
         hashed_default_password = make_password("Temporal01")
@@ -614,12 +592,10 @@ def upload_hermanos_csv(request):
                         from .models import Perfil  # Asegúrate de importar el modelo Perfil
                         Perfil.objects.create(
                             user=user,
-                            cofradia=cofradia,
                             rol='hermano'
                         )
 
                 hermano, created = Hermano.objects.get_or_create(
-                    cofradia=cofradia,
                     num_hermano=num_hermano,
                     defaults={
                         'dni': dni,
@@ -660,8 +636,7 @@ def lista_cuotas(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    cuotas = Cuota.objects.filter(cofradia=cofradia)
+    cuotas = Cuota.objects.all()
     return render(request, 'cuotas/lista_cuotas.html', {'cuotas': cuotas})
 
 @login_required
@@ -670,24 +645,21 @@ def crear_cuota(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
     if request.method == 'POST':
         form = CuotaForm(request.POST)
         if form.is_valid():
             cuota = form.save(commit=False)
-            cuota.cofradia = cofradia
             cuota.save()
 
             if cuota.tipo == 'anual':
                 estado_activo = EstadoHermano.objects.get(nombre='Activo')
                 estado_no_pagado = EstadoHermano.objects.get(nombre='No Pagado')
-                Hermano.objects.filter(cofradia=cofradia, estado=estado_activo).update(estado=estado_no_pagado)
+                Hermano.objects.filter(estado=estado_activo).update(estado=estado_no_pagado)
 
-            hermanos = Hermano.objects.filter(cofradia=cofradia)
+            hermanos = Hermano.objects.all()
             for hermano in hermanos:
                 if hermano.user and hermano.user.email:
                     notificacion = Notificacion.objects.create(
-                        cofradia=cofradia,
                         destinatario=hermano.user,
                         titulo=f"Nueva cuota disponible: {cuota}",
                         cuerpo=f"Ya está disponible la cuota {cuota}. Puedes gestionarla desde tu área personal.",
@@ -712,8 +684,7 @@ def editar_cuota(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    cuota = get_object_or_404(Cuota, pk=pk, cofradia=cofradia)
+    cuota = get_object_or_404(Cuota, pk=pk)
     if request.method == 'POST':
         form = CuotaForm(request.POST, instance=cuota)
         if form.is_valid():
@@ -729,8 +700,7 @@ def eliminar_cuota(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    cuota = get_object_or_404(Cuota, pk=pk, cofradia=cofradia)
+    cuota = get_object_or_404(Cuota, pk=pk)
     if request.method == 'POST':
         cuota.delete()
         return redirect('gestion_cofradia:lista_cuotas')
@@ -744,9 +714,8 @@ def registrar_pago(request, hermano_pk, cuota_pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    hermano = get_object_or_404(Hermano, pk=hermano_pk, cofradia=cofradia)
-    cuota = get_object_or_404(Cuota, pk=cuota_pk, cofradia=cofradia)
+    hermano = get_object_or_404(Hermano, pk=hermano_pk)
+    cuota = get_object_or_404(Cuota, pk=cuota_pk)
 
     if request.method == 'POST':
         form = PagoForm(request.POST)
@@ -760,7 +729,6 @@ def registrar_pago(request, hermano_pk, cuota_pk):
 
             # Verificar si tiene más cuotas pendientes
             cuotas_pendientes = Cuota.objects.filter(
-                cofradia=cofradia,
                 activa=True
             ).exclude(
                 pagos__hermano=hermano
@@ -784,8 +752,7 @@ def lista_pagos_hermano(request, hermano_pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    hermano = get_object_or_404(Hermano, pk=hermano_pk, cofradia=cofradia)
+    hermano = get_object_or_404(Hermano, pk=hermano_pk)
     pagos = Pago.objects.filter(hermano=hermano)
     return render(request, 'pagos/lista_pagos_hermano.html', {'pagos': pagos, 'hermano': hermano})
 
@@ -806,28 +773,26 @@ def crear_notificacion(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
 
     if request.method == 'POST':
-        form = NotificacionForm(request.POST, cofradia=cofradia)
+        form = NotificacionForm(request.POST)
         if form.is_valid():
             notificacion = form.save(commit=False)
-            notificacion.cofradia = cofradia
             notificacion.save()
 
             # Enviar email de aviso
             if notificacion.destinatario and notificacion.destinatario.email:
                 subject = f"Nueva notificación: {notificacion.titulo}"
-                message = f"Tienes una nueva notificación en el portal de la cofradía {cofradia.nombre}.\n\nTítulo: {notificacion.titulo}\n\nPor favor, accede al portal para más detalles."
+                message = f"Tienes una nueva notificación en el portal de la Cofradía de la Expiración.\n\nTítulo: {notificacion.titulo}\n\nPor favor, accede al portal para más detalles."
                 from_email = settings.DEFAULT_FROM_EMAIL
                 recipient_list = [notificacion.destinatario.email]
                 send_mail(subject, message, from_email, recipient_list)
 
             return redirect('gestion_cofradia:lista_notificaciones')
     else:
-        form = NotificacionForm(cofradia=cofradia)
+        form = NotificacionForm()
 
-    return render(request, 'notificaciones/crear_notificacion.html', {'form': form, 'cofradia': cofradia})
+    return render(request, 'notificaciones/crear_notificacion.html', {'form': form})
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -896,7 +861,6 @@ def crear_tarea(request):
         if form.is_valid():
             tarea = form.save(commit=False)
             # Asigna la cofradía del usuario logueado
-            tarea.cofradia = perfil.cofradia
             tarea.save()
             return redirect('gestion_cofradia:lista_tareas')
     else:
@@ -910,7 +874,7 @@ def ver_tarea(request, pk):
     if not perfil:
         return redirect('gestion_cofradia:login')
     tarea = get_object_or_404(Tarea, pk=pk)
-    return render(request, 'gestion_cofradia/ver_tarea.html', {'tarea': tarea})
+    return render(request, 'tareas/ver_tarea.html', {'tarea': tarea})
 
 @login_required
 @role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
@@ -961,8 +925,7 @@ def lista_documentos(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    documentos = Documento.objects.filter(cofradia=cofradia).order_by('-fecha_subida')
+    documentos = Documento.objects.all().order_by('-fecha_subida')
     return render(request, 'documentos/lista_documentos.html', {'documentos': documentos})
 
 @login_required
@@ -971,12 +934,10 @@ def crear_documento(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
     if request.method == 'POST':
         form = DocumentoForm(request.POST, request.FILES)
         if form.is_valid():
             documento = form.save(commit=False)
-            documento.cofradia = cofradia
             documento.subido_por = request.user
             documento.save()
             return redirect('gestion_cofradia:lista_documentos')
@@ -990,7 +951,7 @@ def ver_documento(request, documento_id):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    documento = get_object_or_404(Documento, pk=documento_id, cofradia=perfil.cofradia)
+    documento = get_object_or_404(Documento, pk=documento_id)
     return render(request, 'documentos/ver_documento.html', {'documento': documento})
 
 @login_required
@@ -999,7 +960,7 @@ def editar_documento(request, documento_id):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    documento = get_object_or_404(Documento, pk=documento_id, cofradia=perfil.cofradia)
+    documento = get_object_or_404(Documento, pk=documento_id)
     if request.method == 'POST':
         form = DocumentoForm(request.POST, request.FILES, instance=documento)
         if form.is_valid():
@@ -1015,7 +976,7 @@ def eliminar_documento(request, documento_id):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    documento = get_object_or_404(Documento, pk=documento_id, cofradia=perfil.cofradia)
+    documento = get_object_or_404(Documento, pk=documento_id)
     if request.method == 'POST':
         documento.delete()
         return redirect('gestion_cofradia:lista_documentos')
@@ -1030,7 +991,6 @@ def lista_informes(request):
     if not perfil:
         return redirect('gestion_cofradia:login')
 
-    cofradia = perfil.cofradia
 
     # Traemos todos los estados disponibles (no hardcodeados)
     estados = EstadoHermano.objects.all().order_by("nombre")
@@ -1045,29 +1005,26 @@ def descargar_informe(request, tipo):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    print("DEBUG - perfil:", perfil)
-    print("DEBUG - perfil Cofradía:", perfil.cofradia)
-    cofradia = perfil.cofradia
 
     if tipo == 'hermanos_activos_mayores':
-        return generar_pdf_hermanos_activos_mayores(cofradia)
+        return generar_pdf_hermanos_activos_mayores()
     elif tipo == 'hermanos_por_estado':
         estado_nombre = request.GET.get("estado")  # recogemos el estado elegido en el select
-        return generar_pdf_hermanos_por_estado(cofradia, estado_nombre)
+        return generar_pdf_hermanos_por_estado(estado_nombre)
     elif tipo == 'hermanos_carta_postal':
-        return generar_pdf_hermanos_carta_postal(cofradia)
+        return generar_pdf_hermanos_carta_postal()
     elif tipo == 'hermanos_completo':
-        return generar_pdf_hermanos_completo(cofradia)
+        return generar_pdf_hermanos_completo()
     else:
         return HttpResponse("Informe no encontrado", status=404)
 
-def generar_pdf_hermanos_activos_mayores(cofradia):
+def generar_pdf_hermanos_activos_mayores():
     hoy = now().date()
     edad_mayor = 18
     fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
 
     # Hermanos activos mayores de edad con DNI
-    hermanos_activos_con_dni = cofradia.hermanos.filter(
+    hermanos_activos_con_dni = Hermano.objects.filter(
         estado__nombre__iexact='activo',
         dni__isnull=False,
         dni__gt='',
@@ -1091,7 +1048,7 @@ def generar_pdf_hermanos_activos_mayores(cofradia):
     )
     style_normal = styles['Normal']
 
-    title = Paragraph(f"Hermanos mayores de {edad_mayor} años - Cofradía {cofradia.nombre}", style_title)
+    title = Paragraph(f"Hermanos mayores de {edad_mayor} años - Cofradía Expiración", style_title)
     fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
 
     # Tabla: Hermanos activos con DNI
@@ -1133,10 +1090,10 @@ def generar_pdf_hermanos_activos_mayores(cofradia):
     response['Content-Disposition'] = 'attachment; filename="hermanos_mayores.pdf"'
     return response
 
-def generar_pdf_hermanos_carta_postal(cofradia):
+def generar_pdf_hermanos_carta_postal():
     hoy = now().date()
 
-    hermanos = cofradia.hermanos.filter(
+    hermanos = Hermano.objects.filter(
         estado__nombre__iexact='activo',
         forma_comunicacion__nombre__iexact='carta postal'
     ).order_by('localidad', 'direccion', 'apellidos')
@@ -1157,7 +1114,7 @@ def generar_pdf_hermanos_carta_postal(cofradia):
     )
     style_normal = styles['Normal']
 
-    title = Paragraph(f"Hermanos con forma de comunicación 'Carta Postal' - Cofradía {cofradia.nombre}", style_title)
+    title = Paragraph(f"Hermanos con forma de comunicación 'Carta Postal' - Cofradía Expiración", style_title)
     fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
 
     data = [['Apellidos', 'Nombre', 'Teléfono', 'Localidad', 'Dirección']]
@@ -1188,9 +1145,9 @@ def generar_pdf_hermanos_carta_postal(cofradia):
     response['Content-Disposition'] = 'attachment; filename="hermanos_carta_postal.pdf"'
     return response
 
-def generar_pdf_hermanos_completo(cofradia):
+def generar_pdf_hermanos_completo():
     hoy = now().date()
-    hermanos = cofradia.hermanos.all().order_by('apellidos', 'nombre')
+    hermanos = Hermano.all().order_by('apellidos', 'nombre')
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
@@ -1208,7 +1165,7 @@ def generar_pdf_hermanos_completo(cofradia):
     )
     style_normal = styles['Normal']
 
-    title = Paragraph(f"Listado completo de hermanos - Cofradía {cofradia.nombre}", style_title)
+    title = Paragraph(f"Listado completo de hermanos - Cofradía Expiación", style_title)
     fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
 
     # Columnas principales (ajusta según tu modelo Hermano)
@@ -1265,7 +1222,7 @@ def generar_pdf_hermanos_completo(cofradia):
     response['Content-Disposition'] = 'attachment; filename="hermanos_completo.pdf"'
     return response
 
-def generar_pdf_hermanos_por_estado(cofradia, estado_nombre):
+def generar_pdf_hermanos_por_estado(estado_nombre):
     hoy = now().date()
 
     try:
@@ -1274,7 +1231,7 @@ def generar_pdf_hermanos_por_estado(cofradia, estado_nombre):
         return HttpResponse(f"El estado '{estado_nombre}' no existe", status=404)
 
     # Hermanos filtrados por cofradía y estado
-    hermanos = cofradia.hermanos.filter(estado=estado).order_by('apellidos', 'nombre')
+    hermanos = Hermano.objects.filter(estado=estado).order_by('apellidos', 'nombre')
 
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter),
@@ -1293,7 +1250,7 @@ def generar_pdf_hermanos_por_estado(cofradia, estado_nombre):
     style_normal = styles['Normal']
 
     # Encabezado
-    title = Paragraph(f"Hermanos con estado '{estado.nombre}' - Cofradía {cofradia.nombre}", style_title)
+    title = Paragraph(f"Hermanos con estado '{estado.nombre}' - Cofradía Expiración", style_title)
     fecha = Paragraph(f"Fecha de generación: {hoy.strftime('%d/%m/%Y')}", style_normal)
 
     # Datos básicos — ajusta columnas según lo que quieras mostrar
@@ -1337,8 +1294,7 @@ def lista_eventos(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    eventos = Evento.objects.filter(cofradia=cofradia).order_by('-fecha')
+    eventos = Evento.objects.all().order_by('-fecha')
     return render(request, 'eventos/lista_eventos.html', {'eventos': eventos})
 
 @login_required
@@ -1347,13 +1303,11 @@ def crear_evento(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
 
     if request.method == 'POST':
-        form = EventoForm(request.POST, cofradia=cofradia)
+        form = EventoForm(request.POST)
         if form.is_valid():
             evento = form.save(commit=False)
-            evento.cofradia = cofradia
             evento.save()
 
             if evento.tipo == 'reunion':
@@ -1362,7 +1316,7 @@ def crear_evento(request):
                 fecha_limite = hoy - timedelta(days=edad_mayor * 365.25)
 
                 # Hermanos activos, con DNI, con fecha nacimiento y mayores de edad
-                hermanos_primera_tabla = cofradia.hermanos.filter(
+                hermanos_primera_tabla = Hermano.objects.filter(
                     estado__nombre__iexact='activo',
                     dni__isnull=False,
                     dni__gt='',
@@ -1428,7 +1382,7 @@ def crear_evento(request):
             messages.success(request, f'Evento "{evento.nombre}" creado exitosamente.')
             return redirect('gestion_cofradia:lista_eventos')
     else:
-        form = EventoForm(cofradia=cofradia)
+        form = EventoForm()
 
     return render(request, 'eventos/crear_evento.html', {'form': form})
 
@@ -1438,7 +1392,7 @@ def ver_evento(request, evento_id):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    evento = get_object_or_404(Evento, pk=evento_id, cofradia=perfil.cofradia)
+    evento = get_object_or_404(Evento, pk=evento_id)
     return render(request, 'eventos/ver_evento.html', {'evento': evento})
 
 @login_required
@@ -1447,17 +1401,16 @@ def editar_evento(request, evento_id):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    evento = get_object_or_404(Evento, pk=evento_id, cofradia=perfil.cofradia)
-    cofradia = perfil.cofradia
+    evento = get_object_or_404(Evento, pk=evento_id)
     
     if request.method == 'POST':
-        form = EventoForm(request.POST, instance=evento, cofradia=cofradia)
+        form = EventoForm(request.POST, instance=evento)
         if form.is_valid():
             form.save()
             messages.success(request, f'Evento "{evento.nombre}" actualizado exitosamente.')
             return redirect('gestion_cofradia:ver_evento', evento_id=evento.id)
     else:
-        form = EventoForm(instance=evento, cofradia=cofradia)
+        form = EventoForm(instance=evento)
     return render(request, 'eventos/editar_evento.html', {'form': form, 'evento': evento})
 
 @login_required
@@ -1466,7 +1419,7 @@ def eliminar_evento(request, evento_id):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    evento = get_object_or_404(Evento, pk=evento_id, cofradia=perfil.cofradia)
+    evento = get_object_or_404(Evento, pk=evento_id)
     
     if request.method == 'POST':
         nombre_evento = evento.nombre
@@ -1484,8 +1437,7 @@ def lista_alquileres(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    alquileres = Alquiler.objects.filter(cofradia=cofradia).select_related('enser', 'hermano', 'evento').order_by('-fecha_entrega')
+    alquileres = Alquiler.objects.all().select_related('enser', 'hermano', 'evento').order_by('-fecha_entrega')
     return render(request, 'alquileres/lista_alquileres.html', {'alquileres': alquileres})
 
 @login_required
@@ -1494,8 +1446,7 @@ def ver_alquiler(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    alquiler = get_object_or_404(Alquiler, pk=pk, cofradia=cofradia)
+    alquiler = get_object_or_404(Alquiler, pk=pk)
     return render(request, 'alquileres/ver_alquiler.html', {'alquiler': alquiler})
 
 @login_required
@@ -1504,12 +1455,10 @@ def crear_alquiler(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
     if request.method == 'POST':
         form = AlquilerForm(request.POST)
         if form.is_valid():
             alquiler = form.save(commit=False)
-            alquiler.cofradia = cofradia
             alquiler.save()
             messages.success(request, 'Alquiler creado correctamente.')
             return redirect('gestion_cofradia:lista_alquileres')
@@ -1523,8 +1472,7 @@ def editar_alquiler(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    alquiler = get_object_or_404(Alquiler, pk=pk, cofradia=cofradia)
+    alquiler = get_object_or_404(Alquiler, pk=pk)
     if request.method == 'POST':
         form = AlquilerForm(request.POST, instance=alquiler)
         if form.is_valid():
@@ -1541,8 +1489,7 @@ def eliminar_alquiler(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
-    alquiler = get_object_or_404(Alquiler, pk=pk, cofradia=cofradia)
+    alquiler = get_object_or_404(Alquiler, pk=pk)
     if request.method == 'POST':
         alquiler.delete()
         messages.success(request, 'Alquiler eliminado correctamente.')
@@ -1557,9 +1504,8 @@ def lista_enseres(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
 
-    ensers = Enser.objects.filter(cofradia=cofradia).order_by('nombre')
+    ensers = Enser.objects.all().order_by('nombre')
     return render(request, 'enseres/lista_enseres.html', {'ensers': ensers})
 
 @login_required
@@ -1568,9 +1514,8 @@ def ver_enser(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
 
-    enser = get_object_or_404(Enser, pk=pk, cofradia=cofradia)
+    enser = get_object_or_404(Enser, pk=pk)
     return render(request, 'enseres/ver_enser.html', {'enser': enser})
 
 @login_required
@@ -1579,13 +1524,11 @@ def crear_enser(request):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
 
     if request.method == 'POST':
         form = EnserForm(request.POST)
         if form.is_valid():
             enser = form.save(commit=False)
-            enser.cofradia = cofradia
             enser.save()
             messages.success(request, f'Enser "{enser.nombre}" creado correctamente.')
             return redirect('gestion_cofradia:lista_enseres')
@@ -1599,9 +1542,8 @@ def editar_enser(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
 
-    enser = get_object_or_404(Enser, pk=pk, cofradia=cofradia)
+    enser = get_object_or_404(Enser, pk=pk)
     if request.method == 'POST':
         form = EnserForm(request.POST, instance=enser)
         if form.is_valid():
@@ -1618,11 +1560,60 @@ def borrar_enser(request, pk):
     perfil = request.user.perfil_set.first()
     if not perfil:
         return redirect('gestion_cofradia:login')
-    cofradia = perfil.cofradia
 
-    enser = get_object_or_404(Enser, pk=pk, cofradia=cofradia)
+    enser = get_object_or_404(Enser, pk=pk)
     if request.method == 'POST':
         enser.delete()
         messages.success(request, f'Enser "{enser.nombre}" borrado correctamente.')
         return redirect('gestion_cofradia:lista_enseres')
     return render(request, 'enseres/borrar_enser.html', {'enser': enser})
+
+
+#NOTICIAS
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def lista_noticias(request):
+    noticias = Noticia.objects.order_by("-fecha_publicacion")
+    return render(request, "noticias/lista_noticias.html", {"noticias": noticias})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def ver_noticia(request, pk):
+    noticia = get_object_or_404(Noticia, pk=pk)
+    return render(request, "noticias/ver_noticia.html", {"noticia": noticia})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def crear_noticia(request):
+    if request.method == "POST":
+        form = NoticiaForm(request.POST, request.FILES)
+        if form.is_valid():
+            noticia = form.save(commit=False)
+            noticia.save()
+            return redirect("gestion_cofradia:lista_noticias")
+    else:
+        form = NoticiaForm()
+    return render(request, "noticias/crear_noticia.html", {"form": form})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def editar_noticia(request, pk):
+    noticia = get_object_or_404(Noticia, pk=pk)
+    if request.method == "POST":
+        form = NoticiaForm(request.POST, request.FILES, instance=noticia)
+        if form.is_valid():
+            form.save()
+            return redirect("gestion_cofradia:lista_noticias")
+    else:
+        form = NoticiaForm(instance=noticia)
+    return render(request, "noticias/editar_noticia.html", {"form": form, "noticia": noticia})
+
+@login_required
+@role_required(roles_permitidos=['secretario', 'tesorero', 'hermano_mayor'])
+def eliminar_noticia(request, pk):
+    noticia = get_object_or_404(Noticia, pk=pk)
+    if request.method == "POST":
+        noticia.delete()
+        return redirect("gestion_cofradia:lista_noticias")
+    return render(request, "noticias/eliminar_noticia.html", {"noticia": noticia})
+

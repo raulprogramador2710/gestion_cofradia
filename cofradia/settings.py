@@ -49,8 +49,11 @@ INSTALLED_APPS = [
 
     'gestion_cofradia',
     'portal_hermano',
+    'web_publica',
 
     'widget_tweaks',
+    "crispy_forms",
+    "crispy_bootstrap4",
 ]
 
 MIDDLEWARE = [
@@ -121,7 +124,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login URLs
-LOGIN_URL = '/gestion_cofradia/login/'  # Para que admin funcione por defecto
+LOGIN_URL = '/gestioncofradia/login/'  # Para que admin funcione por defecto
 LOGIN_REDIRECT_URL = 'inicio'
 LOGOUT_REDIRECT_URL = 'login'
 
@@ -146,3 +149,6 @@ LOGGING = {
         },
     },
 }
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
